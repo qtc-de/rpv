@@ -24,19 +24,51 @@ on:
       - win/**
       - .github/workflows/build-docs.yml
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  build-docs:
+
+  build:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout ${{ github.event.repository.name }}
+        uses: actions/checkout@v3
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
       - name: Install V
         uses: vlang/setup-v@v1.3
-
-      - name: ${{ github.event.repository.name }}
-        uses: actions/checkout@v3
 
       - name: Build Docs
         run: |
           mkdir html
           rm -rf alternate examples
           v doc -all -f html -o html -m . .
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: 'html'
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    needs: build
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
