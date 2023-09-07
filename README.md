@@ -3,7 +3,7 @@
 </div>
 <br/>
 
-[![](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml/badge.svg?branch=master)](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml)
+[![](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml/badge.svg?branch=main)](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml)
 [![](https://github.com/qtc-de/rpv/actions/workflows/build-examples-dev.yml/badge.svg?branch=develop)](https://github.com/qtc-de/rpv/actions/workflows/build-examples-dev.yml)
 [![](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/qtc-de/rpv/releases)
 [![](https://img.shields.io/badge/programming%20language-v-blue)](https://vlang.io/)
