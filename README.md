@@ -8,7 +8,7 @@
 [![](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/qtc-de/rpv/releases)
 [![](https://img.shields.io/badge/programming%20language-v-blue)](https://vlang.io/)
 [![](https://img.shields.io/badge/license-GPL%20v3.0-blue)](https://github.com/qtc-de/rpv/blob/master/LICENSE)
-[![](https://img.shields.io/badge/documentation-fa6b05)](https://qtc-de.github.io/rpv)
+[![](https://img.shields.io/badge/docs-fa6b05)](https://qtc-de.github.io/rpv)
 
 *rpv* is a *v* library for analyzing *RPC* servers and interfaces
 on the *Windows* operating system. It is inspired by [RpcView](https://www.rpcview.org/)
