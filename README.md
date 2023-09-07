@@ -54,7 +54,7 @@ ported from *RpcView* to *v*.
 ----
 
 Detailed documentation for the defined methods and structures can be
-found within the auto generated [html docs](https://qtc-de.github.io).
+found within the auto generated [html docs](https://qtc-de.github.io/rpv/).
 A more usage oriented documentation does not exist at the time of
 writing. It is recommended to look at the [examples](/examples) folder
 or the [rpv-web](https://github.com/qtc-de/rpv-web) project to learn
