@@ -50,9 +50,9 @@ jobs:
 
       - name: Build Docs
         run: |
-          mkdir html
-          rm -rf alternate examples
-          v doc -all -f html -o html -m . .
+          mkdir html modules
+          mv internals ndr src utils win
+          v doc -all -f html -o html -m modules .
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
