@@ -51,7 +51,7 @@ jobs:
       - name: Build Docs
         run: |
           mkdir html modules
-          mv internals ndr src utils win
+          mv internals ndr src utils win modules
           v doc -all -f html -o html -m modules .
 
       - name: Upload artifact
