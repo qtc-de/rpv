@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="https://github.com/qtc-de/rpv/assets/49147108/89c49bf5-6f97-455e-b9e1-b38b27e58658"/>
 </div>
 <br/>
 
