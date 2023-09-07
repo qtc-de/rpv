@@ -3,8 +3,8 @@
 </div>
 <br/>
 
-[![](https://github.com/qtc-de/rpv/workflows/build%20examples/badge.svg?branch=master)](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml)
-[![](https://github.com/qtc-de/rpv/workflows/build%20examples%20dev/badge.svg?branch=develop)](https://github.com/qtc-de/rpv/actions/workflows/build-examples-dev.yml)
+[![](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml/badge.svg?branch=master)](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml)
+[![](https://github.com/qtc-de/rpv/actions/workflows/build-examples-dev.yml/badge.svg?branch=develop)](https://github.com/qtc-de/rpv/actions/workflows/build-examples-dev.yml)
 [![](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/qtc-de/rpv/releases)
 [![](https://img.shields.io/badge/programming%20language-v-blue)](https://vlang.io/)
 [![](https://img.shields.io/badge/license-GPL%20v3.0-blue)](https://github.com/qtc-de/rpv/blob/master/LICENSE)
