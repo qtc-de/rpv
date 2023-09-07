@@ -12,17 +12,6 @@ on:
       - utils/**
       - win/**
       - .github/workflows/build-docs.yml
-  pull_request:
-    branches:
-      - main
-    paths:
-      - alternate/**
-      - internals/**
-      - ndr/**
-      - src/**
-      - utils/**
-      - win/**
-      - .github/workflows/build-docs.yml
 
 permissions:
   contents: read
