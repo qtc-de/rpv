@@ -1,0 +1,42 @@
+name: Build Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - alternate/**
+      - internals/**
+      - ndr/**
+      - src/**
+      - utils/**
+      - win/**
+      - .github/workflows/build-docs.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - alternate/**
+      - internals/**
+      - ndr/**
+      - src/**
+      - utils/**
+      - win/**
+      - .github/workflows/build-docs.yml
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install V
+        uses: vlang/setup-v@v1.3
+
+      - name: ${{ github.event.repository.name }}
+        uses: actions/checkout@v3
+
+      - name: Build Docs
+        run: |
+          mkdir html
+          rm -rf alternate examples
+          v doc -all -f html -o html -m . .

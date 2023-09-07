@@ -1,0 +1,52 @@
+name: Build Examples Dev
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - Makefile
+      - alternate/**
+      - examples/**
+      - internals/**
+      - ndr/**
+      - src/**
+      - utils/**
+      - win/**
+      - .github/workflows/build-examples-dev.yml
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - Makefile
+      - alternate/**
+      - examples/**
+      - internals/**
+      - ndr/**
+      - src/**
+      - utils/**
+      - win/**
+      - .github/workflows/build-examples-dev.yml
+
+jobs:
+  build-examples:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install V
+        uses: vlang/setup-v@v1.3
+        with:
+          version: '0.4'
+
+      - name: Install mingw
+        run: |
+          sudo apt install -y gcc-mingw-w64
+
+      - name: ${{ github.event.repository.name }}
+        uses: actions/checkout@v3
+
+      - name: Build Examples
+        run: |
+          mkdir -p ~/.vmodules
+          ln -s $(pwd) ~/.vmodules/
+          make all
