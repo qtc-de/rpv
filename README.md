@@ -49,6 +49,51 @@ only the struct definitions for the most recent *Windows* releases were
 ported from *RpcView* to *v*.
 
 
+### Qickstart
+
+----
+
+The following listing shows an example on how the library can be used to
+enumerate *RPC* servers and interfaces. More examples can be found within
+[examples](/examples) folder.
+
+```v
+import qtc_de.rpv
+
+fn main()
+{
+	infos := rpv.get_rpv_process_infos() or { panic(err) }
+
+	for info in infos
+	{
+		if info.rpc_info.rpc_type in [.no_rpc, .wrong_arch]
+		{
+			continue
+		}
+
+		println('[+]')
+		println('[+] Process Name: ${info.name}')
+		println('[+] PID         : ${info.pid}')
+		println('[+] User        : ${info.user}')
+		println('[+] Path        : ${info.path}')
+		println('[+] RPC Endpoints:')
+
+		for endpoint in info.rpc_info.server_info.endpoints
+		{
+			println('[+]\t ${endpoint.protocol} - ${endpoint.name}')
+		}
+
+		println('[+] RPC Interfaces:')
+
+		for intf in info.rpc_info.interface_infos
+		{
+            println('[+]\t ${intf.id} (${intf.methods.len} methods)')
+		}
+	}
+}
+```
+
+
 ### Documentation
 
 ----
