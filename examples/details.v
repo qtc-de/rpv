@@ -1,8 +1,8 @@
 module main
 
 import os
-import rpv
 import flag
+import qtc_de.rpv
 
 fn main()
 {

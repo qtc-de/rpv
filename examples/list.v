@@ -1,6 +1,6 @@
 module main
 
-import rpv
+import qtc_de.rpv
 
 /*
  * This example attempts to list all running processes that
