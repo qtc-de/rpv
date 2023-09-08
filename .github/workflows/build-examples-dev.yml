@@ -47,6 +47,6 @@ jobs:
 
       - name: Build Examples
         run: |
-          mkdir -p ~/.vmodules
+          mkdir -p ~/.vmodules/qtc_de/
           ln -s $(pwd) ~/.vmodules/qtc_de/rpv
           make all
