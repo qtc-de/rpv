@@ -69,6 +69,17 @@ In future, *rpv* will probably extended to also work for analyzing *RPC*
 servers and interfaces from files without running processes.
 
 
+### Disclaimer
+
+----
+
+*rpv* should not be used to create applications that are accessible by untrusted clients.
+The library contains several *unsafe* code blocks, that bypass the memory safety features
+of *v*. This is required, to get the *C* interop working, but may introduce well known
+memory corruption bugs. Therefore, the library should only be used for local research
+projects and should not be used for applications that are exposed to untrusted clients.
+
+
 ### Acknowledgments
 
 ----
