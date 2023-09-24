@@ -1,22 +1,10 @@
 name: Build Examples Dev
 
 on:
+  pull_request:
   push:
     branches:
-      - develop
-    paths:
-      - Makefile
-      - alternate/**
-      - examples/**
-      - internals/**
-      - ndr/**
-      - src/**
-      - utils/**
-      - win/**
-      - .github/workflows/build-examples-dev.yml
-  pull_request:
-    branches:
-      - develop
+      - dev
     paths:
       - Makefile
       - alternate/**
@@ -35,8 +23,6 @@ jobs:
     steps:
       - name: Install V
         uses: vlang/setup-v@v1.3
-        with:
-          version: '0.4'
 
       - name: Install mingw
         run: |

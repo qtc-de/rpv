@@ -1,20 +1,8 @@
 name: Build Examples
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - Makefile
-      - alternate/**
-      - examples/**
-      - internals/**
-      - ndr/**
-      - src/**
-      - utils/**
-      - win/**
-      - .github/workflows/build-examples.yml
   pull_request:
+  push:
     branches:
       - main
     paths:
@@ -35,8 +23,6 @@ jobs:
     steps:
       - name: Install V
         uses: vlang/setup-v@v1.3
-        with:
-          version: '0.4'
 
       - name: Install mingw
         run: |
