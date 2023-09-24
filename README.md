@@ -29,7 +29,7 @@ Assuming that *v* [is installed](https://github.com/vlang/v#installing-v-from-so
 installing *rpv* can be done using the following command:
 
 ```console
-[user@host ~]$ v install qtc.rpv
+[user@host ~]$ v install qtc_de.rpv
 ```
 
 After installation, *rpv* can be used to analyze *RPC* servers and
