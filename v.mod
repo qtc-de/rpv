@@ -2,7 +2,7 @@ Module
 {
     name: 'rpv'
     author: 'Tobias Neitzel (@qtc_de)'
-    version: '1.0.0'
+    version: '1.0.1'
     repo_url: 'https://github.com/qtc-de/rpv'
     vcs: 'git'
     tags: ['rpc', 'rpv', 'rpv-web', 'rpcview']
