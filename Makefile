@@ -1,4 +1,4 @@
-Options := -os windows
+Options := -os windows -prod
 x64RpcInternals := alternate/default-x64.v
 x86RpcInternals := alternate/default-x86.v
 RpcInternals := internals/rpc-internal-structs.v
