@@ -4,8 +4,8 @@
 <br/>
 
 [![](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml/badge.svg?branch=main)](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml)
-[![](https://github.com/qtc-de/rpv/actions/workflows/build-examples-dev.yml/badge.svg?branch=develop)](https://github.com/qtc-de/rpv/actions/workflows/build-examples-dev.yml)
-[![](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/qtc-de/rpv/releases)
+[![](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml/badge.svg?branch=dev)](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml)
+[![](https://img.shields.io/badge/version-1.0.1-blue)](https://github.com/qtc-de/rpv/releases)
 [![](https://img.shields.io/badge/programming%20language-v-blue)](https://vlang.io/)
 [![](https://img.shields.io/badge/license-GPL%20v3.0-blue)](https://github.com/qtc-de/rpv/blob/master/LICENSE)
 [![](https://img.shields.io/badge/docs-fa6b05)](https://qtc-de.github.io/rpv)
@@ -29,7 +29,7 @@ Assuming that *v* [is installed](https://github.com/vlang/v#installing-v-from-so
 installing *rpv* can be done using the following command:
 
 ```console
-[user@host ~]$ v install qtc.rpv
+[user@host ~]$ v install qtc_de.rpv
 ```
 
 After installation, *rpv* can be used to analyze *RPC* servers and
