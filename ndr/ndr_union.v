@@ -40,7 +40,7 @@ pub fn (mut context NdrContext) read_arm_type(mut addr &voidptr)! NdrType
 {
 	typ := context.read[u16](mut addr)!
 
-	if (typ & 0xFF00 == 0x8000 || typ == 0)
+	if (typ & 0xFF00 == 0x8000) || typ == 0
 	{
 		return NdrSimpleType {
 			format: unsafe { NdrFormatChar(typ & 0xFF) }
