@@ -63,6 +63,8 @@ type REGSAM = int
 type SIZE_T = u32
 type ULONGLONG = u64
 type PCSTR = &char
+type NTSTATUS = u32
+type KPRIORITY = u32
 
 // Arch represents an CPU architecture. Architectures can be x86
 // x64 or are unknown.
@@ -152,6 +154,16 @@ pub enum SID_NAME_USE {
 // here to get access to it.
 pub struct PS_PROTECTION {
 	level u8
+}
+
+// C.RGBQUAD represents the well known RGBQUAD struct from widows. In rpv
+// it is not used, but definition is required for C interop.
+[typedef]
+pub struct C.RGBQUAD {
+	rgbBlue		BYTE
+	rgbGreen	BYTE
+	rgbRed		BYTE
+	rgbReserved	BYTE
 }
 
 // C.GUID represents the well known GUID struct from widows. In rpv,
@@ -447,10 +459,10 @@ pub struct C.UNICODE_STRING_WOW64 {
 // it to find the process environment block of a process.
 [typedef]
 pub struct C.PROCESS_BASIC_INFORMATION {
-	ExitStatus C.NTSTATUS
+	ExitStatus NTSTATUS
 	PebBaseAddress &C.PEB = unsafe { nil }
 	AffinityMask PULONG
-	BasePriority C.KPRIORITY
+	BasePriority KPRIORITY
 	UniqueProcessId PULONG
 	InheritedFromUniqueProcessId PULONG
 }
@@ -459,10 +471,10 @@ pub struct C.PROCESS_BASIC_INFORMATION {
 // it to find the process environment block of a x64 process when running as x32.
 [typedef]
 pub struct C.PROCESS_BASIC_INFORMATION_WOW64 {
-	ExitStatus C.NTSTATUS
+	ExitStatus NTSTATUS
 	PebBaseAddress u64
 	AffinityMask u64
-	BasePriority C.KPRIORITY
+	BasePriority KPRIORITY
 	UniqueProcessId u64
 	InheritedFromUniqueProcessId u64
 }
