@@ -716,22 +716,21 @@ pub struct C.BITMAPFILEHEADER {
 	bfOffBits DWORD
 }
 
-// C.SYSTEM_INFO contains information on the currently operating system
+// SYSTEM_INFO contains information on the currently operating system
 // and the underlying hardware. rpv uses it, to obtain the process
 // architecture.
-[typedef]
-pub struct C.SYSTEM_INFO {
-	wProcessorArchitecture WORD
-	wReserved WORD
-	dwPageSize DWORD
-	lpMinimumApplicationAddress LPVOID
-	lpMaximumApplicationAddress LPVOID
-	dwActiveProcessorMask &DWORD = unsafe { nil }
-	dwNumberOfProcessors DWORD
-	dwProcessorType DWORD
-	dwAllocationGranularity DWORD
-	wProcessorLevel WORD
-	wProcessorRevision WORD
+pub struct SYSTEM_INFO {
+	processor_architecture WORD
+	reserved WORD
+	page_size DWORD
+	minimum_application_address LPVOID
+	maximum_application_address LPVOID
+	active_processor_mask &DWORD = unsafe { nil }
+	number_of_processors DWORD
+	processor_type DWORD
+	allocation_granularity DWORD
+	processor_level WORD
+	processor_revision WORD
 }
 
 pub const (
@@ -1730,11 +1729,11 @@ pub fn icon_to_bmp(icon HANDLE)! string
 pub fn get_process_arch(process_handle HANDLE)! Arch
 {
 	mut wow64 := false
-	system_info := C.SYSTEM_INFO{}
+	system_info := SYSTEM_INFO{}
 
 	C.GetNativeSystemInfo(&system_info)
 
-	if system_info.wProcessorArchitecture == C.PROCESSOR_ARCHITECTURE_INTEL
+	if system_info.processor_architecture == C.PROCESSOR_ARCHITECTURE_INTEL
 	{
 		return Arch.x86
 	}
@@ -1897,7 +1896,7 @@ fn C.GetLastError() DWORD
 fn C.GetLogicalDrives() DWORD
 fn C.GetMappedFileNameA(process_handle HANDLE, addr LPVOID, filename &char, size DWORD) DWORD
 fn C.GetModuleFileNameExA(process_handle HANDLE, module_handle_array HANDLE, filename LPSTR, size DWORD) DWORD
-fn C.GetNativeSystemInfo(system_info &C.SYSTEM_INFO)
+fn C.GetNativeSystemInfo(system_info &SYSTEM_INFO)
 fn C.GetObject(h HANDLE, c int, pv LPVOID) int
 fn C.GetProcessId(process_handle HANDLE) DWORD
 fn C.GetSystemDirectoryA(buffer LPSTR, size UINT) UINT
