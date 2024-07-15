@@ -29,6 +29,18 @@ pub struct NdrPointer {
 	flags NdrPointerFlags
 }
 
+// new creates a new instance of NdrPointer. A constructor for this type was
+// defined, because it is also initialized from other modules which are not able
+// to access the private format property.
+pub fn NdrPointer.new(format NdrFormatChar, ref NdrType, flags NdrPointerFlags) NdrPointer
+{
+	return NdrPointer {
+		format: format
+		ref: ref
+		flags: flags
+	}
+}
+
 // attrs returns an array of NdrAttr that is associated to the
 // NdrPointer type. This includes attributes that are associated
 // to the pointer itself, as well as attributes that are associated

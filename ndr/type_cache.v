@@ -24,6 +24,7 @@ interface ComplexType {
 // decompilation, the types member contains all complex types that have
 // been encountered within an interface. This allows easy formatting of
 // decompilation results.
+@[heap]
 pub struct TypeCache {
 	mut:
 	type_map map[string]NdrType

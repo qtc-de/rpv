@@ -17,6 +17,19 @@ pub struct NdrContext {
 	type_cache &TypeCache
 }
 
+// newNdrContext creates a new NdrContext. The main reason why we have a constructor
+// here is to leave the struct fields access modifiers untouched. In newer v releases,
+// initializing private struct fields seems only possible using a constructor.
+pub fn NdrContext.new(handle win.HANDLE, stub_desc C.MIDL_STUB_DESC, flags NdrInterpreterOptFlags2, mut cache &TypeCache) NdrContext
+{
+	return NdrContext {
+		process_handle: handle
+		stub_desc: stub_desc
+		flags: flags
+		type_cache: cache
+	}
+}
+
 // read attempts to read the type <T> from process memory at the specified
 // address. If successfully, a newly created <T> type is returned. How many
 // bytes to read is determined by the structure size of <T>. Notice that

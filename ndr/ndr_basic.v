@@ -283,6 +283,14 @@ pub struct NdrSimpleType {
 	NdrBaseType
 }
 
+// new creates a new instance of NdrSimpleType. A constructor for this type was
+// defined, because it is also initialized from other modules which are not able
+// to access the private format property.
+pub fn NdrSimpleType.new(format NdrFormatChar) NdrSimpleType
+{
+	return NdrSimpleType { format: format }
+}
+
 // format returns the string representation of NdrSimpleType. This is always the
 // same as the result of calling the format method on the underlying NdrBaseType.
 pub fn (simple_type NdrSimpleType) format() string

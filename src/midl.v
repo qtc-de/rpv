@@ -259,7 +259,7 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 			context_type := win.read_proc_mem[u8](process_handle, mut &ptr)!
 			context_flags := win.read_proc_mem[ndr.NdrHandleParamFlags](process_handle, mut &ptr)!
 			handle_offset := win.read_proc_mem[u16](process_handle, mut &ptr)!
-			param_type := ndr.NdrType(ndr.NdrSimpleType { format: ndr.NdrFormatChar(context_type) })
+			param_type := ndr.NdrType(ndr.NdrSimpleType.new(ndr.NdrFormatChar(context_type)))
 
 			utils.log_debug('Function bind type is 0x${context_type.hex()}')
 
@@ -288,11 +288,7 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 
 			if context_flags.has(.handle_param_is_via_ptr)
 			{
-				param_type = ndr.NdrPointer{
-					format: ndr.NdrFormatChar.fc_pointer
-					ref: param_type
-					flags: ndr.NdrPointerFlags.fc_simple_pointer
-				}
+				param_type = ndr.NdrPointer.new(ndr.NdrFormatChar.fc_pointer, param_type, ndr.NdrPointerFlags.fc_simple_pointer)
 			}
 
 			handle = ndr.NdrHandleParam {
@@ -314,7 +310,7 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 				NdrBasicParam: ndr.NdrBasicParam {
 					name: 'binding'
 					attrs: .is_binding
-					typ: ndr.NdrSimpleType{ format: ndr.NdrFormatChar(handle_type) }
+					typ: ndr.NdrSimpleType.new(ndr.NdrFormatChar(handle_type))
 					offset: 0
 				}
 				flags: ndr.NdrHandleParamFlags(0)
@@ -352,12 +348,7 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 			}
 		}
 
-		context := ndr.NdrContext {
-			process_handle: process_handle
-			stub_desc: intf.midl_stub_desc
-			flags: header_exts.flags
-			type_cache: type_cache
-		}
+		context := ndr.NdrContext.new(process_handle, intf.midl_stub_desc, header_exts.flags, mut type_cache)
 
 		param_list := []ndr.NdrBasicParam{cap: int(arg_num) + 1}
 		utils.log_debug('Parsing ${arg_num} procedure parameters at ${voidptr(intf.midl_stub_desc.pFormatTypes)}.')
