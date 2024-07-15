@@ -166,6 +166,14 @@ pub struct C.RGBQUAD {
 	rgbReserved	BYTE
 }
 
+// C.RGBQUAD represents the well known COMM_FAULT_OFFSETS struct from widows.
+// In rpv it is not used, but definition is required for C interop.
+[typedef]
+pub struct C.COMM_FAULT_OFFSETS {
+	CommOffset	u16
+	FaultOffset u16
+}
+
 // C.GUID represents the well known GUID struct from widows. In rpv,
 // it is used for different purposes. Mainly to identify RPC interfaces,
 // that all contain GUIDs as part of their internal definition.

@@ -151,13 +151,13 @@ pub struct C.MIDL_STUB_DESC {
 	MIDLVersion       u32
 	CommFaultOffsets  &C.COMM_FAULT_OFFSETS = unsafe { nil }
 	// New fields for version 3.0+
-	aUserMarshalQuadruple &C.USER_MARSHAL_ROUTINE_QUADRUPLE = unsafe { nil }
+	aUserMarshalQuadruple voidptr = unsafe { nil }
 	// Notify routines - added for NT5, MIDL 5.0
-	NotifyRoutineTable &C.NDR_NOTIFY_ROUTINE = unsafe { nil }
+	NotifyRoutineTable voidptr = unsafe { nil }
 	// Reserved for future use.
 	mFlags &u32 = unsafe { nil }
 	// International support routines - added for 64bit post NT5
-	CsRoutineTables &C.NDR_CS_ROUTINES = unsafe { nil }
+	CsRoutineTables voidptr = unsafe { nil }
 	Reserved4       voidptr = unsafe { nil }
 	Reserved5       voidptr = unsafe { nil } // mIDA: expr_table - RpcView: pExprInfo
 	// Fields up to now present in win2000 release.
