@@ -158,7 +158,7 @@ pub struct PS_PROTECTION {
 
 // C.RGBQUAD represents the well known RGBQUAD struct from widows. In rpv
 // it is not used, but definition is required for C interop.
-[typedef]
+@[typedef]
 pub struct C.RGBQUAD {
 	rgbBlue		BYTE
 	rgbGreen	BYTE
@@ -168,7 +168,7 @@ pub struct C.RGBQUAD {
 
 // C.RGBQUAD represents the well known COMM_FAULT_OFFSETS struct from widows.
 // In rpv it is not used, but definition is required for C interop.
-[typedef]
+@[typedef]
 pub struct C.COMM_FAULT_OFFSETS {
 	CommOffset	u16
 	FaultOffset u16
@@ -177,7 +177,7 @@ pub struct C.COMM_FAULT_OFFSETS {
 // C.GUID represents the well known GUID struct from widows. In rpv,
 // it is used for different purposes. Mainly to identify RPC interfaces,
 // that all contain GUIDs as part of their internal definition.
-[typedef]
+@[typedef]
 pub struct C.GUID {
 	Data1 u32
 	Data2 u16
@@ -208,7 +208,7 @@ pub fn (this C.GUID) equals(other C.GUID) bool
 // C.IMAGE_DOS_HEADER is a well known header that can be found in PE files.
 // rpv is especially interested in the e_lfanew member, as this contains the
 // offset to the C.IMAGE_NT_HEADERS.
-[typedef]
+@[typedef]
 pub struct C.IMAGE_DOS_HEADER {
 	e_magic WORD
 	e_cblp WORD
@@ -252,7 +252,7 @@ pub struct IMAGE_SECTION_HEADER {
 // C.IMAGE_NT_HEADERS represents the PE header format. rpv uses it to determine
 // the architecture the PE was compiled for and to locate the different sections
 // within the PE file.
-[typedef]
+@[typedef]
 pub struct C.IMAGE_NT_HEADERS {
 	Signature DWORD
 	FileHeader C.IMAGE_FILE_HEADER
@@ -261,7 +261,7 @@ pub struct C.IMAGE_NT_HEADERS {
 
 // C.IMAGE_OPTIONAL_HEADER is actually not used by rpv and is only defined to
 // complete the C.IMAGE_NT_HEADERS struct definition.
-[typedef]
+@[typedef]
 pub struct C.IMAGE_OPTIONAL_HEADER {
 	Magic WORD
 	MajorLinkerVersion BYTE
@@ -299,7 +299,7 @@ pub struct C.IMAGE_OPTIONAL_HEADER {
 // C.IMAGE_NT_HEADERS32 represents the PE header format. rpv uses it to determine
 // the architecture the PE was compiled for and to locate the different sections
 // within the PE file.
-[typedef]
+@[typedef]
 pub struct C.IMAGE_NT_HEADERS32 {
 	Signature DWORD
 	FileHeader C.IMAGE_FILE_HEADER
@@ -308,7 +308,7 @@ pub struct C.IMAGE_NT_HEADERS32 {
 
 // C.IMAGE_OPTIONAL_HEADER32 is actually not used by rpv and is only defined to
 // complete the C.IMAGE_NT_HEADERS32 struct definition.
-[typedef]
+@[typedef]
 pub struct C.IMAGE_OPTIONAL_HEADER32 {
 	Magic WORD
 	MajorLinkerVersion BYTE
@@ -345,7 +345,7 @@ pub struct C.IMAGE_OPTIONAL_HEADER32 {
 
 // C.IMAGE_DATA_DIRECTORY represents a data directory. This struct is actually
 // not used by rpv, but defined to complete the C.IMAGE_OPTIONAL_HEADER struct.
-[typedf]
+@[typedf]
 pub struct C.IMAGE_DATA_DIRECTORY
 {
 	VirtualAddress DWORD
@@ -355,7 +355,7 @@ pub struct C.IMAGE_DATA_DIRECTORY
 // C.IMAGE_FILE_HEADER represents the COFF header and is used by rpv to
 // obtain the architecture the PE was compiled for and the number of it's
 // contained sections.
-[typedef]
+@[typedef]
 pub struct C.IMAGE_FILE_HEADER {
 	Machine WORD
 	NumberOfSections WORD
@@ -379,7 +379,7 @@ pub struct ModuleSectionInfo{
 
 // C.SHFILEINFOA contains information on a file object. rpv uses this struct
 // to obtain a handle to the icon of a file.
-[typedef]
+@[typedef]
 pub struct C.SHFILEINFOA {
 	hIcon	voidptr
 	iIcon int
@@ -390,7 +390,7 @@ pub struct C.SHFILEINFOA {
 
 // C.PEB is the well known process environment block struct. rpv uses it to
 // to obtain the cmdline a process was started with.
-[typedef]
+@[typedef]
 pub struct C.PEB {
 	Reserved1 [2]BYTE
 	BeingDebugged BYTE
@@ -416,7 +416,7 @@ pub struct C.PEB {
 // C.PEB64 is the well known process environment block struct. rpv uses it to
 // to obtain the cmdline a process was started with. Not all fields of the
 // struct were defined, as access is only required to the first few fields.
-[typedef]
+@[typedef]
 pub struct C.PEB64 {
 	Reserved1 [4]BYTE
 	Reserved2 [2]u64
@@ -426,7 +426,7 @@ pub struct C.PEB64 {
 
 // C.RTL_USER_PROCESS_PARAMETERS is contained within the PEB structures and
 // can be used to retrieve the cmdline of a process.
-[typedef]
+@[typedef]
 pub struct C.RTL_USER_PROCESS_PARAMETERS {
 	Reserved1 [16]BYTE
 	Reserved2 [10]PVOID
@@ -437,7 +437,7 @@ pub struct C.RTL_USER_PROCESS_PARAMETERS {
 // C.RTL_USER_PROCESS_PARAMETERS_WOW64 is contained within the PEB structures and
 // can be used to retrieve the cmdline of a process. This version of the struct
 // is required when accessing an x64 process from a x32 process.
-[typedef]
+@[typedef]
 pub struct C.RTL_USER_PROCESS_PARAMETERS_WOW64 {
 	Reserved1 [16]BYTE
 	Reserved2 [10]u64
@@ -446,7 +446,7 @@ pub struct C.RTL_USER_PROCESS_PARAMETERS_WOW64 {
 }
 
 // C.UNICODE_STRING is a well known struct to represent a unicode string.
-[typedef]
+@[typedef]
 pub struct C.UNICODE_STRING {
    Length USHORT
    MaximumLength USHORT
@@ -456,7 +456,7 @@ pub struct C.UNICODE_STRING {
 // C.UNICODE_STRING_WOW64 is a well known struct to represent a unicode string.
 // This version of the struct is required by C.RTL_USER_PROCESS_PARAMETERS_WOW64,
 // that is used when reading x64 command line arguments from a x32 process.
-[typedef]
+@[typedef]
 pub struct C.UNICODE_STRING_WOW64 {
    Length USHORT
    MaximumLength USHORT
@@ -465,7 +465,7 @@ pub struct C.UNICODE_STRING_WOW64 {
 
 // C.PROCESS_BASIC_INFORMATION is another well known Windows structure. rpv uses
 // it to find the process environment block of a process.
-[typedef]
+@[typedef]
 pub struct C.PROCESS_BASIC_INFORMATION {
 	ExitStatus NTSTATUS
 	PebBaseAddress &C.PEB = unsafe { nil }
@@ -477,7 +477,7 @@ pub struct C.PROCESS_BASIC_INFORMATION {
 
 // C.PROCESS_BASIC_INFORMATION_WOW64 is another well known Windows structure. rpv uses
 // it to find the process environment block of a x64 process when running as x32.
-[typedef]
+@[typedef]
 pub struct C.PROCESS_BASIC_INFORMATION_WOW64 {
 	ExitStatus NTSTATUS
 	PebBaseAddress u64
@@ -490,7 +490,7 @@ pub struct C.PROCESS_BASIC_INFORMATION_WOW64 {
 // C.LARGE_INTEGER represents a 64bit integer value. Module version information is
 // represented by this struct. The definition actually contains a union, which needs
 // to be expressed as plain struct members in v at the time of writing.
-[typedef]
+@[typedef]
 pub union C.LARGE_INTEGER {
 	mut:
 	LowPart DWORD
@@ -501,7 +501,7 @@ pub union C.LARGE_INTEGER {
 // C.LUID is described by Microsoft as local identifier. It is used when working
 // witch process privileges. rpv needs it, to enable debug privileges for the
 // current process.
-[typedef]
+@[typedef]
 pub struct C.LUID {
 	mut:
 	LowPart DWORD
@@ -510,7 +510,7 @@ pub struct C.LUID {
 
 // C.LUID_AND_ATTRIBUTES merges a C.LUID struct with it's associated attributes.
 // This struct is used within the C.TOKEN_PRIVILEGES struct.
-[typedef]
+@[typedef]
 pub struct C.LUID_AND_ATTRIBUTES {
 	mut:
 	  Luid C.LUID
@@ -518,7 +518,7 @@ pub struct C.LUID_AND_ATTRIBUTES {
 }
 
 // C.TOKEN_PRIVILEGES contains information on privileges that are held by a token.
-[typedef]
+@[typedef]
 pub struct C.TOKEN_PRIVILEGES {
 	mut:
 	PrivilegeCount DWORD
@@ -527,14 +527,14 @@ pub struct C.TOKEN_PRIVILEGES {
 
 // C.TOKEN_USER contains information on the user that is associated with an access
 // token.
-[typedef]
+@[typedef]
 pub struct C.TOKEN_USER {
 	User C.SID_AND_ATTRIBUTES
 }
 
 // C.SID_AND_ATTRIBUTES is contained in C.TOKEN_USER and is used to obtain
 // information on the user an access token is associated with.
-[typedef]
+@[typedef]
 pub struct C.SID_AND_ATTRIBUTES {
 	Sid PSID
 	Attributes DWORD
@@ -542,13 +542,13 @@ pub struct C.SID_AND_ATTRIBUTES {
 
 // C.SID is the well known security identifier structure. It is used to
 // identify groups and users.
-[typedef]
+@[typedef]
 pub struct C.SID {
 }
 
 // C.PROCESSENTRY32 is used when creating snapshots. It is one entry in the
 // list of processes, that were available when the snapshot was taken.
-[typedef]
+@[typedef]
 pub struct C.PROCESSENTRY32 {
 	dwSize DWORD
 	cntUsage DWORD
@@ -564,7 +564,7 @@ pub struct C.PROCESSENTRY32 {
 
 // C.MODULEENTRY32 is used when creating snapshots. It is one entry of a
 // module list from a process.
-[typedef]
+@[typedef]
 pub struct C.MODULEENTRY32 {
 	dwSize DWORD
 	th32ModuleID DWORD
@@ -580,7 +580,7 @@ pub struct C.MODULEENTRY32 {
 
 // C.VS_FIXEDFILEINFO contains version information of a file. rpv uses
 // this struct to obtain the module version of a file.
-[typedef]
+@[typedef]
 pub struct C.VS_FIXEDFILEINFO {
 	dwSignature DWORD
 	dwStrucVersion DWORD
@@ -599,7 +599,7 @@ pub struct C.VS_FIXEDFILEINFO {
 
 // C.SecPkgInfoA describes a security package. Security packages can be
 // associated with RPC servers and rpv uses this struct to determine this.
-[typedef]
+@[typedef]
 pub struct C.SecPkgInfoA {
 	fCapabilities u32
 	wVersion u16
@@ -611,7 +611,7 @@ pub struct C.SecPkgInfoA {
 
 // C.MEMORY_BASIC_INFORMATION contains information about a specific memory
 // region within the virtual address space.
-[typedef]
+@[typedef]
 pub struct C.MEMORY_BASIC_INFORMATION {
 	BaseAddress PVOID
 	AllocationBase PVOID
@@ -657,7 +657,7 @@ pub struct LocationInfo {
 }
 
 // C.ICONINFO contains icon information.
-[typedef]
+@[typedef]
 pub struct C.ICONINFO {
 	fIcon bool
 	xHotspot u32
@@ -668,7 +668,7 @@ pub struct C.ICONINFO {
 
 // C.BITMAP describes an array of bytes that forms an icon. When processing
 // file system icons, this type is used to encode the icons.
-[typedef]
+@[typedef]
 pub struct C.BITMAP {
 	mut:
 	bmType int
@@ -714,7 +714,7 @@ pub struct BITMAPV4INFOHEADER {
 }
 
 // BITMAPFILEHEADER describes the first few bytes of a bitmap file.
-[typedef]
+@[typedef]
 pub struct C.BITMAPFILEHEADER {
 	mut:
 	bfType WORD

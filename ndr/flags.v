@@ -3,7 +3,7 @@ module ndr
 // NdrFlags contains additional information for NDR data.
 // Especially the has_return value is important for rpv,
 // as it indicates whether a method returns a value.
-[flag]
+@[flag]
 pub enum NdrFlags as u8
 {
 	server_must_size
@@ -19,7 +19,7 @@ pub enum NdrFlags as u8
 // NdrInterpreterOptFlags2 contains additional information
 // on how to interpret NDR data. rpv needs this struct to
 // determine how specific NDR types need to be parsed.
-[flag]
+@[flag]
 pub enum NdrInterpreterOptFlags2 as u8
 {
 	has_new_corr_desc

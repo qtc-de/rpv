@@ -6,7 +6,7 @@ import internals
 // NdrPointerFlags contains a list of flags that can be set for
 // NdrPointer types. These flags add additional information to
 // the pointer that can be used during parsing and formatting.
-[flag]
+@[flag]
 pub enum NdrPointerFlags as u8
 {
 	fc_allocate_all_nodes

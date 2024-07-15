@@ -86,7 +86,7 @@ pub:
 
 // C.RPC_IF_ID represents an ID of an RPC interface. This is basically an GUID
 // but also contains a major and minor version.
-[typedef]
+@[typedef]
 pub struct C.RPC_IF_ID {
 	Uuid      C.GUID
 	VersMajor u16
@@ -103,7 +103,7 @@ pub fn (this C.RPC_IF_ID) equals(other C.RPC_IF_ID) bool
 // C.RPC_DISPATCH_TABLE contains information on the defined RPC methods of an
 // RPC interface. rpv uses it to determine the method count, that can be obtained
 // from the DispatchTableCount property.
-[typedef]
+@[typedef]
 pub struct C.RPC_DISPATCH_TABLE {
 	DispatchTableCount u32
 	DispatchTable      voidptr
@@ -116,7 +116,7 @@ pub struct C.RPC_DISPATCH_TABLE {
 // formatting of these methods. This is used in conjunction with the FmtStringOffset
 // property, which contains the offset of the different methods within the ProcString,
 // to decompile RPC methods.
-[typedef]
+@[typedef]
 pub struct C.MIDL_SERVER_INFO {
 	pStubDesc       &C.MIDL_STUB_DESC = unsafe { nil }
 	DispatchTable   &voidptr     = unsafe { nil }
@@ -133,7 +133,7 @@ pub struct C.MIDL_SERVER_INFO {
 // by the RPC methods of the corresponding interface. rpv uses this information to decompile
 // RPC methods. Moreover, Reserved5 is required for parsing NDR expressions. Actually the
 // member is named pExprInfo by Microsoft, but within the mingw libraries it is Reserved5.
-[typedef]
+@[typedef]
 pub struct C.MIDL_STUB_DESC {
 	RpcInterfaceInformation     voidptr = unsafe { nil }
 	pfnAllocate                 voidptr = unsafe { nil }
@@ -173,7 +173,7 @@ pub struct NDR_EXPR_DESC {
 
 // C.MIDL_SYNTAX_INFO is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
-[typedef]
+@[typedef]
 pub struct C.MIDL_SYNTAX_INFO {
 	TransferSyntax        C.RPC_SYNTAX_IDENTIFIER
 	DispatchTable         &C.RPC_DISPATCH_TABLE
@@ -186,7 +186,7 @@ pub struct C.MIDL_SYNTAX_INFO {
 
 // C.MIDL_INTERFACE_METHOD_PROPERTIES is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
-[typedef]
+@[typedef]
 pub struct C.MIDL_INTERFACE_METHOD_PROPERTIES {
 	MethodCount      u16
 	MethodProperties &C.MIDL_METHOD_PROPERTY_MAP
@@ -194,7 +194,7 @@ pub struct C.MIDL_INTERFACE_METHOD_PROPERTIES {
 
 // C.MIDL_METHOD_PROPERTY_MAP is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
-[typedef]
+@[typedef]
 pub struct C.MIDL_METHOD_PROPERTY_MAP {
 	count      u32
 	Properties &C.MIDL_METHOD_PROPERTY
@@ -202,7 +202,7 @@ pub struct C.MIDL_METHOD_PROPERTY_MAP {
 
 // C.MIDL_METHOD_PROPERTY is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
-[typedef]
+@[typedef]
 pub struct C.MIDL_METHOD_PROPERTY {
 	Id    u32
 	value usize
@@ -210,7 +210,7 @@ pub struct C.MIDL_METHOD_PROPERTY {
 
 // C.UUID_VECTOR is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
-[typedef]
+@[typedef]
 pub struct C.UUID_VECTOR {
 	Count u32
 	Uuid  [1]&C.GUID
@@ -218,7 +218,7 @@ pub struct C.UUID_VECTOR {
 
 // C.RPC_SYNTAX_IDENTIFIER is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
-[typedef]
+@[typedef]
 pub struct C.RPC_SYNTAX_IDENTIFIER {
 	SyntaxGUID    C.GUID
 	SyntaxVersion C.RPC_VERSION
@@ -226,7 +226,7 @@ pub struct C.RPC_SYNTAX_IDENTIFIER {
 
 // C.RPC_VERSION is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
-[typedef]
+@[typedef]
 pub struct C.RPC_VERSION {
 	MajorVersion u16
 	MinorVersion u16
