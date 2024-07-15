@@ -377,7 +377,7 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 
 		mut midl_function := MidlFunction {
 			name: method.name
-			offset: method.base
+			offset: method.addr
 			opcode: index
 			arg_num: arg_num
 			arg_offset: usize(ptr)

@@ -54,14 +54,15 @@ fn main()
 
 				println('[+] Security Callback:')
 
-				if intf.sec_callback.base != 0
+				if intf.sec_callback.addr != 0
 				{
 					println('[+]\t Registred   : True')
-					println('[+]\t Base Address: 0x${intf.sec_callback.base}')
+					println('[+]\t Address     : 0x${intf.sec_callback.addr}')
+					println('[+]\t Offset      : 0x${intf.sec_callback.offset.hex()}')
 
 					if intf.sec_callback.location.path != ''
 					{
-						println('[+]\t Location    : 0x${intf.sec_callback.location.path}')
+						println('[+]\t Location    : ${intf.sec_callback.location.path}')
 					}
 				}
 
@@ -74,7 +75,7 @@ fn main()
 
 				for method in intf.methods
 				{
-					println('[+]\t ${method.name} (base: 0x${method.base})')
+					println('[+]\t ${method.name} (addr: 0x${method.addr}, offset: 0x${method.offset.hex()})')
 				}
 
 				return
