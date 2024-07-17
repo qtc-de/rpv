@@ -82,7 +82,7 @@ pub const compatible_rpc_versions = [
 // of v, the '[if x86]' attribute is ignored for structs, but will be
 // available in future. Up to this point, we need to keep the x64 and x86
 // struct definitions in separate files.
-[if x86]
+@[if x86]
 pub struct RpcInterface {
 pub:
 	p_rpc_server                  &RpcServer = unsafe { nil }
@@ -119,7 +119,7 @@ pub:
 // of v, the '[if x86]' attribute is ignored for structs, but will be
 // available in future. Up to this point, we need to keep the x64 and x86
 // struct definitions in separate files.
-[if x86]
+@[if x86]
 pub struct RpcServer {
 pub:
 	mutex                   Mutex
@@ -158,7 +158,7 @@ pub:
 // of v, the '[if x86]' attribute is ignored for structs, but will be
 // available in future. Up to this point, we need to keep the x64 and x86
 // struct definitions in separate files.
-[if x86]
+@[if x86]
 pub struct RpcAddress {
 pub:
 	vtable       voidptr

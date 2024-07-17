@@ -8,7 +8,7 @@ module ndr
 // NdrHandleParam and to define a separate format method for both
 // types. However, this caused nondeterministic memory corruptions.
 // We may try this approach in future again.
-[flag]
+@[flag]
 pub enum NdrParamAttrs as u16
 {
 	must_size
@@ -103,7 +103,7 @@ pub fn (param NdrBasicParam) comments() []NdrComment
 // NdrHandleParamFlags contains a list of flags that can be
 // used in NdrHandleParam. These flags add more information
 // to the underlying handle.
-[flag]
+@[flag]
 pub enum NdrHandleParamFlags as u8
 {
 	ndr_context_handle_cannot_be_null

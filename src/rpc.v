@@ -105,8 +105,9 @@ pub struct RpcInterfaceBasicInfo {
 // on how the method has to be called. The format address is used during decompilation.
 pub struct RpcMethod {
 	pub:
-	base voidptr
+	addr voidptr
 	fmt voidptr
+	offset u32
 	pub mut:
 	name string
 }
@@ -140,7 +141,8 @@ pub struct RpcAuthInfo {
 pub struct SecurityCallback {
 	pub mut:
 	name string
-	base voidptr
+	addr voidptr
+	offset u32
 	location win.LocationInfo
 }
 
@@ -312,16 +314,17 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 
 			for mut method in intf_info.methods
 			{
-				method.name = resolver.load_symbol(intf_info.location.path, method.base) or { method.name }
+				method.name = resolver.load_symbol(intf_info.location.path, method.addr) or { method.name }
 			}
 
-			if intf_info.sec_callback.base != &voidptr(0)
+			if intf_info.sec_callback.addr != &voidptr(0)
 			{
 				if intf_info.sec_callback.location.base != intf_info.location.base {
 					resolver.attach_pdb(process_handle, intf_info.sec_callback.location.base, intf_info.sec_callback.location.size) or {}
 				}
 
-				intf_info.sec_callback.name = resolver.load_symbol(intf_info.sec_callback.location.path, u64(intf_info.sec_callback.base)) or { '' }
+				intf_info.sec_callback.name = resolver.load_symbol(intf_info.sec_callback.location.path, u64(intf_info.sec_callback.addr)) or { '' }
+				intf_info.sec_callback.offset = u32(usize(intf_info.sec_callback.addr) - usize(intf_info.location.base))
 			}
 
 			resolver.detach_pdb()
@@ -639,8 +642,9 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 
 			unsafe {
 				rpc_methods << RpcMethod {
-					base: voidptr(base)
+					addr: voidptr(base)
 					fmt: voidptr(&u8(midl_server_info.ProcString) + fmt)
+					offset:  u32(usize(base) - usize(location_info.base))
 					name: resolver.load_symbol(location_info.path, u64(base)) or { 'Proc${ctr}' }
 				}
 			}
@@ -648,11 +652,11 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 	}
 
 	mut sec_callback := SecurityCallback {
-		base: &interface_info.intf.sec_callback
+		addr: voidptr(interface_info.intf.sec_callback)
 		name: ''
 	}
 
-	if sec_callback.base != &voidptr(0)
+	if sec_callback.addr != &voidptr(0)
 	{
 		if sec_location := win.get_location_info_h(process_handle, interface_info.intf.sec_callback)
 		{
@@ -662,7 +666,8 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 				resolver.attach_pdb(process_handle, sec_location.base, sec_location.size) or {}
 			}
 
-			sec_callback.name = resolver.load_symbol(sec_location.path, u64(sec_callback.base)) or { '' }
+			sec_callback.name = resolver.load_symbol(sec_location.path, u64(sec_callback.addr)) or { '' }
+			sec_callback.offset = u32(usize(sec_callback.addr) - usize(sec_location.base))
 		}
 	}
 

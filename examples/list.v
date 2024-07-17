@@ -25,12 +25,14 @@ fn main()
 		println('[+] Path        : ${info.path}')
 
 		println('[+] RPC Endpoints:')
+
 		for endpoint in info.rpc_info.server_info.endpoints
 		{
 			println('[+]\t ${endpoint.protocol} - ${endpoint.name}')
 		}
 
 		println('[+] RPC Interfaces:')
+
 		for intf in info.rpc_info.interface_infos
 		{
 			if intf.methods.len > 0

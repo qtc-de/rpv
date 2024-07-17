@@ -15,7 +15,7 @@ struct CV_INFO_PDB70{
 
 // C.IMAGE_DEBUG_DIRECTORY contains the formatting of the debug
 // directory of an executable.
-[typedef]
+@[typedef]
 struct C.IMAGE_DEBUG_DIRECTORY {
   Characteristics DWORD
   TimeDateStamp DWORD

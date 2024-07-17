@@ -28,7 +28,7 @@ pub enum NdrCorrelationType as u8
 // NdrCorrelationFlags provide additional information on a CorrelationDescriptor.
 // As far as I remember, only the range member of this enum is currently used and
 // implemented by rpv.
-[flag]
+@[flag]
 pub enum NdrCorrelationFlags as u8
 {
 	reserved
