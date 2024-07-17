@@ -42,12 +42,12 @@ jobs:
           mkdir html modules
           mv internals ndr src utils win modules/
           v doc -all -f html -o html -m modules/ .
-          echo '<meta http-equiv="refresh" content="0;url=https://qtc-de.github.io/rpv/rpv.html" />' > html/_docs/index.html
+          echo '<meta http-equiv="refresh" content="0;url=https://qtc-de.github.io/rpv/rpv.html" />' > html/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: 'html/_docs/'
+          path: 'html/'
 
   deploy:
     runs-on: ubuntu-latest
