@@ -37,3 +37,9 @@ jobs:
           mkdir -p ~/.vmodules/qtc_de
           ln -s $(pwd) ~/.vmodules/qtc_de/rpv
           make all
+
+      - name: Archive example executables
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpv-compiled-examples
+          path: examples/*.exe
