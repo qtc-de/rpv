@@ -309,7 +309,10 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 	{
 		for mut intf_info in pi.rpc_info.interface_infos
 		{
-			resolver.attach_pdb(process_handle, intf_info.location.base, intf_info.location.size) or {}
+			resolver.attach_pdb(process_handle, intf_info.location.base, intf_info.location.size) or {
+				utils.log_debug('Failed to attach PDB resolver: ${err}')
+			}
+
 			intf_info.name = resolver.load_uuid(intf_info.id)
 
 			for mut method in intf_info.methods
@@ -320,7 +323,9 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 			if intf_info.sec_callback.addr != &voidptr(0)
 			{
 				if intf_info.sec_callback.location.base != intf_info.location.base {
-					resolver.attach_pdb(process_handle, intf_info.sec_callback.location.base, intf_info.sec_callback.location.size) or {}
+					resolver.attach_pdb(process_handle, intf_info.sec_callback.location.base, intf_info.sec_callback.location.size) or {
+						utils.log_debug('Failed to attach PDB resolver: ${err}')
+					}
 				}
 
 				intf_info.sec_callback.name = resolver.load_symbol(intf_info.sec_callback.location.path, u64(intf_info.sec_callback.addr)) or { '' }
@@ -626,7 +631,9 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 	mut midl_stub_desc := C.MIDL_STUB_DESC{}
 
 	mut rpc_methods := []RpcMethod{cap: int(dispatch_table.DispatchTableCount)}
-	resolver.attach_pdb(process_handle, location_info.base, location_info.size) or {}
+	resolver.attach_pdb(process_handle, location_info.base, location_info.size) or {
+		utils.log_debug('Failed to attach PDB resolver: ${err}')
+	}
 
 	if interface_info.intf.server_interface.interpreter_info != &voidptr(0)
 	{
@@ -663,7 +670,9 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 			sec_callback.location = sec_location
 
 			if location_info.base != sec_location.base {
-				resolver.attach_pdb(process_handle, sec_location.base, sec_location.size) or {}
+				resolver.attach_pdb(process_handle, sec_location.base, sec_location.size) or {
+					utils.log_debug('Failed to attach PDB resolver: ${err}')
+				}
 			}
 
 			sec_callback.name = resolver.load_symbol(sec_location.path, u64(sec_callback.addr)) or { '' }
