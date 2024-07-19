@@ -1,5 +1,7 @@
 module win
 
+import utils
+
 // PdbResolver is used to resolve symbols using .pdb files. This
 // struct should be initialized by using the new_pdb_resolver
 // function.
@@ -21,6 +23,7 @@ pub fn new_pdb_resolver(process_handle HANDLE, symbol_path string, module_base v
 	}
 
 	pdb_path := get_pdb_path(process_handle, symbol_path, module_base)!
+	utils.log_debug('Trying to load symbols from: ${pdb_path}')
 
 	if C.SymLoadModuleEx(process_handle, &voidptr(0), &char(pdb_path.str), &voidptr(0), u64(module_base), module_size, &voidptr(0), 0) == 0
 	{
