@@ -1937,6 +1937,7 @@ fn C.RegQueryValueExA(key_handle HANDLE, value LPCSTR, resv &DWORD, reg_type &DW
 fn C.SHGetFileInfoA(path &char, file_attrs DWORD, fileinfo &C.SHFILEINFOA, file_info_size UINT, flags UINT) bool
 fn C.SymCleanup(process_handle HANDLE)
 fn C.SymFromAddr(process_handle HANDLE, address DWORD64, displacement &DWORD64, symbol &SymbolInfoV) bool
+fn C.SymEnumSymbolsForAddr(process_handle HANDLE, address DWORD64, callback fn(&SymbolInfoV, ULONG), context voidptr) bool
 fn C.SymInitialize(process_handle HANDLE, search_path &char, invade_process BOOL) bool
 fn C.SymLoadModuleEx(process_handle HANDLE, file_handle HANDLE, image PCSTR, mod PCSTR, dll_base u64, dll_size u32, data voidptr, flags u32) u64
 fn C.SymUnloadModule(process_handle HANDLE, module_base u32)

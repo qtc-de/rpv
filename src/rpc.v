@@ -319,6 +319,9 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 			for mut method in intf_info.methods
 			{
 				method.name = resolver.load_symbol(intf_info.location.path, method.addr) or { method.name }
+
+				// TODO
+				resolver.load_symbols(intf_info.location.path, method.addr)
 			}
 
 			if intf_info.sec_callback.addr != &voidptr(0)
@@ -647,6 +650,9 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 		{
 			base := win.read_proc_mem_s[usize](process_handle, unsafe { midl_server_info.DispatchTable + ctr }) or { break }
 			fmt := win.read_proc_mem_s[u16](process_handle, unsafe { &u16(midl_server_info.FmtStringOffset) + ctr }) or { break }
+
+			// TODO
+			resolver.load_symbols(location_info.path, u64(base))
 
 			unsafe {
 				rpc_methods << RpcMethod {

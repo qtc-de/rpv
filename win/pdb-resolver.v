@@ -58,6 +58,7 @@ pub fn (context PdbResolver) cleanup()
 pub fn (context PdbResolver) load_symbol(symbol u64)! string
 {
 	mut disp := u64(0)
+
 	symbol_info := SymbolInfoV{
 		size_of_struct: sizeof(C.SYMBOL_INFO)
 	}
@@ -68,4 +69,25 @@ pub fn (context PdbResolver) load_symbol(symbol u64)! string
 	}
 
 	return unsafe { cstring_to_vstring(&char(symbol_info.name[..].data)) }
+}
+
+// load_symbols attempts to resolve the specified symbols for a function address
+// from an already created pdb context.
+pub fn (context PdbResolver) load_symbols(symbol u64)! []string
+{
+	symbols := []string{}
+
+	symbol_closure := fn [symbols] (symbol_info &SymbolInfoV, symbol_size u32) {
+		unsafe {
+			symbols << "Dummy"
+			println('[+] Closure Test: ${cstring_to_vstring(&char(symbol_info.name[..].data))}')
+		}
+	}
+
+	if !C.SymEnumSymbolsForAddr(context.process_handle, symbol, symbol_closure, &voidptr(0))
+	{
+		return error('Unable to resolve symbols at 0x${symbol} via SymEnumSymbolsForAddr')
+	}
+
+	return symbols
 }

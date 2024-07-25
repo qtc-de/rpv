@@ -134,6 +134,19 @@ pub fn (resolver SymbolResolver) load_symbol(location string, offset u64)? strin
 	return none
 }
 
+// load_symbols attempts to resolve the location + offset information to a symbol
+// name. If successful, the symbol name is returned. If the symbol cannot be found
+// the function returns none.
+pub fn (resolver SymbolResolver) load_symbols(location string, offset u64)? []string
+{
+	if resolver.has_pdb
+	{
+		return resolver.pdb_resolver.load_symbols(offset) or { return none }
+	}
+
+	return none
+}
+
 // load_uuid attempts to resolve an interface name by looking up it's uuid.
 // The function call is always successful. If the interface uuid is not found
 // within the SymbolResolver, the uuid itself is returned.
