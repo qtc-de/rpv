@@ -1854,6 +1854,12 @@ pub fn uuid_to_str(interface_id C.RPC_IF_ID)! string
 	return unsafe { cstring_to_vstring(p_uuid_str) }
 }
 
+// get_interface_version returns the version of an RPC_IF_ID as string
+pub fn get_interface_version(interface_id C.RPC_IF_ID) string
+{
+	return '${interface_id.VersMajor}.${interface_id.VersMinor}'
+}
+
 // new_guid attempts to parse a C.GUID struct from the specified string.
 pub fn new_guid(guid_str string)! C.GUID
 {

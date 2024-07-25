@@ -58,6 +58,7 @@ pub struct RpcInterfaceInfo {
 	dispatch_table_addr voidptr
 	location win.LocationInfo
 	id string
+	version string
 	annotation string
 	ep_registered bool
 	intf RpcInterface
@@ -695,6 +696,7 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 	return RpcInterfaceInfo {
 		base: interface_info.base
 		id: win.uuid_to_str(interface_info.intf.server_interface.interface_id) or { 'unknown' }
+		version: win.get_interface_version(interface_info.intf.server_interface.interface_id)
 		intf: interface_info.intf
 		typ: interface_info.typ
 		dispatch_table_addr: dispatch_table.DispatchTable
