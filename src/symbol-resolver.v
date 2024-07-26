@@ -4,22 +4,6 @@ import os
 import win
 import toml
 
-// SymbolResolver is used to resolve method and interface names during runtime.
-// SymbolResolver uses a hybrid approach with PDB files and a custom rpv symbol
-// file in toml format to resolve symbols. Apart from symbols, SymbolResolver
-// can also track notes that were taken for RPC interfaces or methods.
-pub struct SymbolResolver {
-	mut:
-	symbols map[string][]Symbol
-	params map[string][]SymbolSet
-	uuids map[string]InterfaceData
-	has_pdb bool
-	pdb_resolver win.PdbResolver
-	pub mut:
-	symbol_file string
-	symbol_path string
-}
-
 // Symbol represents a single symbol. It contains the offset of the symbol and
 // it's associated name.
 struct Symbol {
@@ -28,12 +12,75 @@ struct Symbol {
 	offset u64
 }
 
+
 // SymbolSet represents a set of symbols like method parameter names.
 struct SymbolSet {
 	mut:
 	names []string
 	offset u64
 }
+
+// SymbolMap maps a location (usually a dll file on the file system)
+// to symbols that are already known for this location.
+type SymbolMap = map[string][]Symbol
+
+// lookup checks whether a symbol is already known for the specified
+// offset + location combination
+fn (sym_map SymbolMap) lookup(location string, offset u64)? string
+{
+	if location in sym_map
+	{
+		for symbol in sym_map[location]
+		{
+			if symbol.offset == offset
+			{
+				return symbol.name
+			}
+		}
+	}
+
+	return none
+}
+
+// SymbolSetMap maps a location (usually a dll file on the file system)
+// to symbols that are already known for this location.
+type SymbolSetMap = map[string][]SymbolSet
+
+// lookup checks whether a symbol is already known for the specified
+// offset + location combination
+fn (sym_map SymbolSetMap) lookup(location string, offset u64)? []string
+{
+	if location in sym_map
+	{
+		for symbol_set in sym_map[location]
+		{
+			if symbol_set.offset == offset
+			{
+				return symbol_set.names
+			}
+		}
+	}
+
+	return none
+}
+
+// SymbolResolver is used to resolve method and interface names during runtime.
+// SymbolResolver uses a hybrid approach with PDB files and a custom rpv symbol
+// file in toml format to resolve symbols. Apart from symbols, SymbolResolver
+// can also track notes that were taken for RPC interfaces or methods.
+pub struct SymbolResolver {
+	mut:
+	symbols SymbolMap
+	sym_cache SymbolMap
+	param_cache SymbolSetMap
+	uuids map[string]InterfaceData
+	has_pdb bool
+	pdb_resolver win.PdbResolver
+	pub mut:
+	symbol_file string
+	symbol_path string
+}
+
 
 // InterfaceData is used to associate names with RPC interfaces. Moreover, the struct
 // contains notes for the interface itself and for associated RPC methods.
@@ -121,48 +168,51 @@ pub fn parse_resolver(toml_data toml.Doc, pdb_path string, symbol_file string) S
 // load_symbol attempts to resolve the location + offset information to a symbol
 // name. If successful, the symbol name is returned. If the symbol cannot be found
 // the function returns none.
-pub fn (resolver SymbolResolver) load_symbol(location string, offset u64)? string
+pub fn (mut resolver SymbolResolver) load_symbol(location string, offset u64)? string
 {
-	if location in resolver.symbols
+	return resolver.symbols.lookup(location, offset) or
 	{
-		for symbol in resolver.symbols[location]
+		return resolver.sym_cache.lookup(location, offset) or
 		{
-			if symbol.offset == offset
+			if resolver.has_pdb
 			{
-				return symbol.name
+				if symbol := resolver.pdb_resolver.load_symbol(offset)
+				{
+					resolver.sym_cache[location] << Symbol {
+						name: symbol
+						offset: offset
+					}
+
+					return symbol
+				}
 			}
+
+			return none
 		}
 	}
-
-	if resolver.has_pdb
-	{
-		return resolver.pdb_resolver.load_symbol(offset) or { return none }
-	}
-
-	return none
 }
 
 // load_symbols attempts to resolve function parameter names from the specified location
-// and offset.
-pub fn (resolver SymbolResolver) load_symbols(location string, offset u64)? []string
+// and offset. Since some DLLs
+pub fn (mut resolver SymbolResolver) load_symbols(location string, offset u64)? []string
 {
-	if location in resolver.params
+	return resolver.param_cache.lookup(location, offset) or
 	{
-		for symbol_set in resolver.params[location]
+		if resolver.has_pdb
 		{
-			if symbol_set.offset == offset
+			if symbols := resolver.pdb_resolver.load_symbols(offset)
 			{
-				return symbol_set.names
+				resolver.param_cache[location] << SymbolSet {
+					names: symbols
+					offset: offset
+				}
+
+				return symbols
 			}
 		}
-	}
 
-	if resolver.has_pdb
-	{
-		return resolver.pdb_resolver.load_symbols(offset) or { return none }
+		return none
 	}
-
-	return none
 }
 
 // load_uuid attempts to resolve an interface name by looking up it's uuid.
