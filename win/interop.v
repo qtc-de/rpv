@@ -1642,7 +1642,7 @@ pub fn get_location_info_h(process_handle HANDLE, address voidptr)! LocationInfo
 
 		for
 		{
-			if unsafe { string_from_wide(module_entry.szModule) == location.substr(location.last_index('\\') or { 0 } + 1, location.len) }
+			if unsafe { string_from_wide(module_entry.szModule).to_lower() == location.substr(location.last_index('\\') or { 0 } + 1, location.len).to_lower() }
 			{
 				base_addr = module_entry.modBaseAddr
 				base_size = module_entry.modBaseSize
