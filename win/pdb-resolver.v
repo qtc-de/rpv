@@ -76,15 +76,24 @@ pub fn (context PdbResolver) load_symbol(symbol u64)! string
 pub fn (context PdbResolver) load_symbols(symbol u64)! []string
 {
 	symbols := []string{}
+	symbols_ref := &symbols
 
-	symbol_closure := fn [symbols] (symbol_info &SymbolInfoV, symbol_size u32) {
+	frame := C.IMAGEHLP_STACK_FRAME{
+		InstructionOffset: symbol
+	}
+
+	if !C.SymSetContext(context.process_handle, &frame, &voidptr(0))
+	{
+		return error('Unable to set symbol context to 0x${symbol}')
+	}
+
+	symbol_closure := fn [symbols_ref] (symbol_info &SymbolInfoV, symbol_size u32) {
 		unsafe {
-			symbols << "Dummy"
-			println('[+] Closure Test: ${cstring_to_vstring(&char(symbol_info.name[..].data))}')
+			symbols_ref << cstring_to_vstring(&char(symbol_info.name[..].data))
 		}
 	}
 
-	if !C.SymEnumSymbolsForAddr(context.process_handle, symbol, symbol_closure, &voidptr(0))
+	if !C.SymEnumSymbols(context.process_handle, 0, &voidptr(0), symbol_closure, &voidptr(0))
 	{
 		return error('Unable to resolve symbols at 0x${symbol} via SymEnumSymbolsForAddr')
 	}

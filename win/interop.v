@@ -174,6 +174,20 @@ pub struct C.COMM_FAULT_OFFSETS {
 	FaultOffset u16
 }
 
+@[typedef]
+pub struct C.IMAGEHLP_STACK_FRAME {
+  InstructionOffset  ULONG64
+  ReturnOffset		 ULONG64
+  FrameOffset		 ULONG64
+  StackOffset		 ULONG64
+  BackingStoreOffset ULONG64
+  FuncTableEntry	 ULONG64
+  Params[4]			 ULONG64
+  Reserved[5]		 ULONG64
+  Virtual			 BOOL
+  Reserved2			 ULONG
+}
+
 // C.GUID represents the well known GUID struct from widows. In rpv,
 // it is used for different purposes. Mainly to identify RPC interfaces,
 // that all contain GUIDs as part of their internal definition.
@@ -1938,6 +1952,8 @@ fn C.SHGetFileInfoA(path &char, file_attrs DWORD, fileinfo &C.SHFILEINFOA, file_
 fn C.SymCleanup(process_handle HANDLE)
 fn C.SymFromAddr(process_handle HANDLE, address DWORD64, displacement &DWORD64, symbol &SymbolInfoV) bool
 fn C.SymEnumSymbolsForAddr(process_handle HANDLE, address DWORD64, callback fn(&SymbolInfoV, ULONG), context voidptr) bool
+fn C.SymEnumSymbols(process_handle HANDLE, base ULONG64, mask &char, callback fn(&SymbolInfoV, ULONG), context voidptr) bool
+fn C.SymSetContext(process_handle HANDLE, frame &C.IMAGEHLP_STACK_FRAME, context voidptr) bool
 fn C.SymInitialize(process_handle HANDLE, search_path &char, invade_process BOOL) bool
 fn C.SymLoadModuleEx(process_handle HANDLE, file_handle HANDLE, image PCSTR, mod PCSTR, dll_base u64, dll_size u32, data voidptr, flags u32) u64
 fn C.SymUnloadModule(process_handle HANDLE, module_base u32)

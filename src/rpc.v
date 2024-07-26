@@ -111,6 +111,7 @@ pub struct RpcMethod {
 	offset u32
 	pub mut:
 	name string
+	symbols []string
 }
 
 // RpcType is used to determine the type if RPC servers that are associated with a process.
@@ -319,9 +320,7 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 			for mut method in intf_info.methods
 			{
 				method.name = resolver.load_symbol(intf_info.location.path, method.addr) or { method.name }
-
-				// TODO
-				resolver.load_symbols(intf_info.location.path, method.addr)
+				method.symbols = resolver.load_symbols(intf_info.location.path, method.addr) or { []string{} }
 			}
 
 			if intf_info.sec_callback.addr != &voidptr(0)
@@ -651,15 +650,16 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 			base := win.read_proc_mem_s[usize](process_handle, unsafe { midl_server_info.DispatchTable + ctr }) or { break }
 			fmt := win.read_proc_mem_s[u16](process_handle, unsafe { &u16(midl_server_info.FmtStringOffset) + ctr }) or { break }
 
-			// TODO
-			resolver.load_symbols(location_info.path, u64(base))
+			name := resolver.load_symbol(location_info.path, u64(base)) or { 'Proc${ctr}' }
+			symbols := resolver.load_symbols(location_info.path, u64(base)) or { []string{} }
 
 			unsafe {
 				rpc_methods << RpcMethod {
 					addr: voidptr(base)
 					fmt: voidptr(&u8(midl_server_info.ProcString) + fmt)
 					offset:  u32(usize(base) - usize(location_info.base))
-					name: resolver.load_symbol(location_info.path, u64(base)) or { 'Proc${ctr}' }
+					name: name
+					symbols: symbols
 				}
 			}
 		}

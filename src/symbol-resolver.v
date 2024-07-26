@@ -11,6 +11,7 @@ import toml
 pub struct SymbolResolver {
 	mut:
 	symbols map[string][]Symbol
+	params map[string][]SymbolSet
 	uuids map[string]InterfaceData
 	has_pdb bool
 	pdb_resolver win.PdbResolver
@@ -24,6 +25,13 @@ pub struct SymbolResolver {
 struct Symbol {
 	mut:
 	name string
+	offset u64
+}
+
+// SymbolSet represents a set of symbols like method parameter names.
+struct SymbolSet {
+	mut:
+	names []string
 	offset u64
 }
 
@@ -134,11 +142,21 @@ pub fn (resolver SymbolResolver) load_symbol(location string, offset u64)? strin
 	return none
 }
 
-// load_symbols attempts to resolve the location + offset information to a symbol
-// name. If successful, the symbol name is returned. If the symbol cannot be found
-// the function returns none.
+// load_symbols attempts to resolve function parameter names from the specified location
+// and offset.
 pub fn (resolver SymbolResolver) load_symbols(location string, offset u64)? []string
 {
+	if location in resolver.params
+	{
+		for symbol_set in resolver.params[location]
+		{
+			if symbol_set.offset == offset
+			{
+				return symbol_set.names
+			}
+		}
+	}
+
 	if resolver.has_pdb
 	{
 		return resolver.pdb_resolver.load_symbols(offset) or { return none }
