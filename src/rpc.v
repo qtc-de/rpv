@@ -319,6 +319,12 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 
 			for mut method in intf_info.methods
 			{
+				/*
+				 * The method.symbols property was supposed to hold symbol data for function parameters
+				 * that is displayed during midl decompilation. However, at the time of writing, it seems
+				 * that only combase.dll contains such symbols, unless the retrieval logic is wrong.
+				 * Therefore, the symbol information is currently not further used, but might be in future.
+				 */
 				method.name = resolver.load_symbol(intf_info.location.path, method.addr) or { method.name }
 				method.symbols = resolver.load_symbols(intf_info.location.path, method.addr) or { []string{} }
 			}
@@ -650,6 +656,12 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 			base := win.read_proc_mem_s[usize](process_handle, unsafe { midl_server_info.DispatchTable + ctr }) or { break }
 			fmt := win.read_proc_mem_s[u16](process_handle, unsafe { &u16(midl_server_info.FmtStringOffset) + ctr }) or { break }
 
+			/*
+			 * The method.symbols property was supposed to hold symbol data for function parameters
+			 * that is displayed during midl decompilation. However, at the time of writing, it seems
+			 * that only combase.dll contains such symbols, unless the retrieval logic is wrong.
+			 * Therefore, the symbol information is currently not further used, but might be in future.
+			 */
 			name := resolver.load_symbol(location_info.path, u64(base)) or { 'Proc${ctr}' }
 			symbols := resolver.load_symbols(location_info.path, u64(base)) or { []string{} }
 
