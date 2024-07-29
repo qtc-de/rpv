@@ -174,6 +174,20 @@ pub struct C.COMM_FAULT_OFFSETS {
 	FaultOffset u16
 }
 
+@[typedef]
+pub struct C.IMAGEHLP_STACK_FRAME {
+  InstructionOffset  ULONG64
+  ReturnOffset		 ULONG64
+  FrameOffset		 ULONG64
+  StackOffset		 ULONG64
+  BackingStoreOffset ULONG64
+  FuncTableEntry	 ULONG64
+  Params[4]			 ULONG64
+  Reserved[5]		 ULONG64
+  Virtual			 BOOL
+  Reserved2			 ULONG
+}
+
 // C.GUID represents the well known GUID struct from widows. In rpv,
 // it is used for different purposes. Mainly to identify RPC interfaces,
 // that all contain GUIDs as part of their internal definition.
@@ -1628,7 +1642,7 @@ pub fn get_location_info_h(process_handle HANDLE, address voidptr)! LocationInfo
 
 		for
 		{
-			if unsafe { string_from_wide(module_entry.szModule) == location.substr(location.last_index('\\') or { 0 } + 1, location.len) }
+			if unsafe { string_from_wide(module_entry.szModule).to_lower() == location.substr(location.last_index('\\') or { 0 } + 1, location.len).to_lower() }
 			{
 				base_addr = module_entry.modBaseAddr
 				base_size = module_entry.modBaseSize
@@ -1854,6 +1868,12 @@ pub fn uuid_to_str(interface_id C.RPC_IF_ID)! string
 	return unsafe { cstring_to_vstring(p_uuid_str) }
 }
 
+// get_interface_version returns the version of an RPC_IF_ID as string
+pub fn get_interface_version(interface_id C.RPC_IF_ID) string
+{
+	return '${interface_id.VersMajor}.${interface_id.VersMinor}'
+}
+
 // new_guid attempts to parse a C.GUID struct from the specified string.
 pub fn new_guid(guid_str string)! C.GUID
 {
@@ -1931,6 +1951,9 @@ fn C.RegQueryValueExA(key_handle HANDLE, value LPCSTR, resv &DWORD, reg_type &DW
 fn C.SHGetFileInfoA(path &char, file_attrs DWORD, fileinfo &C.SHFILEINFOA, file_info_size UINT, flags UINT) bool
 fn C.SymCleanup(process_handle HANDLE)
 fn C.SymFromAddr(process_handle HANDLE, address DWORD64, displacement &DWORD64, symbol &SymbolInfoV) bool
+fn C.SymEnumSymbolsForAddr(process_handle HANDLE, address DWORD64, callback fn(&SymbolInfoV, ULONG), context voidptr) bool
+fn C.SymEnumSymbols(process_handle HANDLE, base ULONG64, mask &char, callback fn(&SymbolInfoV, ULONG), context voidptr) bool
+fn C.SymSetContext(process_handle HANDLE, frame &C.IMAGEHLP_STACK_FRAME, context voidptr) bool
 fn C.SymInitialize(process_handle HANDLE, search_path &char, invade_process BOOL) bool
 fn C.SymLoadModuleEx(process_handle HANDLE, file_handle HANDLE, image PCSTR, mod PCSTR, dll_base u64, dll_size u32, data voidptr, flags u32) u64
 fn C.SymUnloadModule(process_handle HANDLE, module_base u32)

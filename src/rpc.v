@@ -58,6 +58,7 @@ pub struct RpcInterfaceInfo {
 	dispatch_table_addr voidptr
 	location win.LocationInfo
 	id string
+	version string
 	annotation string
 	ep_registered bool
 	intf RpcInterface
@@ -110,6 +111,7 @@ pub struct RpcMethod {
 	offset u32
 	pub mut:
 	name string
+	symbols []string
 }
 
 // RpcType is used to determine the type if RPC servers that are associated with a process.
@@ -317,7 +319,14 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 
 			for mut method in intf_info.methods
 			{
+				/*
+				 * The method.symbols property was supposed to hold symbol data for function parameters
+				 * that is displayed during midl decompilation. However, at the time of writing, it seems
+				 * that only combase.dll contains such symbols, unless the retrieval logic is wrong.
+				 * Therefore, the symbol information is currently not further used, but might be in future.
+				 */
 				method.name = resolver.load_symbol(intf_info.location.path, method.addr) or { method.name }
+				method.symbols = resolver.load_symbols(intf_info.location.path, method.addr) or { []string{} }
 			}
 
 			if intf_info.sec_callback.addr != &voidptr(0)
@@ -647,12 +656,22 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 			base := win.read_proc_mem_s[usize](process_handle, unsafe { midl_server_info.DispatchTable + ctr }) or { break }
 			fmt := win.read_proc_mem_s[u16](process_handle, unsafe { &u16(midl_server_info.FmtStringOffset) + ctr }) or { break }
 
+			/*
+			 * The method.symbols property was supposed to hold symbol data for function parameters
+			 * that is displayed during midl decompilation. However, at the time of writing, it seems
+			 * that only combase.dll contains such symbols, unless the retrieval logic is wrong.
+			 * Therefore, the symbol information is currently not further used, but might be in future.
+			 */
+			name := resolver.load_symbol(location_info.path, u64(base)) or { 'Proc${ctr}' }
+			symbols := resolver.load_symbols(location_info.path, u64(base)) or { []string{} }
+
 			unsafe {
 				rpc_methods << RpcMethod {
 					addr: voidptr(base)
 					fmt: voidptr(&u8(midl_server_info.ProcString) + fmt)
 					offset:  u32(usize(base) - usize(location_info.base))
-					name: resolver.load_symbol(location_info.path, u64(base)) or { 'Proc${ctr}' }
+					name: name
+					symbols: symbols
 				}
 			}
 		}
@@ -695,6 +714,7 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 	return RpcInterfaceInfo {
 		base: interface_info.base
 		id: win.uuid_to_str(interface_info.intf.server_interface.interface_id) or { 'unknown' }
+		version: win.get_interface_version(interface_info.intf.server_interface.interface_id)
 		intf: interface_info.intf
 		typ: interface_info.typ
 		dispatch_table_addr: dispatch_table.DispatchTable

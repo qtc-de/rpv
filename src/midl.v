@@ -156,9 +156,6 @@ pub fn (intf RpcInterfaceInfo) decode_methods(pid u32, methods []int)! MidlInter
 	types.sort(a.id < b.id)
 
 	mut name := intf.name
-	v_major := intf.intf.server_interface.interface_id.VersMajor
-	v_minor := intf.intf.server_interface.interface_id.VersMinor
-
 	if name == ''
 	{
 		name = '${intf.id}'
@@ -167,7 +164,7 @@ pub fn (intf RpcInterfaceInfo) decode_methods(pid u32, methods []int)! MidlInter
 	return MidlInterface {
 		id: '${intf.id}'
 		name: name.replace('-', '')
-		version: '${v_major}.${v_minor}'
+		version: intf.version
 		types: types
 		functions: functions
 	}
