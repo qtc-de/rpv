@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## v1.2.0 - July 29, 2024
+
+### Added
+
+* Add RPC interface version information to `RpcInterfaceInfo`
+* Add support for loading PDB symbols of method parameters (not in use yet)
+
+### Changed
+
+* Fix incorrect module locations for modules with uppercase filenames
+
+
 ## v1.1.1 - July 19, 2024
 
 ### Added
