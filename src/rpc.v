@@ -684,7 +684,7 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 
 	if sec_callback.addr != &voidptr(0)
 	{
-		if sec_location := win.get_location_info_h(process_handle, interface_info.intf.sec_callback)
+		if sec_location := win.get_location_info_h(process_handle, sec_callback.addr)
 		{
 			sec_callback.location = sec_location
 
