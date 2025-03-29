@@ -6,7 +6,7 @@ module ndr
 // ComplexType requires the implementing type to have a unique ID, a location
 // where the type has been found in process memory and a get_definition method
 // to obtain the string representation of the ComplexType as defined in IDL.
-interface ComplexType {
+pub interface ComplexType {
 	id u32
 	location voidptr
 	get_definition() string
