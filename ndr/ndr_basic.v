@@ -319,7 +319,7 @@ pub fn (indirect_type NdrIndirectTypeReference) format() string
 // makes sure that each NdrType has an underlying NdrFormatChar and that it supports
 // the format, attrs, comments and size methods. These methods are required to create
 // the string representation of the NdrType.
-interface NdrType {
+pub interface NdrType {
 	format NdrFormatChar
 	format() string
 	attrs() []NdrAttr

@@ -4,10 +4,8 @@ import win
 import ndr
 import utils
 
-const (
-	oi_has_rpc_flags = u8(0x08)
-	explicit_handle = u8(0x00)
-)
+const oi_has_rpc_flags = u8(0x08)
+const explicit_handle = u8(0x00)
 
 // MidlInterface contains detailed RPC interface information. This includes the id,
 // name and version of the interface, as well as RPC methods and type definitions

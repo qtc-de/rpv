@@ -34,37 +34,37 @@ import encoding.base64
 #include "sspi.h"
 #include "imagehlp.h"
 
-type PULONG = &u32
-type USHORT = u16
-type BOOL = bool
-type BYTE = u8
-type CHAR = u8
-type WORD = u16
-type DWORD = u32
-type DWORD64 = u64
-type HANDLE = voidptr
-type LONG = int
-type LPCSTR = &char
-type LPDWORD = &u32
-type LPSTR = &char
-type PSID = &C.SID
-type PSID_NAME_USE = &SID_NAME_USE
-type UINT = u32
-type ULONG = u32
-type ULONG64 = u64
-type ULONG_PTR = &u32
-type WCHAR = u16
-type PVOID = voidptr
-type LPVOID = voidptr
-type PWSTR = &u16
-type HRESULT = u32
-type PLONG = int
-type REGSAM = int
-type SIZE_T = u32
-type ULONGLONG = u64
-type PCSTR = &char
-type NTSTATUS = u32
-type KPRIORITY = u32
+pub type PULONG = &u32
+pub type USHORT = u16
+pub type BOOL = bool
+pub type BYTE = u8
+pub type CHAR = u8
+pub type WORD = u16
+pub type DWORD = u32
+pub type DWORD64 = u64
+pub type HANDLE = voidptr
+pub type LONG = int
+pub type LPCSTR = &char
+pub type LPDWORD = &u32
+pub type LPSTR = &char
+pub type PSID = &C.SID
+pub type PSID_NAME_USE = &SID_NAME_USE
+pub type UINT = u32
+pub type ULONG = u32
+pub type ULONG64 = u64
+pub type ULONG_PTR = &u32
+pub type WCHAR = u16
+pub type PVOID = voidptr
+pub type LPVOID = voidptr
+pub type PWSTR = &u16
+pub type HRESULT = u32
+pub type PLONG = int
+pub type REGSAM = int
+pub type SIZE_T = u32
+pub type ULONGLONG = u64
+pub type PCSTR = &char
+pub type NTSTATUS = u32
+pub type KPRIORITY = u32
 
 // Arch represents an CPU architecture. Architectures can be x86
 // x64 or are unknown.
@@ -755,14 +755,12 @@ pub struct SYSTEM_INFO {
 	processor_revision WORD
 }
 
-pub const (
-	ioctl_open_process				= u32(0x8335003C)
-	th32cs_snapprocess				= u32(0x00000002)
-	th32cs_snapmodule				= u32(0x00000008)
-	th32cs_snapmodule32				= u32(0x00000010)
-	process_protect_information	    = u32(0x0000003d)
-	rpc_is_wow64 = false
-)
+pub const ioctl_open_process = u32(0x8335003C)
+pub const th32cs_snapprocess = u32(0x00000002)
+pub const th32cs_snapmodule = u32(0x00000008)
+pub const th32cs_snapmodule32 = u32(0x00000010)
+pub const process_protect_information = u32(0x0000003d)
+pub const rpc_is_wow64 = false
 
 // open_process_ext is and extended version of the Win32 OpenProcess function.
 // it first attempts to open a handle to the specified PID via OpenProcess directly.
