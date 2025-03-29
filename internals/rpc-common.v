@@ -244,22 +244,20 @@ pub:
 	arg        voidptr = unsafe { nil }
 }
 
-pub const (
-	max_simple_dict_entries = 0x200
-	iid_iunknown = win.new_guid('00000000-0000-0000-C000-000000000046') or { panic(err) }
-	dce_transfer_syntax   = C.RPC_IF_ID{
-		Uuid: win.new_guid('8A885D04-1CEB-11C9-9FE8-08002B104860') or { panic(err) }
-		VersMajor: 2
-		VersMinor: 0
-	}
-	ndr64_transfer_syntax   = C.RPC_IF_ID{
-		Uuid: win.new_guid('71710533-BEBA-4937-8319-B5DBEF9CCC36') or { panic(err) }
-		VersMajor: 2
-		VersMinor: 0
-	}
-	ior_callback = C.RPC_IF_ID{
-		Uuid: win.new_guid('18f70770-8e64-11cf-9af1-0020AF6E72F4') or { panic(err) }
-		VersMajor: 0
-		VersMinor: 0
-	}
-)
+pub const max_simple_dict_entries = 0x200
+pub const iid_iunknown = win.new_guid('00000000-0000-0000-C000-000000000046') or { panic(err) }
+pub const dce_transfer_syntax = C.RPC_IF_ID{
+	Uuid:      win.new_guid('8A885D04-1CEB-11C9-9FE8-08002B104860') or { panic(err) }
+	VersMajor: 2
+	VersMinor: 0
+}
+pub const ndr64_transfer_syntax = C.RPC_IF_ID{
+	Uuid:      win.new_guid('71710533-BEBA-4937-8319-B5DBEF9CCC36') or { panic(err) }
+	VersMajor: 2
+	VersMinor: 0
+}
+pub const ior_callback = C.RPC_IF_ID{
+	Uuid:      win.new_guid('18f70770-8e64-11cf-9af1-0020AF6E72F4') or { panic(err) }
+	VersMajor: 0
+	VersMinor: 0
+}

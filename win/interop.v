@@ -755,14 +755,12 @@ pub struct SYSTEM_INFO {
 	processor_revision WORD
 }
 
-pub const (
-	ioctl_open_process				= u32(0x8335003C)
-	th32cs_snapprocess				= u32(0x00000002)
-	th32cs_snapmodule				= u32(0x00000008)
-	th32cs_snapmodule32				= u32(0x00000010)
-	process_protect_information	    = u32(0x0000003d)
-	rpc_is_wow64 = false
-)
+pub const ioctl_open_process = u32(0x8335003C)
+pub const th32cs_snapprocess = u32(0x00000002)
+pub const th32cs_snapmodule = u32(0x00000008)
+pub const th32cs_snapmodule32 = u32(0x00000010)
+pub const process_protect_information = u32(0x0000003d)
+pub const rpc_is_wow64 = false
 
 // open_process_ext is and extended version of the Win32 OpenProcess function.
 // it first attempts to open a handle to the specified PID via OpenProcess directly.
