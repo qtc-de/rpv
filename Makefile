@@ -11,7 +11,7 @@ decompile-x64: ${x64RpcInternals} examples/decompile.v
 
 decompile-x86: ${x86RpcInternals} examples/decompile.v
 	cp ${<} ${RpcInternals}
-	v ${Options} examples/decompile.v -o examples/${@}.exe
+	v ${Options} -m32 examples/decompile.v -o examples/${@}.exe
 
 details-x64: ${x64RpcInternals} examples/details.v
 	cp ${<} ${RpcInternals}
@@ -19,7 +19,7 @@ details-x64: ${x64RpcInternals} examples/details.v
 
 details-x86: ${x86RpcInternals} examples/details.v
 	cp ${<} ${RpcInternals}
-	v ${Options} examples/details.v -o examples/${@}.exe
+	v ${Options} -m32 examples/details.v -o examples/${@}.exe
 
 list-x64: ${x64RpcInternals} examples/list.v
 	cp ${<} ${RpcInternals}
@@ -27,7 +27,7 @@ list-x64: ${x64RpcInternals} examples/list.v
 
 list-x86: ${x86RpcInternals} examples/list.v
 	cp ${<} ${RpcInternals}
-	v ${Options} examples/list.v -o examples/${@}.exe
+	v ${Options} -m32 examples/list.v -o examples/${@}.exe
 
 clean:
 	rm -f examples/*.exe ${RpcInternals}
