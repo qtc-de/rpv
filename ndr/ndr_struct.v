@@ -155,6 +155,7 @@ pub struct NdrBaseStruct {
 	location voidptr
 	mut:
 	members []NdrType
+	names	[]string
 }
 
 // read_base_struct attempts to read an NdrBaseStruct from process memory
@@ -210,10 +211,17 @@ pub fn (base NdrBaseStruct) get_members() []NdrStructMember
 			NdrStructPad{}
 			else
 			{
+				mut member_name := 'StructMember${cur_offset:X}'
+
+				if members.len < base.names.len
+				{
+					member_name = base.names[members.len]
+				}
+
 				members << NdrStructMember {
 					typ: member
 					offset: cur_offset
-					name: 'StructMember${cur_offset:X}'
+					name: member_name
 				}
 			}
 		}
