@@ -370,7 +370,7 @@ pub struct NdrBogusStruct {
 	conformant_array NdrType
 }
 
-// read_bogus_struct attempts to read an NdrConformantStruct at the specified address
+// read_bogus_struct attempts to read an NdrBogusStruct at the specified address
 // from process memory.
 pub fn (mut context NdrContext) read_bogus_struct(format NdrFormatChar, mut addr &voidptr)! NdrBogusStruct
 {
