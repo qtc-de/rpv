@@ -183,6 +183,7 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 							{
 								arguments: expr.arguments
 								expression: expr.format()
+								correlation_type: desc.correlation_type
 								typ: desc.parent
 							}
 					   ]
@@ -227,7 +228,21 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 				   ]
 		}
 
-		else {}
+		.fc_pointer_conformance
+		{
+			return [
+						NdrGlobalOffsetAttr
+						{
+							offset: desc.offset
+							typ: desc.parent
+						}
+				   ]
+		}
+
+		.fc_top_level_multid_conformance
+		{
+			utils.log_debug('Missing implementation for fc_top_level_multid_conformance')
+		}
 	}
 
 	return []NdrAttr{}

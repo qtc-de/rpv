@@ -27,7 +27,7 @@ pub fn (intf MidlInterface) format() string
 {
 	mut result := '[\n\tuuid(${intf.id}),\n\tversion(${intf.version})\n]\n\n'
 
-	result += 'interface ${intf.name}\n{\n'
+	result += 'interface I_${intf.name}\n{\n'
 
 	for typ in intf.types
 	{
@@ -102,7 +102,7 @@ pub fn (func MidlFunction) format() string
 
 		if attrs.len > 0
 		{
-			func_str += '${attrs.format_function(func.param_list)} '
+			func_str += '${attrs.format_function(param, func.param_list)} '
 		}
 
 		func_str += '${param.format()},'

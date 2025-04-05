@@ -1,35 +1,49 @@
 module ndr
 
-// KnownType represents a list of known struct types. At the time
-// of writing, only C.GUID is contained.
-pub enum KnownType {
-	guid
-}
+type KnownCheck = fn (mut base NdrBaseStruct) bool
 
-// NdrKnownType represents a known type. The typ member indicates
-// which kind of known type it is, whereas the NdrBaseType member
-// contains information on the underlying NdrFormatChar.
-pub struct NdrKnownType {
-	NdrBaseType
-	typ KnownType
-}
-
-// format returns the string representation of an NdrKnownTyp.
-// Currently, this is just the name of the type representation
-// within the KnownType enum in uppercase.
-pub fn (known NdrKnownType) format() string
+// check_known checks whether the input NdrBaseStruct matches a known struct.
+// The actual checks are performed by the other functions defined in this file.
+// If a function finds a match, it should return true and adjust the struct name
+// and struct member names within its function body.
+pub fn check_known(mut base NdrBaseStruct)
 {
-	return known.typ.str().to_upper()
-}
+	mut known_checks := []KnownCheck{}
+	known_checks << check_guid
 
-// size returns the size of an NdrKnownType. Based on the typ
-// member, a different static value is returned.
-pub fn (known NdrKnownType) size() u32
-{
-	match known.typ
+	for check in known_checks
 	{
-		.guid { return 16 }
+		if check(mut base)
+		{
+			return
+		}
+	}
+}
+
+// check_guid checks whether the specified NdrBaseStruct is the C.GUID struct.
+pub fn check_guid(mut base NdrBaseStruct) bool
+{
+	if base.memory_size == 16 && base.members.len == 4
+	{
+		if base.members[0].format == .fc_long && base.members[1].format == .fc_short && base.members[2].format == .fc_short
+		{
+			mem3 := base.members[3]
+
+			if mem3 is NdrSimpleArray
+			{
+				if mem3.total_size == 8 || mem3.NdrArray.format == .fc_byte
+				{
+					base.NdrComplexType.name = 'GUID'
+					base.names << 'Data1'
+					base.names << 'Data2'
+					base.names << 'Data3'
+					base.names << 'Data4'
+
+					return true
+				}
+			}
+		}
 	}
 
-	return 0
+	return false
 }

@@ -338,7 +338,7 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 				}
 
 				intf_info.sec_callback.name = resolver.load_symbol(intf_info.sec_callback.location.path, u64(intf_info.sec_callback.addr)) or { '' }
-				intf_info.sec_callback.offset = u32(usize(intf_info.sec_callback.addr) - usize(intf_info.location.base))
+				intf_info.sec_callback.offset = u32(usize(intf_info.sec_callback.addr) - usize(intf_info.sec_callback.location.base))
 			}
 
 			resolver.detach_pdb()

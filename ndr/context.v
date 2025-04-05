@@ -192,7 +192,7 @@ pub fn (mut context NdrContext) read_type_ext(mut addr &voidptr)! NdrType
 				mut base_struct := context.read_base_struct(format, mut addr)!
 				base_struct.read_member_info(mut context, mut addr)!
 
-				check_guid(mut base_struct)
+				check_known(mut base_struct)
 				context.type_cache.add_complex(base_struct)
 
 				return base_struct
@@ -354,33 +354,4 @@ pub fn(mut context NdrContext) read_param(mut addr &voidptr, name string)! NdrBa
 		name: name
 		typ: typ
 	}
-}
-
-// check_guid checks whether the specified NdrBaseStruct is the C.GUID struct.
-// C.GUID is used frequently among RPC interfaces. When finding a new struct
-// type, this function is invoked to check whether it is C.GUID. If this is the
-// case, the struct is named accordingly.
-pub fn check_guid(mut base NdrBaseStruct) NdrType
-{
-	if base.memory_size != 16 || base.members.len != 4
-	{
-		return base
-	}
-
-	if base.members[0].format != .fc_long || base.members[1].format != .fc_short || base.members[2].format != .fc_short
-	{
-		return base
-	}
-
-	mem3 := base.members[3]
-
-	if mem3 is NdrSimpleArray
-	{
-		if mem3.total_size == 8 || mem3.NdrArray.format == .fc_byte
-		{
-			base.NdrComplexType.name = 'GUID'
-		}
-	}
-
-	return base
 }

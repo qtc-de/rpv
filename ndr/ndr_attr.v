@@ -1,5 +1,11 @@
 module ndr
 
+import utils
+
+// NdrMember is a helper type to provide unified methods for structs
+// and methods
+type NdrMember = NdrBasicParam | NdrStructMember
+
 // NdrAttr is a type to represent NDR type attributes. NDR types can
 // have attributes like [size_is(arg3)] to indicate that the size of
 // the current argument is determined by argument three of the same
@@ -27,11 +33,12 @@ pub struct NdrStrAttr {
 }
 
 // NdrGlobalOffsetAttr represents an attribute that points to another
-// parameter within the same method. The associated parameter is
-// identified by an offset that is contained within the struct.
-// The actual meaning of the attribute differs depending on the NdrType
-// it is attached to. Therefore, the struct contains an NdrFormatChar
-// member to indicate how the attribute needs to be used.
+// parameter within the same method or another struct member. The
+// associated parameter is identified by an offset that is contained
+// within the struct. The actual meaning of the attribute differs
+// depending on the NdrType it is attached to. Therefore, the struct
+// contains an NdrFormatChar member to indicate how the attribute needs
+// to be used.
 pub struct NdrGlobalOffsetAttr {
 	pub:
 	offset int
@@ -39,33 +46,39 @@ pub struct NdrGlobalOffsetAttr {
 }
 
 // format returns the string representation of an NdrGlobalOffsetAttr.
-// It is required to provide the full parameter list for the method, to
-// determine which parameter the global offset is referencing to.
-pub fn (attr NdrGlobalOffsetAttr) format(params []NdrBasicParam) string
+// It is required to provide the full parameter or member list for the
+// method, to determine which parameter the global offset is referencing
+// to.
+pub fn (attr NdrGlobalOffsetAttr) format(members []NdrMember) string
 {
-	for param in params
+	for member in members
 	{
-		if param.offset == attr.offset
+		if member.offset == attr.offset
 		{
 			match attr.typ
 			{
 				.fc_encapsulated_union,
 				.fc_non_encapsulated_union
 				{
-					return '[switch_is(${param.name})]'
+					return '[switch_is(${member.name})]'
 				}
 
 				else
 				{
-					if param.attrs.has(.is_out)
+					match member
 					{
-						return '[size_is(,*${param.name})]'
+						NdrBasicParam
+						{
+							if member.attrs.has(.is_out)
+							{
+								return '[size_is(,*${member.name})]'
+							}
+						}
+
+						else {}
 					}
 
-					else
-					{
-						return '[size_is(${param.name})]'
-					}
+					return '[size_is(${member.name})]'
 				}
 			}
 		}
@@ -155,6 +168,7 @@ pub fn (attr NdrConstantAttr) format() string
 pub struct NdrExprAttr {
 	arguments []NdrExpression
 	expression string
+	correlation_type NdrCorrelationType
 	typ NdrFormatChar
 }
 
@@ -164,26 +178,58 @@ pub struct NdrExprAttr {
 // this expression to make it complete. Therefore, it is required to provide
 // an array of other struct members to the list. Since references to other members
 // are relative to the current member, it needs to also be provided.
-pub fn (attr NdrExprAttr) format(self NdrStructMember, members []NdrStructMember) string
+pub fn (attr NdrExprAttr) format(self NdrMember, members []NdrMember) string
 {
 	mut expr_str := attr.expression
+	mut var_expressions := []NdrVariableExpression{}
 
-	for arg in attr.arguments
+	for expr in attr.arguments
 	{
-		match arg
+		match expr
 		{
 			NdrVariableExpression
 			{
-				for member in members
-				{
-					if int(member.offset) == (int(self.offset) + arg.offset)
-					{
-						expr_str = expr_str.replace('var{{${arg.offset}}}', member.name)
-					}
-				}
+				var_expressions << expr
+			}
+
+			NdrOperatorExpression
+			{
+				var_expressions << expr.collect_var_expr()
 			}
 
 			else {}
+		}
+	}
+
+	for expr in var_expressions
+	{
+		mut match_index := 0;
+
+		match attr.correlation_type
+		{
+			.fc_normal_conformance
+			{
+				match_index = expr.offset + int(self.offset)
+			}
+
+			.fc_top_level_conformance,
+			.fc_pointer_conformance
+			{
+				match_index = expr.offset
+			}
+
+			else
+			{
+				utils.log_debug('Missing implementation for correlation type: ${attr.correlation_type}')
+			}
+		}
+
+		for member in members
+		{
+			if int(member.offset) == match_index
+			{
+				expr_str = expr_str.replace('var{{${expr.offset}}}', member.name)
+			}
 		}
 	}
 
@@ -222,10 +268,9 @@ pub fn (attr_list []NdrAttr) format() string
 }
 
 // format_struct returns the string representation for a list of NdrAttr types
-// when they are associated with a struct. It seems to be the case that
-// certain attributes like NdrGlobalOffsetAttr are not used for structs.
-// Others require a list of other available struct members and therefore a
-// dedicated format method, that can supply this information.
+// when they are associated with a struct. Some attributes require a list of
+// other available struct members and therefore a dedicated format method,
+// that can supply this information.
 pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []NdrStructMember) string
 {
 	mut attrs_str := ''
@@ -236,9 +281,9 @@ pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []Ndr
 		{
 			NdrStrAttr { attrs_str += attr.value }
 			NdrConstantAttr { attrs_str += attr.format() }
-			NdrExprAttr { attrs_str += attr.format(member, members) }
+			NdrExprAttr { attrs_str += attr.format(NdrMember(member), members.map(NdrMember(it))) }
 			NdrRelativeOffsetAttr { attrs_str += attr.format(member, members) }
-			else {}
+			NdrGlobalOffsetAttr { attrs_str += attr.format(members.map(NdrMember(it))) }
 		}
 	}
 
@@ -250,7 +295,7 @@ pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []Ndr
 // certain attributes like NdrRelativeOffsetAttr are not used for functions.
 // Others require a list of other available  parameters and therefore a
 // dedicated format method, that can supply this information.
-pub fn (attr_list []NdrAttr) format_function(params []NdrBasicParam) string
+pub fn (attr_list []NdrAttr) format_function(param NdrBasicParam, params []NdrBasicParam) string
 {
 	mut attrs_str := ''
 
@@ -259,9 +304,14 @@ pub fn (attr_list []NdrAttr) format_function(params []NdrBasicParam) string
 		match attr
 		{
 			NdrStrAttr { attrs_str += attr.value }
+			NdrExprAttr { attrs_str += attr.format(NdrMember(param), params.map(NdrMember(it))) }
 			NdrConstantAttr { attrs_str += attr.format() }
-			NdrGlobalOffsetAttr { attrs_str += attr.format(params) }
-			else {}
+			NdrGlobalOffsetAttr { attrs_str += attr.format(params.map(NdrMember(it))) }
+
+			else
+			{
+				utils.log_debug('Missing function attribute: ${attr}')
+			}
 		}
 	}
 

@@ -65,23 +65,14 @@ pub struct NdrConformantString {
 
 // attrs returns an array of NdrAttr associated with the NdrConformantString.
 // The NdrAttr array always includes the static NdrStrAttr with value [string].
-// If a correlation descriptor is present, a NdrStrAttr with value [size_is()]
-// is added.
+// If a correlation descriptor is present, this usually adds a [size_is()]
+// attribute.
 pub fn (c_str NdrConformantString) attrs() []NdrAttr
 {
 	mut attrs := []NdrAttr{cap: 1}
 
 	attrs << NdrStrAttr { value: '[string]' }
 	attrs << c_str.c_desc.attrs()
-
-	match c_str.c_desc
-	{
-		NdrNone {}
-		NdrCorrelationDescriptor
-		{
-			attrs << NdrStrAttr{ value: '[size_is(${c_str.char_count()})]' }
-		}
-	}
 
 	return attrs
 }
@@ -109,8 +100,10 @@ pub fn (c_str NdrConformantString) comments() []NdrComment
 }
 
 // char_count returns the character count of an NdrConformantString. If an
-// correlation descriptor is present, the number is obtained from it. Otherwise
-// the static value 1 is returned.
+// correlation descriptor with constant conformanceis present, the number
+// is obtained from it. If no correlation descriptor with constant conformance
+// is present, the size is either unknown or determined by another parameter.
+// In this case, 0 is returned.
 pub fn (c_str NdrConformantString) char_count() u32
 {
 	match c_str.c_desc
@@ -126,7 +119,7 @@ pub fn (c_str NdrConformantString) char_count() u32
 		NdrNone {}
 	}
 
-	return 1
+	return 0
 }
 
 // size returns the size of the NdrConformantString. This is usually equivalent

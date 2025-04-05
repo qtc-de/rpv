@@ -110,6 +110,7 @@ pub struct NdrComplexType {
 // needs obviously an associated type and an offset within the struct.
 // Additionally, the member name is saved within NdrStructMember.
 pub struct NdrStructMember {
+	pub:
 	typ NdrType
 	offset u32
 	name string
@@ -155,6 +156,7 @@ pub struct NdrBaseStruct {
 	location voidptr
 	mut:
 	members []NdrType
+	names	[]string
 }
 
 // read_base_struct attempts to read an NdrBaseStruct from process memory
@@ -210,10 +212,17 @@ pub fn (base NdrBaseStruct) get_members() []NdrStructMember
 			NdrStructPad{}
 			else
 			{
+				mut member_name := 'StructMember${cur_offset:X}'
+
+				if members.len < base.names.len
+				{
+					member_name = base.names[members.len]
+				}
+
 				members << NdrStructMember {
 					typ: member
 					offset: cur_offset
-					name: 'StructMember${cur_offset:X}'
+					name: member_name
 				}
 			}
 		}
@@ -254,18 +263,6 @@ pub fn (base NdrBaseStruct) get_definition() string
 		}
 
 		mut attrs := member.typ.attrs()
-		attrs = attrs.filter(match it
-			{
-				NdrStrAttr,
-				NdrExprAttr,
-				NdrConstantAttr,
-				NdrRelativeOffsetAttr
-				{
-					true
-				}
-				else { false }
-			}
-		)
 
 		if attrs.len > 0
 		{
@@ -373,7 +370,7 @@ pub struct NdrBogusStruct {
 	conformant_array NdrType
 }
 
-// read_bogus_struct attempts to read an NdrConformantStruct at the specified address
+// read_bogus_struct attempts to read an NdrBogusStruct at the specified address
 // from process memory.
 pub fn (mut context NdrContext) read_bogus_struct(format NdrFormatChar, mut addr &voidptr)! NdrBogusStruct
 {
