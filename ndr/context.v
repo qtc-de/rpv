@@ -192,7 +192,7 @@ pub fn (mut context NdrContext) read_type_ext(mut addr &voidptr)! NdrType
 				mut base_struct := context.read_base_struct(format, mut addr)!
 				base_struct.read_member_info(mut context, mut addr)!
 
-				check_guid(mut base_struct)
+				check_known(mut base_struct)
 				context.type_cache.add_complex(base_struct)
 
 				return base_struct
