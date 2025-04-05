@@ -170,6 +170,8 @@ pub fn (context NdrContext) read_correlation_descriptor(format NdrFormatChar, mu
 // parameters.
 pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 {
+	mut ndr_attributes := []NdrAttr{}
+
 	if desc.operator == .fc_expr
 	{
 		mut expr := desc.expression
@@ -178,15 +180,13 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 		{
 			NdrOperatorExpression
 			{
-				return [
-							NdrExprAttr
-							{
-								arguments: expr.arguments
-								expression: expr.format()
-								correlation_type: desc.correlation_type
-								typ: desc.parent
-							}
-					   ]
+				ndr_attributes << NdrExprAttr
+				{
+					arguments: expr.arguments
+					expression: expr.format()
+					correlation_type: desc.correlation_type
+					typ: desc.parent
+				}
 			}
 
 			else
@@ -196,51 +196,62 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 		}
 	}
 
-	match desc.correlation_type
+	else
 	{
-		.fc_top_level_conformance,
-		.fc_pointer_conformance
+		match desc.correlation_type
 		{
-			return [
-						NdrGlobalOffsetAttr
-						{
-							offset: desc.offset
-							typ: desc.parent
-							operator: desc.operator
-						}
-				   ]
+			.fc_top_level_conformance,
+			.fc_pointer_conformance
+			{
+				ndr_attributes << NdrGlobalOffsetAttr
+				{
+					offset: desc.offset
+					typ: desc.parent
+					operator: desc.operator
+				}
+			}
+
+			.fc_normal_conformance
+			{
+				ndr_attributes << NdrRelativeOffsetAttr
+				{
+					offset: desc.offset
+					typ: desc.parent
+					operator: desc.operator
+				}
+			}
+
+			.fc_constant_conformance
+			{
+				ndr_attributes << NdrConstantAttr
+				{
+					offset: desc.offset
+					typ: desc.parent
+				}
+			}
+
+			.fc_top_level_multid_conformance
+			{
+				utils.log_debug('Missing implementation for fc_top_level_multid_conformance')
+			}
 		}
 
-		.fc_normal_conformance
+		match desc.range
 		{
-			return [
-						NdrRelativeOffsetAttr
-						{
-							offset: desc.offset
-							typ: desc.parent
-							operator: desc.operator
-						}
-				   ]
-		}
+			NdrCorrelationDescriptorRange
+			{
+				ndr_attributes << NdrRangeAttr
+				{
+					start: desc.range.min_value
+					end: desc.range.max_value
+				}
+			}
 
-		.fc_constant_conformance
-		{
-			return [
-						NdrConstantAttr
-						{
-							offset: desc.offset
-							typ: desc.parent
-						}
-				   ]
-		}
-
-		.fc_top_level_multid_conformance
-		{
-			utils.log_debug('Missing implementation for fc_top_level_multid_conformance')
+			else {}
 		}
 	}
 
-	return []NdrAttr{}
+	return ndr_attributes
 }
 
 // comments returns an array of NdrComment types that are defined by this

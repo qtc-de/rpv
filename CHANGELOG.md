@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add support for pointer conformance
 * Add support for NDR expressions in method params
 * Add support for NDR correlation operators
+* Add support for NDR ranges
 
 ### Changed
 
