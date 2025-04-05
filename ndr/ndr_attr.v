@@ -1,5 +1,9 @@
 module ndr
 
+// NdrMember is a helper type to provide unified methods for structs
+// and methods
+type NdrMember = NdrBasicParam | NdrStructMember
+
 // NdrAttr is a type to represent NDR type attributes. NDR types can
 // have attributes like [size_is(arg3)] to indicate that the size of
 // the current argument is determined by argument three of the same
@@ -41,7 +45,7 @@ pub struct NdrGlobalOffsetAttr {
 // format returns the string representation of an NdrGlobalOffsetAttr.
 // It is required to provide the full parameter list for the method, to
 // determine which parameter the global offset is referencing to.
-pub fn (attr NdrGlobalOffsetAttr) format(params []NdrBasicParam) string
+pub fn (attr NdrGlobalOffsetAttr) format(params []NdrMember) string
 {
 	for param in params
 	{
@@ -57,15 +61,20 @@ pub fn (attr NdrGlobalOffsetAttr) format(params []NdrBasicParam) string
 
 				else
 				{
-					if param.attrs.has(.is_out)
+					match param
 					{
-						return '[size_is(,*${param.name})]'
+						NdrBasicParam
+						{
+							if param.attrs.has(.is_out)
+							{
+								return '[size_is(,*${param.name})]'
+							}
+						}
+
+						else {}
 					}
 
-					else
-					{
-						return '[size_is(${param.name})]'
-					}
+					return '[size_is(${param.name})]'
 				}
 			}
 		}
@@ -238,7 +247,7 @@ pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []Ndr
 			NdrConstantAttr { attrs_str += attr.format() }
 			NdrExprAttr { attrs_str += attr.format(member, members) }
 			NdrRelativeOffsetAttr { attrs_str += attr.format(member, members) }
-			else {}
+			NdrGlobalOffsetAttr { attrs_str += attr.format(members.map(NdrMember(it))) }
 		}
 	}
 
@@ -260,7 +269,7 @@ pub fn (attr_list []NdrAttr) format_function(params []NdrBasicParam) string
 		{
 			NdrStrAttr { attrs_str += attr.value }
 			NdrConstantAttr { attrs_str += attr.format() }
-			NdrGlobalOffsetAttr { attrs_str += attr.format(params) }
+			NdrGlobalOffsetAttr { attrs_str += attr.format(params.map(NdrMember(it))) }
 			else {}
 		}
 	}

@@ -262,18 +262,6 @@ pub fn (base NdrBaseStruct) get_definition() string
 		}
 
 		mut attrs := member.typ.attrs()
-		attrs = attrs.filter(match it
-			{
-				NdrStrAttr,
-				NdrExprAttr,
-				NdrConstantAttr,
-				NdrRelativeOffsetAttr
-				{
-					true
-				}
-				else { false }
-			}
-		)
 
 		if attrs.len > 0
 		{

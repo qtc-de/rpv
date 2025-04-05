@@ -227,6 +227,17 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 				   ]
 		}
 
+		.fc_pointer_conformance
+		{
+			return [
+						NdrGlobalOffsetAttr
+						{
+							offset: desc.offset
+							typ: desc.parent
+						}
+				   ]
+		}
+
 		else {}
 	}
 

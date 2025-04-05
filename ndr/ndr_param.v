@@ -33,7 +33,7 @@ pub struct NdrBasicParam {
 	attrs NdrParamAttrs
 	typ NdrType = NdrNone{}
 	server_alloc_size int
-	offset int
+	offset u32
 	name string
 }
 
