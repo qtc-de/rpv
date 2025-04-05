@@ -152,7 +152,12 @@ pub fn (array NdrConformantArray) attrs() []NdrAttr
 // Possible comments are fetched from the c_desc correlation descriptor.
 pub fn (array NdrConformantArray) comments() []NdrComment
 {
-	return array.c_desc.comments()
+	mut comments := []NdrComment{}
+
+	comments << array.c_desc.comments()
+	comments << array.v_desc.comments()
+
+	return comments
 }
 
 // length returns the length of an NdrConformantArray. This length is obtained
