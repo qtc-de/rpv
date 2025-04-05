@@ -82,14 +82,16 @@ pub fn (context NdrContext) read_correlation_descriptor_range(mut addr &voidptr)
 // an optional correlation expression.
 struct NdrCorrelationDescriptor
 {
-	correlation_type NdrCorrelationType
-	value_type NdrFormatChar
-	operator NdrFormatChar
-	offset int
-	flags NdrCorrelationFlags
-	range MaybeCorrelationDescriptorRange
-	expression MaybeExpression = MaybeExpression(NdrNone{})
-	parent NdrFormatChar
+	correlation_type	NdrCorrelationType
+	value_type			NdrFormatChar
+	operator			NdrFormatChar
+	offset				int
+	flags				NdrCorrelationFlags
+	range				MaybeCorrelationDescriptorRange
+	expression			MaybeExpression = MaybeExpression(NdrNone{})
+	parent				NdrFormatChar
+	mut:
+	is_varying			bool
 }
 
 // MaybeCorrelationDescriptor represents the possible presence of a
@@ -105,6 +107,16 @@ type MaybeCorrelationDescriptor = NdrCorrelationDescriptor | NdrNone
 // is returned. Otherwise, NdrNone is returned. Both types are wrapped within the
 // MaybeCorrelationDescriptor type.
 pub fn (context NdrContext) read_correlation_descriptor(format NdrFormatChar, mut addr &voidptr)! MaybeCorrelationDescriptor
+{
+	return context.read_correlation_descriptor_ex(format, false, mut addr)!
+}
+
+// read_correlation_descriptor_ex attempts to read an NdrCorrelationDescriptor
+// from the specified address. If it succeeds, the parsed NdrCorrelationDescriptor
+// is returned. Otherwise, NdrNone is returned. Both types are wrapped within the
+// MaybeCorrelationDescriptor type. This function allows the caller to also specify
+// wether the descriptor was read as a varying descriptor
+pub fn (context NdrContext) read_correlation_descriptor_ex(format NdrFormatChar, varying bool, mut addr &voidptr)! MaybeCorrelationDescriptor
 {
 	type_byte := context.read[u8](mut addr)!
 	op_byte := context.read[u8](mut addr)!
@@ -160,6 +172,7 @@ pub fn (context NdrContext) read_correlation_descriptor(format NdrFormatChar, mu
 		range: range
 		expression: expression
 		parent: format
+		is_varying: varying
 	}
 }
 
@@ -186,6 +199,7 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 					expression: expr.format()
 					correlation_type: desc.correlation_type
 					typ: desc.parent
+					is_varying: desc.is_varying
 				}
 			}
 
@@ -208,6 +222,7 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 					offset: desc.offset
 					typ: desc.parent
 					operator: desc.operator
+					is_varying: desc.is_varying
 				}
 			}
 
@@ -218,6 +233,7 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 					offset: desc.offset
 					typ: desc.parent
 					operator: desc.operator
+					is_varying: desc.is_varying
 				}
 			}
 
@@ -227,6 +243,7 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 				{
 					offset: desc.offset
 					typ: desc.parent
+					is_varying: desc.is_varying
 				}
 			}
 

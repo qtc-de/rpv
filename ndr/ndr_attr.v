@@ -41,9 +41,10 @@ pub struct NdrStrAttr {
 // to be used.
 pub struct NdrGlobalOffsetAttr {
 	pub:
-	offset int
-	typ NdrFormatChar
-	operator NdrFormatChar
+	offset		int
+	typ			NdrFormatChar
+	operator	NdrFormatChar
+	is_varying	bool
 }
 
 // format returns the string representation of an NdrGlobalOffsetAttr.
@@ -68,20 +69,22 @@ pub fn (attr NdrGlobalOffsetAttr) format(members []NdrMember) string
 
 				else
 				{
+					prefix := if attr.is_varying { 'length_is' } else { 'size_is' }
+
 					match member
 					{
 						NdrBasicParam
 						{
 							if member.attrs.has(.is_out)
 							{
-								return '[size_is(,*${name})]'
+								return '[${prefix}(,${name})]'
 							}
 						}
 
 						else {}
 					}
 
-					return '[size_is(${name})]'
+					return '[${prefix}(${name})]'
 				}
 			}
 		}
@@ -100,9 +103,10 @@ pub fn (attr NdrGlobalOffsetAttr) format(members []NdrMember) string
 // needs to be used.
 pub struct NdrRelativeOffsetAttr {
 	pub:
-	offset int
-	typ NdrFormatChar
-	operator NdrFormatChar
+	offset		int
+	typ			NdrFormatChar
+	operator	NdrFormatChar
+	is_varying	bool
 }
 
 // format returns the string representation of an NdrRelativeOffsetAttr.
@@ -110,6 +114,8 @@ pub struct NdrRelativeOffsetAttr {
 // determine which parameter the global offset is referencing to.
 pub fn (attr NdrRelativeOffsetAttr) format(self NdrStructMember, members []NdrStructMember) string
 {
+	prefix := if attr.is_varying { 'length_is' } else { 'size_is' }
+
 	for member in members
 	{
 		if int(member.offset) == (int(self.offset) + attr.offset)
@@ -126,7 +132,7 @@ pub fn (attr NdrRelativeOffsetAttr) format(self NdrStructMember, members []NdrSt
 
 				else
 				{
-					return '[size_is(${name})]'
+					return '[${prefix}(${name})]'
 				}
 			}
 		}
@@ -144,7 +150,7 @@ pub fn (attr NdrRelativeOffsetAttr) format(self NdrStructMember, members []NdrSt
 
 		else
 		{
-			return '[size_is(${offset})]'
+			return '[${prefix}(${offset})]'
 		}
 	}
 }
@@ -155,15 +161,17 @@ pub fn (attr NdrRelativeOffsetAttr) format(self NdrStructMember, members []NdrSt
 // associated type is still included within the struct.
 pub struct NdrConstantAttr {
 	pub:
-	offset int
-	typ NdrFormatChar
+	offset		int
+	typ			NdrFormatChar
+	is_varying	bool
 }
 
 // format returns the string representation of an NdrConstantAttr. This is
 // currently [size_is(offset)] for all possible associated types.
 pub fn (attr NdrConstantAttr) format() string
 {
-	return '[size_is(${attr.offset})]'
+	prefix := if attr.is_varying { 'length_is' } else { 'size_is' }
+	return '[${prefix}(${attr.offset})]'
 }
 
 // NdrRangeAttr is an attribute that just contains a range that is defined
@@ -189,10 +197,11 @@ pub fn (attr NdrRangeAttr) format() string
 // and also the arguments as NdrExpression types. When formatting the NdrExprAttr,
 // the arguments need to be resolved and inserted into the expression string.
 pub struct NdrExprAttr {
-	arguments []NdrExpression
-	expression string
-	correlation_type NdrCorrelationType
-	typ NdrFormatChar
+	arguments			[]NdrExpression
+	expression			string
+	correlation_type	NdrCorrelationType
+	typ					NdrFormatChar
+	is_varying			bool
 }
 
 // format returns the string representation of an NdrExprAttr. The skeleton for
@@ -266,7 +275,9 @@ pub fn (attr NdrExprAttr) format(self NdrMember, members []NdrMember) string
 
 		else
 		{
-			return '[size_is(${expr_str})]'
+
+			prefix := if attr.is_varying { 'length_is' } else { 'size_is' }
+			return '[${prefix}(${expr_str})]'
 		}
 	}
 }

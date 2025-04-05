@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix doubling of `size_is` for `NdrConformantString`
 * Fix incorrect offset in NDR variable expressions
 * Fix incorrect handling of teneray operator in NDR expressions
+* Fix handling of varying correlation descriptors
 
 
 ## v1.2.1 - Mar 29, 2025
