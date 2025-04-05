@@ -177,7 +177,7 @@ pub struct NdrExprAttr {
 // this expression to make it complete. Therefore, it is required to provide
 // an array of other struct members to the list. Since references to other members
 // are relative to the current member, it needs to also be provided.
-pub fn (attr NdrExprAttr) format(self NdrStructMember, members []NdrStructMember) string
+pub fn (attr NdrExprAttr) format(self NdrMember, members []NdrMember) string
 {
 	mut expr_str := attr.expression
 
@@ -196,7 +196,12 @@ pub fn (attr NdrExprAttr) format(self NdrStructMember, members []NdrStructMember
 				}
 			}
 
-			else {}
+			else
+			{
+				// notice that the formatted expression value is already contained
+				// in expr_str. This function only applies some post processing, which
+				// is only required for NdrVariableExpression.
+			}
 		}
 	}
 
@@ -248,7 +253,7 @@ pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []Ndr
 		{
 			NdrStrAttr { attrs_str += attr.value }
 			NdrConstantAttr { attrs_str += attr.format() }
-			NdrExprAttr { attrs_str += attr.format(member, members) }
+			NdrExprAttr { attrs_str += attr.format(NdrMember(member), members.map(NdrMember(it))) }
 			NdrRelativeOffsetAttr { attrs_str += attr.format(member, members) }
 			NdrGlobalOffsetAttr { attrs_str += attr.format(members.map(NdrMember(it))) }
 		}
@@ -262,7 +267,7 @@ pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []Ndr
 // certain attributes like NdrRelativeOffsetAttr are not used for functions.
 // Others require a list of other available  parameters and therefore a
 // dedicated format method, that can supply this information.
-pub fn (attr_list []NdrAttr) format_function(params []NdrBasicParam) string
+pub fn (attr_list []NdrAttr) format_function(param NdrBasicParam, params []NdrBasicParam) string
 {
 	mut attrs_str := ''
 
@@ -271,6 +276,7 @@ pub fn (attr_list []NdrAttr) format_function(params []NdrBasicParam) string
 		match attr
 		{
 			NdrStrAttr { attrs_str += attr.value }
+			NdrExprAttr { attrs_str += attr.format(NdrMember(param), params.map(NdrMember(it))) }
 			NdrConstantAttr { attrs_str += attr.format() }
 			NdrGlobalOffsetAttr { attrs_str += attr.format(params.map(NdrMember(it))) }
 

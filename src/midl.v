@@ -102,7 +102,7 @@ pub fn (func MidlFunction) format() string
 
 		if attrs.len > 0
 		{
-			func_str += '${attrs.format_function(func.param_list)} '
+			func_str += '${attrs.format_function(param, func.param_list)} '
 		}
 
 		func_str += '${param.format()},'
