@@ -27,7 +27,7 @@ pub fn (intf MidlInterface) format() string
 {
 	mut result := '[\n\tuuid(${intf.id}),\n\tversion(${intf.version})\n]\n\n'
 
-	result += 'interface ${intf.name}\n{\n'
+	result += 'interface I_${intf.name}\n{\n'
 
 	for typ in intf.types
 	{
