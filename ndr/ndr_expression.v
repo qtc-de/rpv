@@ -185,7 +185,7 @@ pub fn (op_exp NdrOperatorExpression) format() string
 		.op_expression
 		{
 			args := op_exp.arguments
-			return '${args[2]} ? ${args[0]} : ${args[1]}'
+			return '${args[2].format()} ? ${args[0].format()} : ${args[1].format()}'
 		}
 		else { return '' }
 	}
