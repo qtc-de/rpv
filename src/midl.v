@@ -357,7 +357,12 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 		{
 			for ctr := 0; ctr < param_list.len; ctr++
 			{
-				if param_list[ctr].offset > handle.offset
+				if param_list[ctr].offset == handle.offset
+				{
+					break
+				}
+
+				else if param_list[ctr].offset > handle.offset
 				{
 					param_list.insert(ctr, handle.NdrBasicParam)
 					break
