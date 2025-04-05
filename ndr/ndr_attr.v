@@ -1,5 +1,7 @@
 module ndr
 
+import utils
+
 // NdrMember is a helper type to provide unified methods for structs
 // and methods
 type NdrMember = NdrBasicParam | NdrStructMember
@@ -31,11 +33,12 @@ pub struct NdrStrAttr {
 }
 
 // NdrGlobalOffsetAttr represents an attribute that points to another
-// parameter within the same method. The associated parameter is
-// identified by an offset that is contained within the struct.
-// The actual meaning of the attribute differs depending on the NdrType
-// it is attached to. Therefore, the struct contains an NdrFormatChar
-// member to indicate how the attribute needs to be used.
+// parameter within the same method or another struct member. The
+// associated parameter is identified by an offset that is contained
+// within the struct. The actual meaning of the attribute differs
+// depending on the NdrType it is attached to. Therefore, the struct
+// contains an NdrFormatChar member to indicate how the attribute needs
+// to be used.
 pub struct NdrGlobalOffsetAttr {
 	pub:
 	offset int
@@ -43,38 +46,39 @@ pub struct NdrGlobalOffsetAttr {
 }
 
 // format returns the string representation of an NdrGlobalOffsetAttr.
-// It is required to provide the full parameter list for the method, to
-// determine which parameter the global offset is referencing to.
-pub fn (attr NdrGlobalOffsetAttr) format(params []NdrMember) string
+// It is required to provide the full parameter or member list for the
+// method, to determine which parameter the global offset is referencing
+// to.
+pub fn (attr NdrGlobalOffsetAttr) format(members []NdrMember) string
 {
-	for param in params
+	for member in members
 	{
-		if param.offset == attr.offset
+		if member.offset == attr.offset
 		{
 			match attr.typ
 			{
 				.fc_encapsulated_union,
 				.fc_non_encapsulated_union
 				{
-					return '[switch_is(${param.name})]'
+					return '[switch_is(${member.name})]'
 				}
 
 				else
 				{
-					match param
+					match member
 					{
 						NdrBasicParam
 						{
-							if param.attrs.has(.is_out)
+							if member.attrs.has(.is_out)
 							{
-								return '[size_is(,*${param.name})]'
+								return '[size_is(,*${member.name})]'
 							}
 						}
 
 						else {}
 					}
 
-					return '[size_is(${param.name})]'
+					return '[size_is(${member.name})]'
 				}
 			}
 		}
@@ -231,10 +235,9 @@ pub fn (attr_list []NdrAttr) format() string
 }
 
 // format_struct returns the string representation for a list of NdrAttr types
-// when they are associated with a struct. It seems to be the case that
-// certain attributes like NdrGlobalOffsetAttr are not used for structs.
-// Others require a list of other available struct members and therefore a
-// dedicated format method, that can supply this information.
+// when they are associated with a struct. Some attributes require a list of
+// other available struct members and therefore a dedicated format method,
+// that can supply this information.
 pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []NdrStructMember) string
 {
 	mut attrs_str := ''
@@ -270,7 +273,11 @@ pub fn (attr_list []NdrAttr) format_function(params []NdrBasicParam) string
 			NdrStrAttr { attrs_str += attr.value }
 			NdrConstantAttr { attrs_str += attr.format() }
 			NdrGlobalOffsetAttr { attrs_str += attr.format(params.map(NdrMember(it))) }
-			else {}
+
+			else
+			{
+				utils.log_debug('Missing function attribute: ${attr}')
+			}
 		}
 	}
 

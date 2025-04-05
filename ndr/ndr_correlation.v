@@ -238,7 +238,10 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 				   ]
 		}
 
-		else {}
+		.fc_top_level_multid_conformance
+		{
+			utils.log_debug('Missing implementation for fc_top_level_multid_conformance')
+		}
 	}
 
 	return []NdrAttr{}
