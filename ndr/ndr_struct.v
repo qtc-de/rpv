@@ -110,6 +110,7 @@ pub struct NdrComplexType {
 // needs obviously an associated type and an offset within the struct.
 // Additionally, the member name is saved within NdrStructMember.
 pub struct NdrStructMember {
+	pub:
 	typ NdrType
 	offset u32
 	name string
