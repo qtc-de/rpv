@@ -183,6 +183,7 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 							{
 								arguments: expr.arguments
 								expression: expr.format()
+								correlation_type: desc.correlation_type
 								typ: desc.parent
 							}
 					   ]

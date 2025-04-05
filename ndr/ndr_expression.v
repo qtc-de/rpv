@@ -121,7 +121,8 @@ pub fn (context NdrContext) read_expression(mut addr &voidptr)! MaybeExpression
 // function.
 pub fn (context NdrContext) read_context_expression(index int)! MaybeExpression
 {
-	unsafe {
+	unsafe
+	{
 		expr_desc := context.read_s[internals.NDR_EXPR_DESC](context.stub_desc.Reserved5)!
 		expr_offset := context.read_s[i16](voidptr(&u8(expr_desc.p_offset) + 2 * index))!
 
@@ -202,6 +203,33 @@ pub fn (op_exp NdrOperatorExpression) format_unary(op string) string
 pub fn (op_exp NdrOperatorExpression) format_binary(op string) string
 {
 	return '${(op_exp.arguments[0]).format()} ${op} ${(op_exp.arguments[1]).format()}'
+}
+
+// collect_var_exr returns an array of variable expressions contained in this
+// operator expression.
+pub fn (op_exp NdrOperatorExpression) collect_var_expr() []NdrVariableExpression
+{
+	mut var_expr := []NdrVariableExpression{}
+
+	for expr in op_exp.arguments
+	{
+		match expr
+		{
+			NdrVariableExpression
+			{
+				var_expr << expr
+			}
+
+			NdrOperatorExpression
+			{
+				var_expr << expr.collect_var_expr()
+			}
+
+			else {}
+		}
+	}
+
+	return var_expr
 }
 
 // read_operator_expression attempts to read an NdrOperatorExpression from

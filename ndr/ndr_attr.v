@@ -168,6 +168,7 @@ pub fn (attr NdrConstantAttr) format() string
 pub struct NdrExprAttr {
 	arguments []NdrExpression
 	expression string
+	correlation_type NdrCorrelationType
 	typ NdrFormatChar
 }
 
@@ -180,27 +181,54 @@ pub struct NdrExprAttr {
 pub fn (attr NdrExprAttr) format(self NdrMember, members []NdrMember) string
 {
 	mut expr_str := attr.expression
+	mut var_expressions := []NdrVariableExpression{}
 
-	for arg in attr.arguments
+	for expr in attr.arguments
 	{
-		match arg
+		match expr
 		{
 			NdrVariableExpression
 			{
-				for member in members
-				{
-					if int(member.offset) == (int(self.offset) + arg.offset)
-					{
-						expr_str = expr_str.replace('var{{${arg.offset}}}', member.name)
-					}
-				}
+				var_expressions << expr
+			}
+
+			NdrOperatorExpression
+			{
+				var_expressions << expr.collect_var_expr()
+			}
+
+			else {}
+		}
+	}
+
+	for expr in var_expressions
+	{
+		mut match_index := 0;
+
+		match attr.correlation_type
+		{
+			.fc_normal_conformance
+			{
+				match_index = expr.offset + int(self.offset)
+			}
+
+			.fc_top_level_conformance,
+			.fc_pointer_conformance
+			{
+				match_index = expr.offset
 			}
 
 			else
 			{
-				// notice that the formatted expression value is already contained
-				// in expr_str. This function only applies some post processing, which
-				// is only required for NdrVariableExpression.
+				utils.log_debug('Missing implementation for correlation type: ${attr.correlation_type}')
+			}
+		}
+
+		for member in members
+		{
+			if int(member.offset) == match_index
+			{
+				expr_str = expr_str.replace('var{{${expr.offset}}}', member.name)
 			}
 		}
 	}

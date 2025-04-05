@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Refactor checks for known structs
 * Fix bug when updating security callbacks
 * Fix doubling of `size_is` for `NdrConformantString`
+* Fix incorrect offset in NDR variable expressions
 
 
 ## v1.2.1 - Mar 29, 2025
