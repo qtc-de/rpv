@@ -189,19 +189,24 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 					   ]
 			}
 
-			else {}
+			else
+			{
+				utils.log_debug('Missing implementation for ${expr}.')
+			}
 		}
 	}
 
 	match desc.correlation_type
 	{
-		.fc_top_level_conformance
+		.fc_top_level_conformance,
+		.fc_pointer_conformance
 		{
 			return [
 						NdrGlobalOffsetAttr
 						{
 							offset: desc.offset
 							typ: desc.parent
+							operator: desc.operator
 						}
 				   ]
 		}
@@ -213,6 +218,7 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 						{
 							offset: desc.offset
 							typ: desc.parent
+							operator: desc.operator
 						}
 				   ]
 		}
@@ -221,17 +227,6 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 		{
 			return [
 						NdrConstantAttr
-						{
-							offset: desc.offset
-							typ: desc.parent
-						}
-				   ]
-		}
-
-		.fc_pointer_conformance
-		{
-			return [
-						NdrGlobalOffsetAttr
 						{
 							offset: desc.offset
 							typ: desc.parent

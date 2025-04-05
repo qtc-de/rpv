@@ -43,6 +43,7 @@ pub struct NdrGlobalOffsetAttr {
 	pub:
 	offset int
 	typ NdrFormatChar
+	operator NdrFormatChar
 }
 
 // format returns the string representation of an NdrGlobalOffsetAttr.
@@ -55,12 +56,14 @@ pub fn (attr NdrGlobalOffsetAttr) format(members []NdrMember) string
 	{
 		if member.offset == attr.offset
 		{
+			name := apply_operator(member.name, attr.operator)
+
 			match attr.typ
 			{
 				.fc_encapsulated_union,
 				.fc_non_encapsulated_union
 				{
-					return '[switch_is(${member.name})]'
+					return '[switch_is(${name})]'
 				}
 
 				else
@@ -71,14 +74,14 @@ pub fn (attr NdrGlobalOffsetAttr) format(members []NdrMember) string
 						{
 							if member.attrs.has(.is_out)
 							{
-								return '[size_is(,*${member.name})]'
+								return '[size_is(,*${name})]'
 							}
 						}
 
 						else {}
 					}
 
-					return '[size_is(${member.name})]'
+					return '[size_is(${name})]'
 				}
 			}
 		}
@@ -99,6 +102,7 @@ pub struct NdrRelativeOffsetAttr {
 	pub:
 	offset int
 	typ NdrFormatChar
+	operator NdrFormatChar
 }
 
 // format returns the string representation of an NdrRelativeOffsetAttr.
@@ -110,33 +114,37 @@ pub fn (attr NdrRelativeOffsetAttr) format(self NdrStructMember, members []NdrSt
 	{
 		if int(member.offset) == (int(self.offset) + attr.offset)
 		{
+			name := apply_operator(member.name, attr.operator)
+
 			match attr.typ
 			{
 				.fc_encapsulated_union,
 				.fc_non_encapsulated_union
 				{
-					return '[switch_is(${member.name})]'
+					return '[switch_is(${name})]'
 				}
 
 				else
 				{
-					return '[size_is(${member.name})]'
+					return '[size_is(${name})]'
 				}
 			}
 		}
 	}
+
+	offset := apply_operator('${attr.offset}', attr.operator)
 
 	match attr.typ
 	{
 		.fc_encapsulated_union,
 		.fc_non_encapsulated_union
 		{
-			return '[switch_is(${attr.offset})]'
+			return '[switch_is(${offset})]'
 		}
 
 		else
 		{
-			return '[size_is(${attr.offset})]'
+			return '[size_is(${offset})]'
 		}
 	}
 }
@@ -334,4 +342,21 @@ pub fn (attr_list []NdrAttr) uniq() []NdrAttr
 	}
 
 	return uniq
+}
+
+// apply_operator applies the specified NDR conformant operator to the
+// input string
+pub fn apply_operator(input string, operator NdrFormatChar) string
+{
+	match operator
+	{
+		.fc_add_1 { return '${input} + 1' }
+		.fc_sub_1 { return '${input} - 1' }
+		.fc_mult_2 { return '${input} * 2' }
+		.fc_div_2 { return '${input} / 2' }
+		.fc_dereference { return '*${input}' }
+		else {}
+	}
+
+	return input
 }
