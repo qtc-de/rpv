@@ -387,6 +387,7 @@ pub enum SemaphoreAccessRights as u32
 }
 
 // TokenAccessRights represents access masks used for token access
+@[flag]
 pub enum TokenAccessRights as u32
 {
 	assign_primary			// 0x00000001
