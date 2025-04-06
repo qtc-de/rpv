@@ -144,12 +144,12 @@ pub fn (format NdrFormatChar) format() string
 		.fc_ignore,
 		.fc_int3264 { '__int3264' }
 		.fc_uint3264 { 'unsigned __int3264' }
-		.fc_system_handle { 'HANDLE' }
+		.fc_system_handle { 'void*' }
 		.fc_auto_handle,
 		.fc_callback_handle,
 		.fc_bind_primitive,
-		.fc_bind_generic { 'handle_t' }
-		.fc_bind_context { 'void*' }
+		.fc_bind_generic,
+		.fc_bind_context { 'handle_t' }
 
 		else { format.str() }
 	}

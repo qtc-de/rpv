@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix incorrect handling of teneray operator in NDR expressions
 * Fix handling of varying correlation descriptors
 * Fix duplicate handle parameter for certain interfaces
+* Fix handling of system handles
 
 
 ## v1.2.1 - Mar 29, 2025
