@@ -166,6 +166,7 @@ pub struct NdrInfo {
 	midl_version u32
 	flags usize
 	syntax string
+	syntax_name string
 }
 
 // get_rpc_process_infos returns an RpvProcessInformation array containing
@@ -727,6 +728,15 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 			midl_version: midl_stub_desc.MIDLVersion
 			flags: usize(midl_stub_desc.mFlags)
 			syntax: win.uuid_to_str(interface_info.intf.server_interface.transfer_syntax) or { 'unknown' }
+			syntax_name: if interface_info.intf.server_interface.transfer_syntax.equals(internals.ndr64_transfer_syntax)
+			{
+				'NDR64'
+			}
+
+			else
+			{
+				'DCE'
+			}
 		}
 		midl_stub_desc: midl_stub_desc
 		sec_callback: sec_callback
