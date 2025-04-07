@@ -10,9 +10,10 @@ type MaybePointerInfo = NdrPointerInfo | NdrNone
 // offsets and the NdrType type of the referenced type. At least that's
 // what I would guess. This type was copied from James implementation
 // and I'm not really sure, how it is used or formatted.
-pub struct NdrPointerInfoInstance {
-	mem_offset int
-	buf_offset int
+pub struct NdrPointerInfoInstance
+{
+	mem_offset   int
+	buf_offset   int
 	pointer_type NdrType
 }
 
@@ -24,9 +25,10 @@ pub fn (mut context NdrContext) read_pointer_info_instance(mut addr &voidptr)! N
 	buf_offset := context.read[u16](mut addr)!
 	pointer_type := context.read_type_ext(mut addr)!
 
-	return NdrPointerInfoInstance {
-		mem_offset: mem_offset
-		buf_offset: buf_offset
+	return NdrPointerInfoInstance
+	{
+		mem_offset:   mem_offset
+		buf_offset:   buf_offset
 		pointer_type: pointer_type
 	}
 }
@@ -34,13 +36,14 @@ pub fn (mut context NdrContext) read_pointer_info_instance(mut addr &voidptr)! N
 // NdrPointerInfo is a pointer like struct that probably references another
 // NDR type. At least that's what I would guess. This type was copied from
 // James implementation and I'm not really sure, how it is used or formatted.
-pub struct NdrPointerInfo {
+pub struct NdrPointerInfo
+{
 	NdrBaseType
 	base_ptr_type NdrFormatChar
-	sub_ptr_type NdrFormatChar
-	iterations int
-	increment int
-	offset int
+	sub_ptr_type  NdrFormatChar
+	iterations    int
+	increment     int
+	offset        int
 	ptr_instances []NdrPointerInfoInstance
 }
 
@@ -63,8 +66,8 @@ pub fn (mut context NdrContext) read_pointer_info(mut addr &voidptr)! NdrPointer
 	{
 		.fc_no_repeat { instances << context.read_pointer_info_instance(mut addr)! }
 		.fc_fixed_repeat,
-		.fc_variable_repeat {
-
+		.fc_variable_repeat
+		{
 			if base_ptr_type == .fc_fixed_repeat
 			{
 				iterations = context.read[u16](mut addr)!
@@ -76,22 +79,24 @@ pub fn (mut context NdrContext) read_pointer_info(mut addr &voidptr)! NdrPointer
 
 			utils.log_debug('Attempting to read ${ptr_num} pointers')
 
-			for ctr := 0; ctr < ptr_num; ctr++ {
+			for ctr := 0; ctr < ptr_num; ctr++
+			{
 				instances << context.read_pointer_info_instance(mut addr)!
 			}
 		}
+
 		else {}
 	}
 
 	for context.read[NdrFormatChar](mut addr)! != NdrFormatChar.fc_end {}
 
-	return NdrPointerInfo {
-		format: NdrFormatChar.fc_pp
+	return NdrPointerInfo{
+		format:        NdrFormatChar.fc_pp
 		base_ptr_type: base_ptr_type
-		sub_ptr_type: sub_ptr_type
-		iterations: iterations
-		increment: increment
-		offset: offset
+		sub_ptr_type:  sub_ptr_type
+		iterations:    iterations
+		increment:     increment
+		offset:        offset
 		ptr_instances: instances
 	}
 }
@@ -99,28 +104,31 @@ pub fn (mut context NdrContext) read_pointer_info(mut addr &voidptr)! NdrPointer
 // NdrComplexType is the base type that is extended by all other struct
 // definitions within this file. The NdrBaseType member indicates the type
 // of the underlying struct.
-pub struct NdrComplexType {
+pub struct NdrComplexType
+{
 	NdrBaseType
 	member_count u32
-	mut:
+mut:
 	name string
 }
 
 // NdrStructMember represents one member of an NdrStruct. A struct member
 // needs obviously an associated type and an offset within the struct.
 // Additionally, the member name is saved within NdrStructMember.
-pub struct NdrStructMember {
-	pub:
-	typ NdrType
+pub struct NdrStructMember
+{
+pub:
+	typ    NdrType
 	offset u32
-	name string
+	name   string
 }
 
 // NdrStructPad represents padding that is applied to struct members.
 // Padding bytes are common within of struct definitions to align types
 // to certain boundaries. NdrStructPad just consists out of the
 // NdrBaseType that defines the padding.
-pub struct NdrStructPad {
+pub struct NdrStructPad
+{
 	NdrBaseType
 }
 
@@ -148,15 +156,16 @@ pub fn (pad NdrStructPad) size() u32
 // of an NdrBaseStruct are contained in the members array. Moreover,
 // NdrBaseStruct adds some additional fields to implement the ComplexType
 // interface.
-pub struct NdrBaseStruct {
+pub struct NdrBaseStruct
+{
 	NdrComplexType
-	id u32
-	alignment u8
+	id          u32
+	alignment   u8
 	memory_size int
-	location voidptr
-	mut:
+	location    voidptr
+mut:
 	members []NdrType
-	names	[]string
+	names   []string
 }
 
 // read_base_struct attempts to read an NdrBaseStruct from process memory
@@ -168,13 +177,13 @@ pub fn (mut context NdrContext) read_base_struct(format NdrFormatChar, mut addr 
 	memory_size := context.read[u16](mut addr)!
 	id := context.type_cache.get_id(location)
 
-	return NdrBaseStruct {
-		id: id
-		format: format
-		name: 'Struct_${id}'
-		alignment: alignment
+	return NdrBaseStruct{
+		id:          id
+		format:      format
+		name:        'Struct_${id}'
+		alignment:   alignment
 		memory_size: memory_size
-		location: location
+		location:    location
 	}
 }
 
@@ -219,10 +228,11 @@ pub fn (base NdrBaseStruct) get_members() []NdrStructMember
 					member_name = base.names[members.len]
 				}
 
-				members << NdrStructMember {
-					typ: member
+				members << NdrStructMember
+				{
+					typ:    member
 					offset: cur_offset
-					name: member_name
+					name:   member_name
 				}
 			}
 		}
@@ -302,7 +312,8 @@ pub fn (base NdrBaseStruct) size() u32
 // NdrSimpleStructWithPointers is basically the same as NdrBaseStruct, but also
 // contains an NdrPointerInfo. At the time of writing, the pointer information
 // is not used at all and the struct is formatted in the same way as NdrBaseStruct.
-pub struct NdrSimpleStructWithPointers {
+pub struct NdrSimpleStructWithPointers
+{
 	NdrBaseStruct
 	pointer_info NdrPointerInfo
 }
@@ -337,7 +348,8 @@ pub fn (mut context NdrContext) read_struct_with_pointers(mut addr &voidptr)! Nd
 // NdrConformantStruct extends NdrBaseStruct by adding an additional conformant array
 // that describes the struct. At the time of writing, the conformant_array is not used
 // at all and the struct is formatted the same as NdrBaseStruct.
-pub struct NdrConformantStruct {
+pub struct NdrConformantStruct
+{
 	NdrBaseStruct
 	conformant_array NdrType
 }
@@ -353,7 +365,8 @@ pub fn (mut context NdrContext) read_conformant_struct(format NdrFormatChar, mut
 	base_struct.read_member_info(mut context, mut addr)!
 	base_struct.members << conformant_array
 
-	conf_struct := NdrConformantStruct {
+	conf_struct := NdrConformantStruct
+	{
 		NdrBaseStruct: base_struct
 		conformant_array: conformant_array
 	}
@@ -365,7 +378,8 @@ pub fn (mut context NdrContext) read_conformant_struct(format NdrFormatChar, mut
 // NdrBogusStruct extends NdrBaseStruct by adding an additional conformant array
 // that describes the struct. At the time of writing, the conformant_array is not used
 // at all and the struct is formatted the same as NdrBaseStruct.
-pub struct NdrBogusStruct {
+pub struct NdrBogusStruct
+{
 	NdrBaseStruct
 	conformant_array NdrType
 }
@@ -406,8 +420,9 @@ pub fn (mut context NdrContext) read_bogus_struct(format NdrFormatChar, mut addr
 		else { base_struct.members << conformant_array }
 	}
 
-	bogus_struct := NdrBogusStruct {
-		NdrBaseStruct: base_struct
+	bogus_struct := NdrBogusStruct
+	{
+		NdrBaseStruct:    base_struct
 		conformant_array: conformant_array
 	}
 
@@ -417,7 +432,8 @@ pub fn (mut context NdrContext) read_bogus_struct(format NdrFormatChar, mut addr
 
 // NdrIgnore is basically equivalent to an `NdrBaseType`, but gets an additional comment
 // during formatting, that indicates that the type should be ignored.
-pub struct NdrIgnore {
+pub struct NdrIgnore
+{
 	NdrBaseType
 }
 
