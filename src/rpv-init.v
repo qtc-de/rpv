@@ -8,22 +8,27 @@ import internals { validate_rpc_version }
 // CoInitialize. If one of these operations fails, the module causes a panic.
 // Additionally, the RPC runtime version is obtained and compared against the
 // selected RPC struct definitions within the rpv.internals module.
-fn init() {
+fn init()
+{
 	utils.log_debug('Starting initialization of rpv.')
 
-	win.adjust_privilege("SeDebugPrivilege", true) or {
+	win.adjust_privilege("SeDebugPrivilege", true) or
+	{
 		panic('Failure while enabling SeDebugPrivilege: ${err}')
 	}
 
-	if C.CoInitialize(&voidptr(0)) != C.S_OK {
+	if C.CoInitialize(&voidptr(0)) != C.S_OK
+	{
 		panic('Failure while initializing the COM library.')
 	}
 
-	rpc_version := win.get_rpc_runtime_version() or {
+	rpc_version := win.get_rpc_runtime_version() or
+	{
 		panic('Unable to obtain RPC runtime version: ${err}')
 	}
 
-	validate_rpc_version(rpc_version) or {
+	validate_rpc_version(rpc_version) or
+	{
 		eprintln(err)
 		return
 	}

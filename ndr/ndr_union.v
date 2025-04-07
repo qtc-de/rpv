@@ -235,11 +235,9 @@ pub fn (uni NdrUnion) get_definition() string
 		NdrNone {}
 		else
 		{
-			union_def += '${indent}/* default */\n'
-
 			if uni.arms.default_arm.format != .fc_zero
 			{
-				union_def += '${indent}${uni.arms.default_arm.format()} Default;\n'
+				union_def += '${indent}[default] ${uni.arms.default_arm.format()} Default;\n'
 			}
 		}
 	}

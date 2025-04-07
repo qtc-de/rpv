@@ -125,7 +125,7 @@ pub fn (mut context NdrContext) read_conformant_array(format NdrFormatChar, mut 
 
 	if format == .fc_cvarray
 	{
-		v_desc = context.read_correlation_descriptor(format, mut addr)!
+		v_desc = context.read_correlation_descriptor_ex(format, true, mut addr)!
 	}
 
 	return NdrConformantArray {
@@ -152,7 +152,12 @@ pub fn (array NdrConformantArray) attrs() []NdrAttr
 // Possible comments are fetched from the c_desc correlation descriptor.
 pub fn (array NdrConformantArray) comments() []NdrComment
 {
-	return array.c_desc.comments()
+	mut comments := []NdrComment{}
+
+	comments << array.c_desc.comments()
+	comments << array.v_desc.comments()
+
+	return comments
 }
 
 // length returns the length of an NdrConformantArray. This length is obtained
@@ -215,7 +220,7 @@ pub fn(mut context NdrContext) read_bogus_array(format NdrFormatChar, mut addr &
 	num := context.read[u16](mut addr)!
 
 	c_desc := context.read_correlation_descriptor(format, mut addr)!
-	v_desc := context.read_correlation_descriptor(format, mut addr)!
+	v_desc := context.read_correlation_descriptor_ex(format, true, mut addr)!
 
 	array := context.read_array(format, alignment, mut addr)!
 
@@ -275,7 +280,7 @@ pub fn(mut context NdrContext) read_varying_array(format NdrFormatChar, mut addr
 	}
 
 	element_size := context.read[u16](mut addr)!
-	v_desc := context.read_correlation_descriptor(format, mut addr)!
+	v_desc := context.read_correlation_descriptor_ex(format, true, mut addr)!
 
 	return NdrVaryingArray {
 		NdrArray: context.read_array(format, alignment, mut addr)!

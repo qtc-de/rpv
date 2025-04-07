@@ -82,14 +82,16 @@ pub fn (context NdrContext) read_correlation_descriptor_range(mut addr &voidptr)
 // an optional correlation expression.
 struct NdrCorrelationDescriptor
 {
-	correlation_type NdrCorrelationType
-	value_type NdrFormatChar
-	operator NdrFormatChar
-	offset int
-	flags NdrCorrelationFlags
-	range MaybeCorrelationDescriptorRange
-	expression MaybeExpression = MaybeExpression(NdrNone{})
-	parent NdrFormatChar
+	correlation_type	NdrCorrelationType
+	value_type			NdrFormatChar
+	operator			NdrFormatChar
+	offset				int
+	flags				NdrCorrelationFlags
+	range				MaybeCorrelationDescriptorRange
+	expression			MaybeExpression = MaybeExpression(NdrNone{})
+	parent				NdrFormatChar
+	mut:
+	is_varying			bool
 }
 
 // MaybeCorrelationDescriptor represents the possible presence of a
@@ -105,6 +107,16 @@ type MaybeCorrelationDescriptor = NdrCorrelationDescriptor | NdrNone
 // is returned. Otherwise, NdrNone is returned. Both types are wrapped within the
 // MaybeCorrelationDescriptor type.
 pub fn (context NdrContext) read_correlation_descriptor(format NdrFormatChar, mut addr &voidptr)! MaybeCorrelationDescriptor
+{
+	return context.read_correlation_descriptor_ex(format, false, mut addr)!
+}
+
+// read_correlation_descriptor_ex attempts to read an NdrCorrelationDescriptor
+// from the specified address. If it succeeds, the parsed NdrCorrelationDescriptor
+// is returned. Otherwise, NdrNone is returned. Both types are wrapped within the
+// MaybeCorrelationDescriptor type. This function allows the caller to also specify
+// wether the descriptor was read as a varying descriptor
+pub fn (context NdrContext) read_correlation_descriptor_ex(format NdrFormatChar, varying bool, mut addr &voidptr)! MaybeCorrelationDescriptor
 {
 	type_byte := context.read[u8](mut addr)!
 	op_byte := context.read[u8](mut addr)!
@@ -160,6 +172,7 @@ pub fn (context NdrContext) read_correlation_descriptor(format NdrFormatChar, mu
 		range: range
 		expression: expression
 		parent: format
+		is_varying: varying
 	}
 }
 
@@ -170,6 +183,8 @@ pub fn (context NdrContext) read_correlation_descriptor(format NdrFormatChar, mu
 // parameters.
 pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 {
+	mut ndr_attributes := []NdrAttr{}
+
 	if desc.operator == .fc_expr
 	{
 		mut expr := desc.expression
@@ -178,59 +193,82 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 		{
 			NdrOperatorExpression
 			{
-				return [
-							NdrExprAttr
-							{
-								arguments: expr.arguments
-								expression: expr.format()
-								typ: desc.parent
-							}
-					   ]
+				ndr_attributes << NdrExprAttr
+				{
+					arguments: expr.arguments
+					expression: expr.format()
+					correlation_type: desc.correlation_type
+					typ: desc.parent
+					is_varying: desc.is_varying
+				}
+			}
+
+			else
+			{
+				utils.log_debug('Missing implementation for ${expr}.')
+			}
+		}
+	}
+
+	else
+	{
+		match desc.correlation_type
+		{
+			.fc_top_level_conformance,
+			.fc_pointer_conformance
+			{
+				ndr_attributes << NdrGlobalOffsetAttr
+				{
+					offset: desc.offset
+					typ: desc.parent
+					operator: desc.operator
+					is_varying: desc.is_varying
+				}
+			}
+
+			.fc_normal_conformance
+			{
+				ndr_attributes << NdrRelativeOffsetAttr
+				{
+					offset: desc.offset
+					typ: desc.parent
+					operator: desc.operator
+					is_varying: desc.is_varying
+				}
+			}
+
+			.fc_constant_conformance
+			{
+				ndr_attributes << NdrConstantAttr
+				{
+					offset: desc.offset
+					typ: desc.parent
+					is_varying: desc.is_varying
+				}
+			}
+
+			.fc_top_level_multid_conformance
+			{
+				utils.log_debug('Missing implementation for fc_top_level_multid_conformance')
+			}
+		}
+
+		match desc.range
+		{
+			NdrCorrelationDescriptorRange
+			{
+				ndr_attributes << NdrRangeAttr
+				{
+					start: desc.range.min_value
+					end: desc.range.max_value
+				}
 			}
 
 			else {}
 		}
 	}
 
-	match desc.correlation_type
-	{
-		.fc_top_level_conformance
-		{
-			return [
-						NdrGlobalOffsetAttr
-						{
-							offset: desc.offset
-							typ: desc.parent
-						}
-				   ]
-		}
-
-		.fc_normal_conformance
-		{
-			return [
-						NdrRelativeOffsetAttr
-						{
-							offset: desc.offset
-							typ: desc.parent
-						}
-				   ]
-		}
-
-		.fc_constant_conformance
-		{
-			return [
-						NdrConstantAttr
-						{
-							offset: desc.offset
-							typ: desc.parent
-						}
-				   ]
-		}
-
-		else {}
-	}
-
-	return []NdrAttr{}
+	return ndr_attributes
 }
 
 // comments returns an array of NdrComment types that are defined by this

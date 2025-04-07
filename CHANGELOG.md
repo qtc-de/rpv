@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## v1.3.0 - Apr 07, 2025
+
+### Added
+
+* Add support for pointer conformance
+* Add support for NDR expressions in method params
+* Add support for NDR correlation operators
+* Add support for NDR ranges
+
+### Changed
+
+* Refactor checks for known structs
+* Fix bug when updating security callbacks
+* Fix doubling of `size_is` for `NdrConformantString`
+* Fix incorrect offset in NDR variable expressions
+* Fix incorrect handling of teneray operator in NDR expressions
+* Fix handling of varying correlation descriptors
+* Fix duplicate handle parameter for certain interfaces
+* Fix handling of system handles
+* Fix union default arm formatting
+
+
 ## v1.2.1 - Mar 29, 2025
 
 ### Changed

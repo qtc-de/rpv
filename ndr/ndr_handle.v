@@ -44,19 +44,33 @@ pub fn (mut context NdrContext) read_system_handle(mut addr &voidptr)! NdrSystem
 	}
 }
 
-// format returns the string representation of an NdrSystemHandle.
-// All different handle types are generally formatted as HANDLE.
-// However, depending on the underlying resource type, the access
-// mask is formatted differently and returned within a comment
-// that the HANDLE is prefixed with.
-pub fn (handle NdrSystemHandle) format() string
+// attrs returns the attributes for NdrSystemHandle.
+pub fn (handle NdrSystemHandle) attrs() []NdrAttr
 {
-	mut format := '/* FC_SYSTEM_HANDLE ${handle.resource}'
+	mut attrs := []NdrAttr{cap: 1}
+	mut format := '[system_handle(${handle.get_attr_name()}'
 
 	if handle.access_mask != 0
 	{
+		format += ', 0x${handle.access_mask.hex()}'
+	}
 
-		format += '('
+	attrs << NdrStrAttr{
+		value: format + ')]'
+	}
+
+	return attrs
+}
+
+// comments returns the comments for NdrSystemHandle.
+pub fn (handle NdrSystemHandle) comments() []NdrComment
+{
+	mut comments := []NdrComment{}
+	comments << NdrComment { value: 'HANDLE for resource type: ${handle.resource}' }
+
+	if handle.access_mask != 0
+	{
+		mut format := 'Access: '
 
 		unsafe
 		{
@@ -119,11 +133,33 @@ pub fn (handle NdrSystemHandle) format() string
 				}
 			}
 
-			format += ')'
+			comments << NdrComment { value: format }
 		}
 	}
 
-	return '${format} */ HANDLE'
+	return comments
+}
+
+// get_attr_name returns the name for the resource the handle is refering to
+// as required in the system_handle attribute
+pub fn (handle NdrSystemHandle) get_attr_name() string
+{
+	match handle.resource
+	{
+		.file		 { return 'sh_file' }
+		.semaphore	 { return 'sh_semaphore' }
+		.event		 { return 'sh_event' }
+		.mutex		 { return 'sh_mutex' }
+		.process	 { return 'sh_process' }
+		.token		 { return 'sh_token' }
+		.section	 { return 'sh_section' }
+		.reg_key	 { return 'sh_reg_key' }
+		.thread		 { return 'sh_thread' }
+		.composition { return 'sh_composition' }
+		.socket		 { return 'sh_socket' }
+		.job		 { return 'sh_job' }
+		.pipe		 { return 'sh_pipe' }
+	}
 }
 
 // NdrHandle represents a general purpose RPC handle. More information on these

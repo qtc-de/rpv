@@ -5,7 +5,7 @@
 
 [![](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml/badge.svg?branch=main)](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml)
 [![](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml/badge.svg?branch=dev)](https://github.com/qtc-de/rpv/actions/workflows/build-examples.yml)
-[![](https://img.shields.io/badge/version-1.2.1-blue)](https://github.com/qtc-de/rpv/releases)
+[![](https://img.shields.io/badge/version-1.3.0-blue)](https://github.com/qtc-de/rpv/releases)
 [![](https://img.shields.io/badge/programming%20language-v-blue)](https://vlang.io/)
 [![](https://img.shields.io/badge/license-GPL%20v3.0-blue)](https://github.com/qtc-de/rpv/blob/master/LICENSE)
 [![](https://img.shields.io/badge/docs-fa6b05)](https://qtc-de.github.io/rpv)

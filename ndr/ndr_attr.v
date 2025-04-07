@@ -1,5 +1,11 @@
 module ndr
 
+import utils
+
+// NdrMember is a helper type to provide unified methods for structs
+// and methods
+type NdrMember = NdrBasicParam | NdrStructMember
+
 // NdrAttr is a type to represent NDR type attributes. NDR types can
 // have attributes like [size_is(arg3)] to indicate that the size of
 // the current argument is determined by argument three of the same
@@ -16,7 +22,7 @@ module ndr
 //
 // NdrAttr is a sum type that merges all these types of attributes
 // into a single representation.
-type NdrAttr = NdrStrAttr | NdrGlobalOffsetAttr | NdrRelativeOffsetAttr | NdrConstantAttr | NdrExprAttr
+type NdrAttr = NdrStrAttr | NdrGlobalOffsetAttr | NdrRelativeOffsetAttr | NdrConstantAttr | NdrExprAttr | NdrRangeAttr
 
 // NdrStrAttr is probably the most simple NDR attribute. It just
 // contains a plain string that needs to be displayed when formatting
@@ -27,45 +33,58 @@ pub struct NdrStrAttr {
 }
 
 // NdrGlobalOffsetAttr represents an attribute that points to another
-// parameter within the same method. The associated parameter is
-// identified by an offset that is contained within the struct.
-// The actual meaning of the attribute differs depending on the NdrType
-// it is attached to. Therefore, the struct contains an NdrFormatChar
-// member to indicate how the attribute needs to be used.
+// parameter within the same method or another struct member. The
+// associated parameter is identified by an offset that is contained
+// within the struct. The actual meaning of the attribute differs
+// depending on the NdrType it is attached to. Therefore, the struct
+// contains an NdrFormatChar member to indicate how the attribute needs
+// to be used.
 pub struct NdrGlobalOffsetAttr {
 	pub:
-	offset int
-	typ NdrFormatChar
+	offset		int
+	typ			NdrFormatChar
+	operator	NdrFormatChar
+	is_varying	bool
 }
 
 // format returns the string representation of an NdrGlobalOffsetAttr.
-// It is required to provide the full parameter list for the method, to
-// determine which parameter the global offset is referencing to.
-pub fn (attr NdrGlobalOffsetAttr) format(params []NdrBasicParam) string
+// It is required to provide the full parameter or member list for the
+// method, to determine which parameter the global offset is referencing
+// to.
+pub fn (attr NdrGlobalOffsetAttr) format(members []NdrMember) string
 {
-	for param in params
+	for member in members
 	{
-		if param.offset == attr.offset
+		if member.offset == attr.offset
 		{
+			name := apply_operator(member.name, attr.operator)
+
 			match attr.typ
 			{
 				.fc_encapsulated_union,
 				.fc_non_encapsulated_union
 				{
-					return '[switch_is(${param.name})]'
+					return '[switch_is(${name})]'
 				}
 
 				else
 				{
-					if param.attrs.has(.is_out)
+					prefix := if attr.is_varying { 'length_is' } else { 'size_is' }
+
+					match member
 					{
-						return '[size_is(,*${param.name})]'
+						NdrBasicParam
+						{
+							if member.attrs.has(.is_out)
+							{
+								return '[${prefix}(,${name})]'
+							}
+						}
+
+						else {}
 					}
 
-					else
-					{
-						return '[size_is(${param.name})]'
-					}
+					return '[${prefix}(${name})]'
 				}
 			}
 		}
@@ -84,8 +103,10 @@ pub fn (attr NdrGlobalOffsetAttr) format(params []NdrBasicParam) string
 // needs to be used.
 pub struct NdrRelativeOffsetAttr {
 	pub:
-	offset int
-	typ NdrFormatChar
+	offset		int
+	typ			NdrFormatChar
+	operator	NdrFormatChar
+	is_varying	bool
 }
 
 // format returns the string representation of an NdrRelativeOffsetAttr.
@@ -93,37 +114,43 @@ pub struct NdrRelativeOffsetAttr {
 // determine which parameter the global offset is referencing to.
 pub fn (attr NdrRelativeOffsetAttr) format(self NdrStructMember, members []NdrStructMember) string
 {
+	prefix := if attr.is_varying { 'length_is' } else { 'size_is' }
+
 	for member in members
 	{
 		if int(member.offset) == (int(self.offset) + attr.offset)
 		{
+			name := apply_operator(member.name, attr.operator)
+
 			match attr.typ
 			{
 				.fc_encapsulated_union,
 				.fc_non_encapsulated_union
 				{
-					return '[switch_is(${member.name})]'
+					return '[switch_is(${name})]'
 				}
 
 				else
 				{
-					return '[size_is(${member.name})]'
+					return '[${prefix}(${name})]'
 				}
 			}
 		}
 	}
+
+	offset := apply_operator('${attr.offset}', attr.operator)
 
 	match attr.typ
 	{
 		.fc_encapsulated_union,
 		.fc_non_encapsulated_union
 		{
-			return '[switch_is(${attr.offset})]'
+			return '[switch_is(${offset})]'
 		}
 
 		else
 		{
-			return '[size_is(${attr.offset})]'
+			return '[${prefix}(${offset})]'
 		}
 	}
 }
@@ -134,15 +161,32 @@ pub fn (attr NdrRelativeOffsetAttr) format(self NdrStructMember, members []NdrSt
 // associated type is still included within the struct.
 pub struct NdrConstantAttr {
 	pub:
-	offset int
-	typ NdrFormatChar
+	offset		int
+	typ			NdrFormatChar
+	is_varying	bool
 }
 
 // format returns the string representation of an NdrConstantAttr. This is
 // currently [size_is(offset)] for all possible associated types.
 pub fn (attr NdrConstantAttr) format() string
 {
-	return '[size_is(${attr.offset})]'
+	prefix := if attr.is_varying { 'length_is' } else { 'size_is' }
+	return '[${prefix}(${attr.offset})]'
+}
+
+// NdrRangeAttr is an attribute that just contains a range that is defined
+// by too integer values.
+pub struct NdrRangeAttr {
+	pub:
+	start	int
+	end		int
+}
+
+// format returns the string representation of an NdrRangeAttr. This is
+// just [range(start, end)].
+pub fn (attr NdrRangeAttr) format() string
+{
+	return '[range(${attr.start}, ${attr.end})]'
 }
 
 // NdrExprAttr represents an attribute that holds NdrExpression types. These
@@ -153,9 +197,11 @@ pub fn (attr NdrConstantAttr) format() string
 // and also the arguments as NdrExpression types. When formatting the NdrExprAttr,
 // the arguments need to be resolved and inserted into the expression string.
 pub struct NdrExprAttr {
-	arguments []NdrExpression
-	expression string
-	typ NdrFormatChar
+	arguments			[]NdrExpression
+	expression			string
+	correlation_type	NdrCorrelationType
+	typ					NdrFormatChar
+	is_varying			bool
 }
 
 // format returns the string representation of an NdrExprAttr. The skeleton for
@@ -164,26 +210,58 @@ pub struct NdrExprAttr {
 // this expression to make it complete. Therefore, it is required to provide
 // an array of other struct members to the list. Since references to other members
 // are relative to the current member, it needs to also be provided.
-pub fn (attr NdrExprAttr) format(self NdrStructMember, members []NdrStructMember) string
+pub fn (attr NdrExprAttr) format(self NdrMember, members []NdrMember) string
 {
 	mut expr_str := attr.expression
+	mut var_expressions := []NdrVariableExpression{}
 
-	for arg in attr.arguments
+	for expr in attr.arguments
 	{
-		match arg
+		match expr
 		{
 			NdrVariableExpression
 			{
-				for member in members
-				{
-					if int(member.offset) == (int(self.offset) + arg.offset)
-					{
-						expr_str = expr_str.replace('var{{${arg.offset}}}', member.name)
-					}
-				}
+				var_expressions << expr
+			}
+
+			NdrOperatorExpression
+			{
+				var_expressions << expr.collect_var_expr()
 			}
 
 			else {}
+		}
+	}
+
+	for expr in var_expressions
+	{
+		mut match_index := 0;
+
+		match attr.correlation_type
+		{
+			.fc_normal_conformance
+			{
+				match_index = expr.offset + int(self.offset)
+			}
+
+			.fc_top_level_conformance,
+			.fc_pointer_conformance
+			{
+				match_index = expr.offset
+			}
+
+			else
+			{
+				utils.log_debug('Missing implementation for correlation type: ${attr.correlation_type}')
+			}
+		}
+
+		for member in members
+		{
+			if int(member.offset) == match_index
+			{
+				expr_str = expr_str.replace('var{{${expr.offset}}}', member.name)
+			}
 		}
 	}
 
@@ -197,7 +275,9 @@ pub fn (attr NdrExprAttr) format(self NdrStructMember, members []NdrStructMember
 
 		else
 		{
-			return '[size_is(${expr_str})]'
+
+			prefix := if attr.is_varying { 'length_is' } else { 'size_is' }
+			return '[${prefix}(${expr_str})]'
 		}
 	}
 }
@@ -222,10 +302,9 @@ pub fn (attr_list []NdrAttr) format() string
 }
 
 // format_struct returns the string representation for a list of NdrAttr types
-// when they are associated with a struct. It seems to be the case that
-// certain attributes like NdrGlobalOffsetAttr are not used for structs.
-// Others require a list of other available struct members and therefore a
-// dedicated format method, that can supply this information.
+// when they are associated with a struct. Some attributes require a list of
+// other available struct members and therefore a dedicated format method,
+// that can supply this information.
 pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []NdrStructMember) string
 {
 	mut attrs_str := ''
@@ -234,11 +313,16 @@ pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []Ndr
 	{
 		match attr
 		{
+			NdrRangeAttr,
+			NdrConstantAttr
+			{
+				attrs_str += attr.format()
+			}
+
 			NdrStrAttr { attrs_str += attr.value }
-			NdrConstantAttr { attrs_str += attr.format() }
-			NdrExprAttr { attrs_str += attr.format(member, members) }
+			NdrExprAttr { attrs_str += attr.format(NdrMember(member), members.map(NdrMember(it))) }
+			NdrGlobalOffsetAttr { attrs_str += attr.format(members.map(NdrMember(it))) }
 			NdrRelativeOffsetAttr { attrs_str += attr.format(member, members) }
-			else {}
 		}
 	}
 
@@ -250,7 +334,7 @@ pub fn (attr_list []NdrAttr) format_struct(member NdrStructMember, members []Ndr
 // certain attributes like NdrRelativeOffsetAttr are not used for functions.
 // Others require a list of other available  parameters and therefore a
 // dedicated format method, that can supply this information.
-pub fn (attr_list []NdrAttr) format_function(params []NdrBasicParam) string
+pub fn (attr_list []NdrAttr) format_function(param NdrBasicParam, params []NdrBasicParam) string
 {
 	mut attrs_str := ''
 
@@ -258,10 +342,20 @@ pub fn (attr_list []NdrAttr) format_function(params []NdrBasicParam) string
 	{
 		match attr
 		{
+			NdrRangeAttr,
+			NdrConstantAttr
+			{
+				attrs_str += attr.format()
+			}
+
 			NdrStrAttr { attrs_str += attr.value }
-			NdrConstantAttr { attrs_str += attr.format() }
-			NdrGlobalOffsetAttr { attrs_str += attr.format(params) }
-			else {}
+			NdrExprAttr { attrs_str += attr.format(NdrMember(param), params.map(NdrMember(it))) }
+			NdrGlobalOffsetAttr { attrs_str += attr.format(params.map(NdrMember(it))) }
+
+			else
+			{
+				utils.log_debug('Missing function attribute: ${attr}')
+			}
 		}
 	}
 
@@ -284,4 +378,21 @@ pub fn (attr_list []NdrAttr) uniq() []NdrAttr
 	}
 
 	return uniq
+}
+
+// apply_operator applies the specified NDR conformant operator to the
+// input string
+pub fn apply_operator(input string, operator NdrFormatChar) string
+{
+	match operator
+	{
+		.fc_add_1 { return '${input} + 1' }
+		.fc_sub_1 { return '${input} - 1' }
+		.fc_mult_2 { return '${input} * 2' }
+		.fc_div_2 { return '${input} / 2' }
+		.fc_dereference { return '*${input}' }
+		else {}
+	}
+
+	return input
 }
