@@ -35,12 +35,11 @@ pub enum NdrInterpreterOptFlags2 as u8
 // NdrProcHeaderExts defines the header in front of a RPC
 // method definition. rpv mainly uses it to get access to
 // the NdrInterpreterOptFlags2 struct.
-pub struct NdrProcHeaderExts
-{
-	pub:
-	size u8
-	flags NdrInterpreterOptFlags2
+pub struct NdrProcHeaderExts {
+pub:
+	size             u8
+	flags            NdrInterpreterOptFlags2
 	client_corr_hint u16
 	server_corr_hint u16
-	notify_index u16
+	notify_index     u16
 }

@@ -8,8 +8,8 @@ import utils
 // can be contained.
 pub struct NdrArray {
 	NdrBaseType
-	alignment u8
-	element_type NdrType = NdrNone{}
+	alignment      u8
+	element_type   NdrType          = NdrNone{}
 	pointer_layout MaybePointerInfo = NdrNone{}
 }
 
@@ -34,7 +34,8 @@ pub fn(mut context NdrContext) read_array(format NdrFormatChar, alignment u8, mu
 		{
 			element_type := context.read_type_ext(mut addr)!
 
-			return NdrArray {
+			return NdrArray
+			{
 				format: format,
 				alignment: alignment,
 				element_type: element_type
@@ -44,7 +45,8 @@ pub fn(mut context NdrContext) read_array(format NdrFormatChar, alignment u8, mu
 
 		else
 		{
-			return NdrArray {
+			return NdrArray
+			{
 				format: format,
 				alignment: alignment,
 				element_type: ndr_type
@@ -98,7 +100,8 @@ pub fn (mut context NdrContext) read_simple_array(format NdrFormatChar, mut addr
 		total_size = context.read[u32](mut addr)!
 	}
 
-	return NdrSimpleArray {
+	return NdrSimpleArray
+	{
 		NdrArray: context.read_array(format, alignment, mut addr)!
 		total_size: total_size
 	}
@@ -109,8 +112,8 @@ pub fn (mut context NdrContext) read_simple_array(format NdrFormatChar, mut addr
 pub struct NdrConformantArray {
 	NdrArray
 	element_size u32
-	c_desc MaybeCorrelationDescriptor
-	v_desc MaybeCorrelationDescriptor
+	c_desc       MaybeCorrelationDescriptor
+	v_desc       MaybeCorrelationDescriptor
 }
 
 // read_conformant_array attempts to read an NdrConformantArray from the specified
@@ -128,7 +131,8 @@ pub fn (mut context NdrContext) read_conformant_array(format NdrFormatChar, mut 
 		v_desc = context.read_correlation_descriptor_ex(format, true, mut addr)!
 	}
 
-	return NdrConformantArray {
+	return NdrConformantArray
+	{
 		NdrArray: context.read_array(format, alignment, mut addr)!
 		element_size: element_size
 		c_desc: c_desc
@@ -224,7 +228,8 @@ pub fn(mut context NdrContext) read_bogus_array(format NdrFormatChar, mut addr &
 
 	array := context.read_array(format, alignment, mut addr)!
 
-	return NdrBogusArray {
+	return NdrBogusArray
+	{
 		NdrArray: array
 		element_num: num
 		c_desc: c_desc
@@ -282,7 +287,8 @@ pub fn(mut context NdrContext) read_varying_array(format NdrFormatChar, mut addr
 	element_size := context.read[u16](mut addr)!
 	v_desc := context.read_correlation_descriptor_ex(format, true, mut addr)!
 
-	return NdrVaryingArray {
+	return NdrVaryingArray
+	{
 		NdrArray: context.read_array(format, alignment, mut addr)!
 		element_size: element_size
 		total_size: total_size

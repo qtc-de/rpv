@@ -102,7 +102,6 @@ mut:
 // combines both types together.
 type MaybeCorrelationDescriptor = NdrCorrelationDescriptor | NdrNone
 
-
 // read_correlation_descriptor attempts to read an NdrCorrelationDescriptor
 // from the specified address. If it succeeds, the parsed NdrCorrelationDescriptor
 // is returned. Otherwise, NdrNone is returned. Both types are wrapped within the

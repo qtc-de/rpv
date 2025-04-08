@@ -177,7 +177,8 @@ pub fn (mut context NdrContext) read_base_struct(format NdrFormatChar, mut addr 
 	memory_size := context.read[u16](mut addr)!
 	id := context.type_cache.get_id(location)
 
-	return NdrBaseStruct{
+	return NdrBaseStruct
+	{
 		id:          id
 		format:      format
 		name:        'Struct_${id}'
@@ -336,9 +337,10 @@ pub fn (mut context NdrContext) read_struct_with_pointers(mut addr &voidptr)! Nd
 	utils.log_debug('Reading member info')
 	base_struct.read_member_info(mut context, mut addr)!
 
-	pointer_struct := NdrSimpleStructWithPointers {
+	pointer_struct := NdrSimpleStructWithPointers
+	{
 		NdrBaseStruct: base_struct
-		pointer_info: pointer_info
+		pointer_info:  pointer_info
 	}
 
 	context.type_cache.add_complex(pointer_struct)

@@ -1,5 +1,8 @@
 module ndr
 
+// KnownCheck are functions that compare a struct find within the NDR data
+// against known struct types. This allows to identify and rename these
+// structs accordingly
 type KnownCheck = fn (mut base NdrBaseStruct) bool
 
 // check_known checks whether the input NdrBaseStruct matches a known struct.

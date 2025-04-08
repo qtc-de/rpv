@@ -6,27 +6,28 @@ import win
 // referencing to.
 pub enum NdrSystemHandleResource as u8
 {
-	file = 0
-	semaphore = 1
-	event = 2
-	mutex = 3
-	process = 4
-	token = 5
-	section = 6
-	reg_key = 7
-	thread = 8
+	file        = 0
+	semaphore   = 1
+	event       = 2
+	mutex       = 3
+	process     = 4
+	token       = 5
+	section     = 6
+	reg_key     = 7
+	thread      = 8
 	composition = 9
-	socket = 10
-	job = 11
-	pipe = 12
+	socket      = 10
+	job         = 11
+	pipe        = 12
 }
 
 // NdrSystemHandle represents a regular Windows handle to a specific
 // resource. The type of the resource is encoded within the resource
 // member.
-pub struct NdrSystemHandle {
+pub struct NdrSystemHandle
+{
 	NdrBaseType
-	resource NdrSystemHandleResource
+	resource    NdrSystemHandleResource
 	access_mask u32
 }
 
@@ -37,9 +38,10 @@ pub fn (mut context NdrContext) read_system_handle(mut addr &voidptr)! NdrSystem
 	resource := context.read[NdrSystemHandleResource](mut addr)!
 	access_mask := context.read[u32](mut addr)!
 
-	return NdrSystemHandle {
-		format: .fc_system_handle
-		resource: resource
+	return NdrSystemHandle
+	{
+		format:      .fc_system_handle
+		resource:    resource
 		access_mask: access_mask
 	}
 }
@@ -55,7 +57,8 @@ pub fn (handle NdrSystemHandle) attrs() []NdrAttr
 		format += ', 0x${handle.access_mask.hex()}'
 	}
 
-	attrs << NdrStrAttr{
+	attrs << NdrStrAttr
+	{
 		value: format + ')]'
 	}
 
@@ -146,19 +149,19 @@ pub fn (handle NdrSystemHandle) get_attr_name() string
 {
 	match handle.resource
 	{
-		.file		 { return 'sh_file' }
-		.semaphore	 { return 'sh_semaphore' }
-		.event		 { return 'sh_event' }
-		.mutex		 { return 'sh_mutex' }
-		.process	 { return 'sh_process' }
-		.token		 { return 'sh_token' }
-		.section	 { return 'sh_section' }
-		.reg_key	 { return 'sh_reg_key' }
-		.thread		 { return 'sh_thread' }
+		.fil         { return 'sh_file' }
+		.semaphor    { return 'sh_semaphore' }
+		.even        { return 'sh_event' }
+		.mute        { return 'sh_mutex' }
+		.proces      { return 'sh_process' }
+		.toke        { return 'sh_token' }
+		.sectio      { return 'sh_section' }
+		.reg_ke      { return 'sh_reg_key' }
+		.threa       { return 'sh_thread' }
 		.composition { return 'sh_composition' }
-		.socket		 { return 'sh_socket' }
-		.job		 { return 'sh_job' }
-		.pipe		 { return 'sh_pipe' }
+		.socke       { return 'sh_socket' }
+		.jo          { return 'sh_job' }
+		.pip         { return 'sh_pipe' }
 	}
 }
 

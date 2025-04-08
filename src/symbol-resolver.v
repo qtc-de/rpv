@@ -6,17 +6,19 @@ import toml
 
 // Symbol represents a single symbol. It contains the offset of the symbol and
 // it's associated name.
-struct Symbol {
-	mut:
-	name string
+struct Symbol
+{
+mut:
+	name   string
 	offset u64
 }
 
 
 // SymbolSet represents a set of symbols like method parameter names.
-struct SymbolSet {
-	mut:
-	names []string
+struct SymbolSet
+{
+mut:
+	names  []string
 	offset u64
 }
 
@@ -68,15 +70,16 @@ fn (sym_map SymbolSetMap) lookup(location string, offset u64)? []string
 // SymbolResolver uses a hybrid approach with PDB files and a custom rpv symbol
 // file in toml format to resolve symbols. Apart from symbols, SymbolResolver
 // can also track notes that were taken for RPC interfaces or methods.
-pub struct SymbolResolver {
-	mut:
-	symbols SymbolMap
-	sym_cache SymbolMap
-	param_cache SymbolSetMap
-	uuids map[string]InterfaceData
-	has_pdb bool
+pub struct SymbolResolver
+{
+mut:
+	symbols      SymbolMap
+	sym_cache    SymbolMap
+	param_cache  SymbolSetMap
+	uuids        map[string]InterfaceData
+	has_pdb      bool
 	pdb_resolver win.PdbResolver
-	pub mut:
+pub mut:
 	symbol_file string
 	symbol_path string
 }
@@ -84,10 +87,11 @@ pub struct SymbolResolver {
 
 // InterfaceData is used to associate names with RPC interfaces. Moreover, the struct
 // contains notes for the interface itself and for associated RPC methods.
-struct InterfaceData {
-	mut:
-	name string
-	notes string
+struct InterfaceData
+{
+mut:
+	name         string
+	notes        string
 	method_notes map[string]string
 }
 
@@ -126,15 +130,18 @@ pub fn parse_resolver(toml_data toml.Doc, pdb_path string, symbol_file string) S
 
 			for prop, val in value.as_map().as_strings()
 			{
-				if prop == 'name' {
+				if prop == 'name'
+				{
 					uuids[key].name = val
 				}
 
-				else if prop == 'notes' {
+				else if prop == 'notes'
+				{
 					uuids[key].notes = val
 				}
 
-				else {
+				else
+				{
 					uuids[key].method_notes[prop] = val
 				}
 			}
@@ -147,8 +154,9 @@ pub fn parse_resolver(toml_data toml.Doc, pdb_path string, symbol_file string) S
 
 			for offset, name in values
 			{
-				symbol_arr << Symbol {
-					name: name
+				symbol_arr << Symbol
+				{
+					name:   name
 					offset: offset.u64()
 				}
 			}
@@ -157,9 +165,10 @@ pub fn parse_resolver(toml_data toml.Doc, pdb_path string, symbol_file string) S
 		}
 	}
 
-	return SymbolResolver {
-		symbols: symbols
-		uuids: uuids
+	return SymbolResolver
+	{
+		symbols:     symbols
+		uuids:       uuids
 		symbol_file: symbol_file
 		symbol_path: pdb_path
 	}
@@ -178,8 +187,9 @@ pub fn (mut resolver SymbolResolver) load_symbol(location string, offset u64)? s
 			{
 				if symbol := resolver.pdb_resolver.load_symbol(offset)
 				{
-					resolver.sym_cache[location] << Symbol {
-						name: symbol
+					resolver.sym_cache[location] << Symbol
+					{
+						name:   symbol
 						offset: offset
 					}
 
@@ -202,8 +212,9 @@ pub fn (mut resolver SymbolResolver) load_symbols(location string, offset u64)? 
 		{
 			if symbols := resolver.pdb_resolver.load_symbols(offset)
 			{
-				resolver.param_cache[location] << SymbolSet {
-					names: symbols
+				resolver.param_cache[location] << SymbolSet
+				{
+					names:  symbols
 					offset: offset
 				}
 
@@ -251,7 +262,8 @@ pub fn (resolver SymbolResolver) load_uuid_method_notes(uuid string, index strin
 // for a different process should be resolved.
 pub fn (mut resolver SymbolResolver) attach_pdb(process_handle win.HANDLE, base voidptr, size u32)!
 {
-	if resolver.has_pdb {
+	if resolver.has_pdb
+	{
 		resolver.detach_pdb()
 	}
 
@@ -262,7 +274,8 @@ pub fn (mut resolver SymbolResolver) attach_pdb(process_handle win.HANDLE, base 
 // detach_pdb is used to detach an existing pdb resolver from the symbol resolver.
 pub fn (mut resolver SymbolResolver) detach_pdb()
 {
-	if resolver.has_pdb {
+	if resolver.has_pdb
+	{
 		resolver.pdb_resolver.cleanup()
 		resolver.has_pdb = false
 	}
@@ -273,8 +286,9 @@ pub fn (mut resolver SymbolResolver) detach_pdb()
 // The SymbolResolver is synced after the symbol was added.
 pub fn (mut resolver SymbolResolver) add_symbol(location string, offset u64, name string)!
 {
-	symbol := Symbol {
-		name: name
+	symbol := Symbol
+	{
+		name:   name
 		offset: offset
 	}
 
@@ -282,7 +296,8 @@ pub fn (mut resolver SymbolResolver) add_symbol(location string, offset u64, nam
 	{
 		for mut sym in resolver.symbols[location]
 		{
-			if sym.offset == offset {
+			if sym.offset == offset
+			{
 				sym.name = name
 				resolver.sync()!
 				return
@@ -304,11 +319,13 @@ pub fn (mut resolver SymbolResolver) add_symbol(location string, offset u64, nam
 // The SymbolResolver is synced after this action.
 pub fn (mut resolver SymbolResolver) add_uuid_name(uuid string, name string)!
 {
-	if uuid in resolver.uuids {
+	if uuid in resolver.uuids
+	{
 		resolver.uuids[uuid].name = name
 	}
 
-	else {
+	else
+	{
 		resolver.uuids[uuid] = InterfaceData{ name: name }
 	}
 

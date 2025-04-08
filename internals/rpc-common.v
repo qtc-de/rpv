@@ -119,13 +119,13 @@ pub struct C.RPC_DISPATCH_TABLE {
 @[typedef]
 pub struct C.MIDL_SERVER_INFO {
 	pStubDesc       &C.MIDL_STUB_DESC = unsafe { nil }
-	DispatchTable   &voidptr     = unsafe { nil }
-	ProcString      &char        = unsafe { nil }
-	FmtStringOffset &u16         = unsafe { nil }
-	ThunkTable      &voidptr     = unsafe { nil }
-	pTransferSyntax &C.RPC_IF_ID = unsafe { nil }
-	nCount          &u32    = unsafe { nil }
-	pSyntaxInfo     voidptr = unsafe { nil }
+	DispatchTable   &voidptr          = unsafe { nil }
+	ProcString      &char             = unsafe { nil }
+	FmtStringOffset &u16              = unsafe { nil }
+	ThunkTable      &voidptr          = unsafe { nil }
+	pTransferSyntax &C.RPC_IF_ID      = unsafe { nil }
+	nCount          &u32              = unsafe { nil }
+	pSyntaxInfo     voidptr           = unsafe { nil }
 }
 
 // C.MIDL_STUB_DESC contains information about an RPC stub. For rpv, mainly the pFormatTypes
@@ -146,28 +146,27 @@ pub struct C.MIDL_STUB_DESC {
 	pFormatTypes                &char   = unsafe { nil } // mIDA: type_raw
 	fCheckBounds                int
 	// Ndr library version.
-	Version           u32
-	pMallocFreeStruct voidptr = unsafe { nil }
-	MIDLVersion       u32
-	CommFaultOffsets  &C.COMM_FAULT_OFFSETS = unsafe { nil }
+	Version                     u32
+	pMallocFreeStruct           voidptr = unsafe { nil }
+	MIDLVersion                 u32
+	CommFaultOffsets            &C.COMM_FAULT_OFFSETS = unsafe { nil }
 	// New fields for version 3.0+
-	aUserMarshalQuadruple voidptr = unsafe { nil }
+	aUserMarshalQuadruple       voidptr               = unsafe { nil }
 	// Notify routines - added for NT5, MIDL 5.0
-	NotifyRoutineTable voidptr = unsafe { nil }
+	NotifyRoutineTable          voidptr               = unsafe { nil }
 	// Reserved for future use.
-	mFlags &u32 = unsafe { nil }
+	mFlags                      &u32                  = unsafe { nil }
 	// International support routines - added for 64bit post NT5
-	CsRoutineTables voidptr = unsafe { nil }
-	Reserved4       voidptr = unsafe { nil }
-	Reserved5       voidptr = unsafe { nil } // mIDA: expr_table - RpcView: pExprInfo
-	// Fields up to now present in win2000 release.
+	CsRoutineTables             voidptr               = unsafe { nil }
+	Reserved4                   voidptr               = unsafe { nil }
+	Reserved5                   voidptr               = unsafe { nil } // mIDA: expr_table - RpcView: pExprInfo
 }
 
 // NDR_EXPR_DESC is the struct that is pointed to by C.MIDL_STUB_DESC.Reserved5, alias
 // pExprInfo. It is used by rpv to parse NDR expressions. 
 pub struct NDR_EXPR_DESC {
-	pub:
-	p_offset voidptr
+pub:
+	p_offset      voidptr
 	p_format_expr voidptr
 }
 
@@ -246,17 +245,20 @@ pub:
 
 pub const max_simple_dict_entries = 0x200
 pub const iid_iunknown = win.new_guid('00000000-0000-0000-C000-000000000046') or { panic(err) }
-pub const dce_transfer_syntax = C.RPC_IF_ID{
+pub const dce_transfer_syntax = C.RPC_IF_ID
+{
 	Uuid:      win.new_guid('8A885D04-1CEB-11C9-9FE8-08002B104860') or { panic(err) }
 	VersMajor: 2
 	VersMinor: 0
 }
-pub const ndr64_transfer_syntax = C.RPC_IF_ID{
+pub const ndr64_transfer_syntax = C.RPC_IF_ID
+{
 	Uuid:      win.new_guid('71710533-BEBA-4937-8319-B5DBEF9CCC36') or { panic(err) }
 	VersMajor: 2
 	VersMinor: 0
 }
-pub const ior_callback = C.RPC_IF_ID{
+pub const ior_callback = C.RPC_IF_ID
+{
 	Uuid:      win.new_guid('18f70770-8e64-11cf-9af1-0020AF6E72F4') or { panic(err) }
 	VersMajor: 0
 	VersMinor: 0

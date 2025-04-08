@@ -28,13 +28,14 @@ pub enum NdrParamAttrs as u16
 // NdrBasicParam is the basis struct for each method parameter.
 // It contains the parameter attributes, the underlying NdrType,
 // the offset within the format string and the parameter name.
-pub struct NdrBasicParam {
-	pub mut:
-	attrs NdrParamAttrs
-	typ NdrType = NdrNone{}
+pub struct NdrBasicParam
+{
+pub mut:
+	attrs             NdrParamAttrs
+	typ               NdrType = NdrNone{}
 	server_alloc_size int
-	offset u32
-	name string
+	offset            u32
+	name              string
 }
 
 // attrs returns an array of NdrAttr that is required to
@@ -120,10 +121,11 @@ pub enum NdrHandleParamFlags as u8
 // It contains some additional attributes like the handle
 // flags and information whether it is a generic or explicit
 // handle.
-pub struct NdrHandleParam {
+pub struct NdrHandleParam
+{
 	NdrBasicParam
-	pub mut:
-	flags NdrHandleParamFlags
+pub mut:
+	flags    NdrHandleParamFlags
 	explicit bool
-	generic bool
+	generic  bool
 }

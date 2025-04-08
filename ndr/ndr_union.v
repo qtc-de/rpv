@@ -7,10 +7,11 @@ import utils
 // The arm_type member indicates the type of the Union if the respective arm
 // is used. The case_value is used to reference the arm by another field or
 // parameter within procedure calls or struct definitions.
-pub struct NdrUnionArm {
-	arm_type NdrType
+pub struct NdrUnionArm
+{
+	arm_type   NdrType
 	case_value int
-	name string
+	name       string
 }
 
 // read_union_arm attempts to read an NdrUnionArm from process memory at the
@@ -27,10 +28,11 @@ pub fn (mut context NdrContext) read_union_arm(mut addr &voidptr)! NdrUnionArm
 		name = 'arm_minus_${math.abs(case_value)}'
 	}
 
-	return NdrUnionArm {
-		arm_type: arm_type
+	return NdrUnionArm
+	{
+		arm_type:   arm_type
 		case_value: case_value
-		name: name
+		name:       name
 	}
 }
 
@@ -42,7 +44,8 @@ pub fn (mut context NdrContext) read_arm_type(mut addr &voidptr)! NdrType
 
 	if (typ & 0xFF00 == 0x8000) || typ == 0
 	{
-		return NdrSimpleType {
+		return NdrSimpleType
+		{
 			format: unsafe { NdrFormatChar(typ & 0xFF) }
 		}
 	}
@@ -67,11 +70,12 @@ pub fn (mut context NdrContext) read_arm_type(mut addr &voidptr)! NdrType
 // The different possible types are contained within the arms member and
 // are encapsulated within NdrUnionArm structs. The default_arm describes
 // which representation is chosen by default, if no other one was specified.
-pub struct NdrUnionArms {
+pub struct NdrUnionArms
+{
 	memory_size u16
-	arms []NdrUnionArm
+	arms        []NdrUnionArm
 	default_arm NdrType = NdrNone{}
-	alignment int
+	alignment   int
 }
 
 // read_union_arms attempts to read an NdrUnionArms struct from process memory
@@ -95,11 +99,12 @@ pub fn (mut context NdrContext) read_union_arms(mut addr &voidptr)! NdrUnionArms
 
 	default_arm := context.read_arm_type(mut addr)!
 
-	return NdrUnionArms {
+	return NdrUnionArms
+	{
 		memory_size: memory_size
-		arms: arms
+		arms:        arms
 		default_arm: default_arm
-		alignment: alignment
+		alignment:   alignment
 	}
 }
 
@@ -122,15 +127,16 @@ pub fn (mut context NdrContext) read_union_arms(mut addr &voidptr)! NdrUnionArms
 // More details can be found within the Microsoft RPC union documentation:
 //
 // https://learn.microsoft.com/en-us/windows/win32/rpc/unions
-pub struct NdrUnion {
+pub struct NdrUnion
+{
 	NdrComplexType
-	id u32
-	location voidptr
-	switch_type NdrFormatChar
+	id               u32
+	location         voidptr
+	switch_type      NdrFormatChar
 	switch_increment int
-	arms NdrUnionArms
-	correlation MaybeCorrelationDescriptor
-	encapsulated bool
+	arms             NdrUnionArms
+	correlation      MaybeCorrelationDescriptor
+	encapsulated     bool
 }
 
 // format returns the string representation of an NdrUnion. This is just the
@@ -280,10 +286,12 @@ pub fn (mut context NdrContext) read_union(format NdrFormatChar, mut addr &voidp
 		arms = context.read_union_arms(mut addr)!
 	}
 
-	uni := NdrUnion {
-		NdrComplexType: NdrComplexType {
-			format: format
-			name: 'Union_${id}'
+	uni := NdrUnion
+	{
+		NdrComplexType: NdrComplexType
+		{
+			format:       format
+			name:         'Union_${id}'
 			member_count: u32(arms.arms.len)
 		}
 		id: id

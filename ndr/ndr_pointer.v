@@ -23,9 +23,10 @@ pub enum NdrPointerFlags as u8
 // information useful). The ref member represents the NdrType the
 // pointer is referencing to. The flags member contains additional
 // information describing the pointer.
-pub struct NdrPointer {
+pub struct NdrPointer
+{
 	NdrBaseType
-	ref NdrType
+	ref   NdrType
 	flags NdrPointerFlags
 }
 
@@ -34,10 +35,11 @@ pub struct NdrPointer {
 // to access the private format property.
 pub fn NdrPointer.new(format NdrFormatChar, ref NdrType, flags NdrPointerFlags) NdrPointer
 {
-	return NdrPointer {
+	return NdrPointer
+	{
 		format: format
-		ref: ref
-		flags: flags
+		ref:    ref
+		flags:  flags
 	}
 }
 
@@ -123,10 +125,11 @@ pub fn (mut context NdrContext) read_pointer(format NdrFormatChar, mut addr &voi
 
 		utils.log_debug('  Pointer is simple pointer to: ${ref_format}')
 
-		return NdrPointer {
+		return NdrPointer
+		{
 			format: format
-			ref: NdrBaseType { format: ref_format }
-			flags: flags
+			ref:    NdrBaseType{ format: ref_format }
+			flags:  flags
 		}
 	}
 
@@ -134,10 +137,11 @@ pub fn (mut context NdrContext) read_pointer(format NdrFormatChar, mut addr &voi
 	{
 		ref := context.read_offset(mut addr)!
 
-		return NdrPointer {
+		return NdrPointer
+		{
 			format: format
-			ref: ref
-			flags: flags
+			ref:    ref
+			flags:  flags
 		}
 	}
 }
@@ -145,11 +149,12 @@ pub fn (mut context NdrContext) read_pointer(format NdrFormatChar, mut addr &voi
 // NdrInterfacePointer represents an NDR pointer that is referencing
 // an interface. This type of pointer contains the interface GUID within
 // the iid member and has an associated NdrCorrelationDescriptor.
-pub struct NdrInterfacePointer {
+pub struct NdrInterfacePointer
+{
 	NdrBaseType
-	iid C.GUID
+	iid         C.GUID
 	is_constant bool
-	c_desc NdrCorrelationDescriptor
+	c_desc      NdrCorrelationDescriptor
 }
 
 // read_interface_pointer attempts to read an NdrInterfacePointer
@@ -162,18 +167,20 @@ pub fn(mut context NdrContext) read_interface_pointer(mut addr &voidptr)! NdrInt
 	{
 		iid := context.read[C.GUID](mut addr)!
 
-		return NdrInterfacePointer {
-			format: NdrFormatChar.fc_ip
-			iid: iid
+		return NdrInterfacePointer
+		{
+			format:      NdrFormatChar.fc_ip
+			iid:         iid
 			is_constant: true
 		}
 	}
 
 	else
 	{
-		return NdrInterfacePointer {
-			format: NdrFormatChar.fc_ip
-			iid: internals.iid_iunknown
+		return NdrInterfacePointer
+		{
+			format:      NdrFormatChar.fc_ip
+			iid:         internals.iid_iunknown
 			is_constant: false
 		}
 	}
@@ -184,7 +191,8 @@ pub fn(mut context NdrContext) read_interface_pointer(mut addr &voidptr)! NdrInt
 // NdrPointer is unused for this type and the attrs and comments
 // methods need to be re-implemented to include the correlation
 // descriptor.
-pub struct NdrByteCountPointer {
+pub struct NdrByteCountPointer
+{
 	NdrPointer
 	desc MaybeCorrelationDescriptor
 }
@@ -199,10 +207,11 @@ pub fn (mut context NdrContext) read_byte_count_pointer(mut addr &voidptr)! NdrB
 	{
 		.fc_pad
 		{
-			return NdrByteCountPointer {
+			return NdrByteCountPointer
+			{
 				format: .fc_byte_count_pointer
-				ref: NdrSimpleType { format: format }
-				desc: NdrNone{}
+				ref:    NdrSimpleType{ format: format }
+				desc:   NdrNone{}
 			}
 		}
 
@@ -211,10 +220,11 @@ pub fn (mut context NdrContext) read_byte_count_pointer(mut addr &voidptr)! NdrB
 			desc := context.read_correlation_descriptor(.fc_byte_count_pointer, mut addr)!
 			ref := context.read_offset(mut addr)!
 
-			return NdrByteCountPointer {
+			return NdrByteCountPointer
+			{
 				format: .fc_byte_count_pointer
-				ref: ref
-				desc: desc
+				ref:    ref
+				desc:   desc
 			}
 		}
 	}

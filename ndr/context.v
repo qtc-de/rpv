@@ -11,10 +11,10 @@ import utils
 // 
 pub struct NdrContext {
 	process_handle win.HANDLE
-	stub_desc C.MIDL_STUB_DESC
-	flags NdrInterpreterOptFlags2
-	pub mut:
-	type_cache &TypeCache
+	stub_desc      C.MIDL_STUB_DESC
+	flags          NdrInterpreterOptFlags2
+pub mut:
+	type_cache	&TypeCache
 }
 
 // newNdrContext creates a new NdrContext. The main reason why we have a constructor
@@ -22,7 +22,8 @@ pub struct NdrContext {
 // initializing private struct fields seems only possible using a constructor.
 pub fn NdrContext.new(handle win.HANDLE, stub_desc C.MIDL_STUB_DESC, flags NdrInterpreterOptFlags2, mut cache &TypeCache) NdrContext
 {
-	return NdrContext {
+	return NdrContext
+	{
 		process_handle: handle
 		stub_desc: stub_desc
 		flags: flags
@@ -340,7 +341,8 @@ pub fn(mut context NdrContext) read_param(mut addr &voidptr, name string)! NdrBa
 
 	else
 	{
-		typ = NdrSimpleType {
+		typ = NdrSimpleType
+		{
 			format: context.read[NdrFormatChar](mut addr)!
 		}
 
@@ -348,7 +350,8 @@ pub fn(mut context NdrContext) read_param(mut addr &voidptr, name string)! NdrBa
 		context.read[u8](mut addr)! // padding
 	}
 
-	return NdrBasicParam {
+	return NdrBasicParam
+	{
 		attrs: attrs
 		offset: stack_offset
 		name: name
