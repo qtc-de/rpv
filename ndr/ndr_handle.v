@@ -149,19 +149,19 @@ pub fn (handle NdrSystemHandle) get_attr_name() string
 {
 	match handle.resource
 	{
-		.fil         { return 'sh_file' }
-		.semaphor    { return 'sh_semaphore' }
-		.even        { return 'sh_event' }
-		.mute        { return 'sh_mutex' }
-		.proces      { return 'sh_process' }
-		.toke        { return 'sh_token' }
-		.sectio      { return 'sh_section' }
-		.reg_ke      { return 'sh_reg_key' }
-		.threa       { return 'sh_thread' }
+		.file        { return 'sh_file' }
+		.semaphore   { return 'sh_semaphore' }
+		.event       { return 'sh_event' }
+		.mutex       { return 'sh_mutex' }
+		.process     { return 'sh_process' }
+		.token       { return 'sh_token' }
+		.section     { return 'sh_section' }
+		.reg_key     { return 'sh_reg_key' }
+		.thread      { return 'sh_thread' }
 		.composition { return 'sh_composition' }
-		.socke       { return 'sh_socket' }
-		.jo          { return 'sh_job' }
-		.pip         { return 'sh_pipe' }
+		.socket      { return 'sh_socket' }
+		.job         { return 'sh_job' }
+		.pipe        { return 'sh_pipe' }
 	}
 }
 
