@@ -9,11 +9,12 @@ import utils
 // (to find type definitions based on their offset) and a TypeCache to
 // quickly recognize types that have already been decompiled.
 // 
-pub struct NdrContext {
+pub struct NdrContext
+{
 	process_handle win.HANDLE
-	stub_desc C.MIDL_STUB_DESC
-	flags NdrInterpreterOptFlags2
-	pub mut:
+	stub_desc      C.MIDL_STUB_DESC
+	flags          NdrInterpreterOptFlags2
+pub mut:
 	type_cache &TypeCache
 }
 
@@ -22,7 +23,8 @@ pub struct NdrContext {
 // initializing private struct fields seems only possible using a constructor.
 pub fn NdrContext.new(handle win.HANDLE, stub_desc C.MIDL_STUB_DESC, flags NdrInterpreterOptFlags2, mut cache &TypeCache) NdrContext
 {
-	return NdrContext {
+	return NdrContext
+	{
 		process_handle: handle
 		stub_desc: stub_desc
 		flags: flags
@@ -117,23 +119,24 @@ pub fn (mut context NdrContext) read_type_ext(mut addr &voidptr)! NdrType
 	{
 		utils.log_debug('Found ${format} at 0x${voidptr(addr_old)}')
 
-		match format {
+		match format
+		{
 			.fc_byte,
-            .fc_char,
-            .fc_small,
-            .fc_usmall,
-            .fc_wchar,
-            .fc_short,
-            .fc_ushort,
-            .fc_long,
-            .fc_ulong,
-            .fc_float,
-            .fc_hyper,
-            .fc_double,
-            .fc_enum16,
-            .fc_enum32,
-            .fc_error_status_t,
-            .fc_int3264,
+			.fc_char,
+			.fc_small,
+			.fc_usmall,
+			.fc_wchar,
+			.fc_short,
+			.fc_ushort,
+			.fc_long,
+			.fc_ulong,
+			.fc_float,
+			.fc_hyper,
+			.fc_double,
+			.fc_enum16,
+			.fc_enum32,
+			.fc_error_status_t,
+			.fc_int3264,
 			.fc_uint3264
 			{
 				return NdrSimpleType{ format: format }
@@ -176,18 +179,18 @@ pub fn (mut context NdrContext) read_type_ext(mut addr &voidptr)! NdrType
 				return context.read_structure_string(mut addr)!
 			}
 
-            .fc_user_marshal
+			.fc_user_marshal
 			{
 				utils.log_debug('TODO: fc_user_marshal')
 			}
 
-            .fc_embedded_complex
+			.fc_embedded_complex
 			{
 				context.read[u8](mut addr)! // padding
 				return context.read_offset(mut addr)!
 			}
 
-            .fc_struct
+			.fc_struct
 			{
 				mut base_struct := context.read_base_struct(format, mut addr)!
 				base_struct.read_member_info(mut context, mut addr)!
@@ -198,108 +201,108 @@ pub fn (mut context NdrContext) read_type_ext(mut addr &voidptr)! NdrType
 				return base_struct
 			}
 
-            .fc_pstruct
+			.fc_pstruct
 			{
 				return context.read_struct_with_pointers(mut addr)!
 			}
 
 			.fc_cvstruct,
-            .fc_cstruct
+			.fc_cstruct
 			{
 				return context.read_conformant_struct(format, mut addr)!
 			}
 
-            .fc_bogus_struct,
-            .fc_forced_bogus_struct
+			.fc_bogus_struct,
+			.fc_forced_bogus_struct
 			{
 				return context.read_bogus_struct(format, mut addr)!
 			}
 
-            .fc_pp
+			.fc_pp
 			{
 				return context.read_pointer_info(mut addr)!
 			}
 
 			.fc_smfarray,
-            .fc_lgfarray
+			.fc_lgfarray
 			{
 				return context.read_simple_array(format, mut addr)!
 			}
 
 			.fc_carray,
-            .fc_cvarray
+			.fc_cvarray
 			{
 				return context.read_conformant_array(format, mut addr)!
 			}
 
-            .fc_bogus_array
+			.fc_bogus_array
 			{
 				return context.read_bogus_array(format, mut addr)!
 			}
 
 			.fc_lgvarray,
-            .fc_smvarray
+			.fc_smvarray
 			{
 				return context.read_varying_array(format, mut addr)!
 			}
 
-            .fc_range
+			.fc_range
 			{
 				return context.read_range(mut addr)!
 			}
 
-            .fc_encapsulated_union,
+			.fc_encapsulated_union,
 			.fc_non_encapsulated_union
 			{
 				return context.read_union(format, mut addr)!
 			}
 
-            .fc_structpad1,
-            .fc_structpad2,
-            .fc_structpad3,
-            .fc_structpad4,
-            .fc_structpad5,
-            .fc_structpad6,
-            .fc_structpad7
+			.fc_structpad1,
+			.fc_structpad2,
+			.fc_structpad3,
+			.fc_structpad4,
+			.fc_structpad5,
+			.fc_structpad6,
+			.fc_structpad7
 			{
 				return NdrStructPad { format: format }
 			}
 
-            .fc_ignore
+			.fc_ignore
 			{
 				return NdrIgnore { format: format }
 			}
 
-            .fc_system_handle
+			.fc_system_handle
 			{
 				return context.read_system_handle(mut addr)!
 			}
 
-            .fc_auto_handle,
-            .fc_bind_context,
-            .fc_bind_generic,
-            .fc_bind_primitive,
-            .fc_callback_handle
+			.fc_auto_handle,
+			.fc_bind_context,
+			.fc_bind_generic,
+			.fc_bind_primitive,
+			.fc_callback_handle
 			{
 				return NdrHandle{ format: format }
 			}
 
-            .fc_pipe
+			.fc_pipe
 			{
 				return context.read_pipe(mut addr)!
 			}
 
-            .fc_supplement
+			.fc_supplement
 			{
 				return context.read_supplement(mut addr)!
 			}
 
-            .fc_byte_count_pointer
+			.fc_byte_count_pointer
 			{
 				return context.read_byte_count_pointer(mut addr)!
 			}
 
-            .fc_end
+			.fc_end
 			{
 				return NdrNone{}
 			}
@@ -340,7 +343,8 @@ pub fn(mut context NdrContext) read_param(mut addr &voidptr, name string)! NdrBa
 
 	else
 	{
-		typ = NdrSimpleType {
+		typ = NdrSimpleType
+		{
 			format: context.read[NdrFormatChar](mut addr)!
 		}
 
@@ -348,7 +352,8 @@ pub fn(mut context NdrContext) read_param(mut addr &voidptr, name string)! NdrBa
 		context.read[u8](mut addr)! // padding
 	}
 
-	return NdrBasicParam {
+	return NdrBasicParam
+	{
 		attrs: attrs
 		offset: stack_offset
 		name: name

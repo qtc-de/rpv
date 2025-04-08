@@ -37,10 +37,10 @@ pub enum NdrInterpreterOptFlags2 as u8
 // the NdrInterpreterOptFlags2 struct.
 pub struct NdrProcHeaderExts
 {
-	pub:
-	size u8
-	flags NdrInterpreterOptFlags2
+pub:
+	size             u8
+	flags            NdrInterpreterOptFlags2
 	client_corr_hint u16
 	server_corr_hint u16
-	notify_index u16
+	notify_index     u16
 }

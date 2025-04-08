@@ -9,9 +9,9 @@ pub enum NdrExpressionType as u8
 {
 	fc_expr_const32 = 0x01
 	fc_expr_const64 = 0x02
-	fc_expr_var = 0x03
-	fc_expr_oper = 0x04
-	fc_expr_pad = 0x05
+	fc_expr_var     = 0x03
+	fc_expr_oper    = 0x04
+	fc_expr_pad     = 0x05
 }
 
 // NdrExpressionOperator contains the different operator types that can
@@ -19,47 +19,48 @@ pub enum NdrExpressionType as u8
 // ternary.
 pub enum NdrExpressionOperator as u8
 {
-	op_unary_plus = 0x01
-	op_unary_minus = 0x02
-	op_unary_not = 0x03
-	op_unary_complement = 0x04
+	op_unary_plus        = 0x01
+	op_unary_minus       = 0x02
+	op_unary_not         = 0x03
+	op_unary_complement  = 0x04
 	op_unary_indirection = 0x05
-	op_unary_cast = 0x06
-	op_unary_and = 0x07
-	op_unary_sizeof = 0x08
-	op_unary_alignof = 0x09
-	op_pre_incr = 0x0a
-	op_pre_decr = 0x0b
-	op_post_incr = 0x0c
-	op_post_decr = 0x0d
-	op_plus = 0x0e
-	op_minus = 0x0f
-	op_star = 0x10
-	op_slash = 0x11
-	op_mod = 0x12
-	op_left_shift = 0x13
-	op_right_shift = 0x14
-	op_less = 0x15
-	op_less_equal = 0x16
-	op_greater_equal = 0x17
-	op_greater = 0x18
-	op_equal = 0x19
-	op_not_equal = 0x1A
-	op_and = 0x1B
-	op_or = 0x1C
-	op_xor = 0x1D
-	op_logical_and = 0x1E
-	op_logical_or = 0x1F
-	op_expression = 0x20
-	op_asyncsplit = 0x2B
-	op_corr_pointer = 0x2C
-	op_corr_top_level = 0x2D
+	op_unary_cast        = 0x06
+	op_unary_and         = 0x07
+	op_unary_sizeof      = 0x08
+	op_unary_alignof     = 0x09
+	op_pre_incr          = 0x0a
+	op_pre_decr          = 0x0b
+	op_post_incr         = 0x0c
+	op_post_decr         = 0x0d
+	op_plus              = 0x0e
+	op_minus             = 0x0f
+	op_star              = 0x10
+	op_slash             = 0x11
+	op_mod               = 0x12
+	op_left_shift        = 0x13
+	op_right_shift       = 0x14
+	op_less              = 0x15
+	op_less_equal        = 0x16
+	op_greater_equal     = 0x17
+	op_greater           = 0x18
+	op_equal             = 0x19
+	op_not_equal         = 0x1A
+	op_and               = 0x1B
+	op_or                = 0x1C
+	op_xor               = 0x1D
+	op_logical_and       = 0x1E
+	op_logical_or        = 0x1F
+	op_expression        = 0x20
+	op_asyncsplit        = 0x2B
+	op_corr_pointer      = 0x2C
+	op_corr_top_level    = 0x2D
 }
 
 // NdrBaseExpression represents the base type all other NdrExpression types
 // are branched of from. It only contains the NdrExpressionType as member
 // and is actually unused.
-pub struct NdrBaseExpression {
+pub struct NdrBaseExpression
+{
 	typ NdrExpressionType
 }
 
@@ -140,11 +141,12 @@ pub fn (context NdrContext) read_context_expression(index int)! MaybeExpression
 // Depending on the operator type (unary, binary, ternary) a corresponding
 // amount of arguments is required, which are stored within the arguments
 // member.
-pub struct NdrOperatorExpression {
+pub struct NdrOperatorExpression
+{
 	NdrBaseExpression
-	operator NdrExpressionOperator
-	format NdrFormatChar
-	offset i16
+	operator  NdrExpressionOperator
+	format    NdrFormatChar
+	offset    i16
 	arguments []NdrExpression
 }
 
@@ -311,11 +313,12 @@ pub fn (context NdrContext) read_operator_expression(mut addr &voidptr)! MaybeEx
 		}
 	}
 
-	return NdrOperatorExpression {
-		typ: .fc_expr_var
-		operator: operator
-		format: format
-		offset: offset
+	return NdrOperatorExpression
+	{
+		typ:       .fc_expr_var
+		operator:  operator
+		format:    format
+		offset:    offset
 		arguments: arguments
 	}
 }
@@ -347,7 +350,8 @@ pub fn (context NdrContext) read_variable_expression(mut addr &voidptr)! NdrVari
 	format := context.read[NdrFormatChar](mut addr)!
 	offset := context.read[i16](mut addr)!
 
-	return NdrVariableExpression {
+	return NdrVariableExpression
+	{
 		typ: .fc_expr_var
 		format: format
 		offset: offset
@@ -360,7 +364,7 @@ pub struct NdrConstantExpression
 	NdrBaseExpression
 	format NdrFormatChar
 	offset i16
-	value u64
+	value  u64
 }
 
 // read_constant_expression reads an NdrConstantExpression at the specified
@@ -383,9 +387,10 @@ pub fn (context NdrContext) read_constant_expression(mut addr &voidptr, typ NdrE
 		value = context.read[u64](mut addr)!
 	}
 
-	return NdrConstantExpression {
-		typ: typ
-		value: value
+	return NdrConstantExpression
+	{
+		typ:    typ
+		value:  value
 		format: format
 		offset: offset
 	}
@@ -402,6 +407,7 @@ pub fn (const_expr NdrConstantExpression) format() string
 // expressions. It requires it's implementors to implement the
 // format method, that is used to obtain the string representation
 // of the associated expression.
-interface NdrExpression {
+interface NdrExpression
+{
 	format() string
 }

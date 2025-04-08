@@ -4,19 +4,20 @@ import win
 import ndr
 import utils
 
+const explicit_handle  = u8(0x00)
 const oi_has_rpc_flags = u8(0x08)
-const explicit_handle = u8(0x00)
 
 // MidlInterface contains detailed RPC interface information. This includes the id,
 // name and version of the interface, as well as RPC methods and type definitions
 // that are used within these methods. The MidlInterface struct can be obtained by
 // decompiling an RPC interface.
-pub struct MidlInterface {
-	pub:
-	id string
-	name string
-	version string
-	types []ndr.ComplexType
+pub struct MidlInterface
+{
+pub:
+	id        string
+	name      string
+	version   string
+	types     []ndr.ComplexType
 	functions []MaybeMidlFunction
 }
 
@@ -66,17 +67,18 @@ pub fn (intf MidlInterface) format() string
 // MidlFunction contains detailed RPC method information. This includes the name
 // of a method, information in it's required parameters and return value and other
 // information. A MidlFunction struct can be obtained by decompiling an RPC method.
-struct MidlFunction {
-	pub mut:
-	name string
-	offset usize
-	opcode int
-	arg_num u8
-	arg_offset usize
-	handle_offset usize
+struct MidlFunction
+{
+pub mut:
+	name              string
+	offset            usize
+	opcode            int
+	arg_num           u8
+	arg_offset        usize
+	handle_offset     usize
 	interpreter_flags ndr.NdrFlags
-	param_list []ndr.NdrBasicParam
-	return_value ndr.NdrBasicParam
+	param_list        []ndr.NdrBasicParam
+	return_value      ndr.NdrBasicParam
 }
 
 // format returns the IDL source code of a MidlFunction struct as string. This string
@@ -86,7 +88,8 @@ pub fn (func MidlFunction) format() string
 {
 	mut func_str := '${func.return_value.format()} ${func.name}('
 
-	if func.param_list.len == 0 {
+	if func.param_list.len == 0
+	{
 		return '${func_str});'
 	}
 
@@ -119,8 +122,9 @@ pub fn (func MidlFunction) format() string
 // MidlInvalidFunction represents an RPC method that was not successfully decompiled.
 // It is used within the sum type MaybeMidlFunction to represent possible success
 // of the decompilation methods.
-struct MidlInvalidFunction {
-	pub mut:
+struct MidlInvalidFunction
+{
+pub mut:
 	name string
 }
 
@@ -159,11 +163,12 @@ pub fn (intf RpcInterfaceInfo) decode_methods(pid u32, methods []int)! MidlInter
 		name = '${intf.id}'
 	}
 
-	return MidlInterface {
-		id: '${intf.id}'
-		name: name.replace('-', '')
-		version: intf.version
-		types: types
+	return MidlInterface
+	{
+		id:        '${intf.id}'
+		name:      name.replace('-', '')
+		version:   intf.version
+		types:     types
 		functions: functions
 	}
 }
@@ -180,7 +185,8 @@ pub fn (intf RpcInterfaceInfo) decode_methods_ex(pid u32, methods []int, mut res
 {
 	process_handle := win.open_process_ext(u32(C.PROCESS_VM_READ | C.PROCESS_QUERY_INFORMATION), false, pid)!
 
-	defer {
+	defer
+	{
 		C.CloseHandle(process_handle)
 	}
 
@@ -260,17 +266,21 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 
 			match context_type
 			{
-				u8(ndr.NdrFormatChar.fc_bind_generic) {
+				u8(ndr.NdrFormatChar.fc_bind_generic)
+				{
 					context_flags = ndr.NdrHandleParamFlags(u8(context_flags) & 0xF0)
 					ptr = voidptr(&u16(ptr) + 1)
 				}
 
-				u8(ndr.NdrFormatChar.fc_bind_context) {
+				u8(ndr.NdrFormatChar.fc_bind_context)
+				{
 					ptr = voidptr(&u16(ptr) + 1)
 				}
 
-				u8(ndr.NdrFormatChar.fc_bind_primitive) {
-					if u8(context_flags) != 0 {
+				u8(ndr.NdrFormatChar.fc_bind_primitive)
+				{
+					if u8(context_flags) != 0
+					{
 						context_flags = ndr.NdrHandleParamFlags.handle_param_is_via_ptr
 					}
 				}
@@ -286,11 +296,13 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 				param_type = ndr.NdrPointer.new(ndr.NdrFormatChar.fc_pointer, param_type, ndr.NdrPointerFlags.fc_simple_pointer)
 			}
 
-			handle = ndr.NdrHandleParam {
-				NdrBasicParam: ndr.NdrBasicParam {
-					name: 'binding'
-					attrs: .is_binding
-					typ: param_type
+			handle = ndr.NdrHandleParam
+			{
+				NdrBasicParam: ndr.NdrBasicParam
+				{
+					name:   'binding'
+					attrs:  .is_binding
+					typ:    param_type
 					offset: handle_offset
 				}
 				flags: context_flags
@@ -301,11 +313,13 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 
 		else
 		{
-			handle = ndr.NdrHandleParam {
-				NdrBasicParam: ndr.NdrBasicParam {
-					name: 'binding'
-					attrs: .is_binding
-					typ: ndr.NdrSimpleType.new(ndr.NdrFormatChar(handle_type))
+			handle = ndr.NdrHandleParam
+			{
+				NdrBasicParam: ndr.NdrBasicParam
+				{
+					name:   'binding'
+					attrs:  .is_binding
+					typ:    ndr.NdrSimpleType.new(ndr.NdrFormatChar(handle_type))
 					offset: 0
 				}
 				flags: ndr.NdrHandleParamFlags(0)
@@ -375,15 +389,16 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 			}
 		}
 
-		mut midl_function := MidlFunction {
-			name: method.name
-			offset: method.addr
-			opcode: index
-			arg_num: arg_num
-			arg_offset: usize(ptr)
-			handle_offset: 0
+		mut midl_function := MidlFunction
+		{
+			name:              method.name
+			offset:            method.addr
+			opcode:            index
+			arg_num:           arg_num
+			arg_offset:        usize(ptr)
+			handle_offset:     0
 			interpreter_flags: interpreter_flags
-			param_list: param_list
+			param_list:        param_list
 		}
 
 		if interpreter_flags.has(ndr.NdrFlags.has_return)

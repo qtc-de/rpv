@@ -2,7 +2,8 @@ module ndr
 
 // NdrString represents the most basic string type and consists out of an
 // NdrBaseType and the associated string length.
-pub struct NdrString {
+pub struct NdrString
+{
 	NdrBaseType
 	length u16
 }
@@ -14,7 +15,8 @@ pub fn (context NdrContext) read_string(format NdrFormatChar, mut addr &voidptr)
 	context.read[u8](mut addr)! // padding
 	length := context.read[u16](mut addr)!
 
-	return NdrString {
+	return NdrString
+	{
 		format: format
 		length: length
 	}
@@ -58,7 +60,8 @@ pub fn (str NdrString) size() u32
 // NdrCorrelationDescriptor attached. In contrast to NdrString, this
 // struct is missing a length member. Instead, the string length is
 // encoded within the NdrCorrelationDescriptor.
-pub struct NdrConformantString {
+pub struct NdrConformantString
+{
 	NdrBaseType
 	c_desc MaybeCorrelationDescriptor
 }
@@ -146,7 +149,8 @@ pub fn (context NdrContext) read_conformant_string(format NdrFormatChar, mut add
 		c_desc = context.read_correlation_descriptor(format, mut addr)!
 	}
 
-	return NdrConformantString {
+	return NdrConformantString
+	{
 		format: format
 		c_desc: c_desc
 	}
@@ -154,10 +158,11 @@ pub fn (context NdrContext) read_conformant_string(format NdrFormatChar, mut add
 
 // NdrStructureString is another NDR string type that contains the element size
 // and the element number as part of it's struct definition.
-pub struct NdrStructureString {
+pub struct NdrStructureString
+{
 	NdrBaseType
 	element_size u8
-	element_num u16
+	element_num  u16
 }
 
 // read_structure_string attempts to read an NdrStructureString from process
@@ -167,10 +172,11 @@ pub fn (context NdrContext) read_structure_string(mut addr &voidptr)! NdrStructu
 	element_size := context.read[u8](mut addr)!
 	element_num := context.read[u16](mut addr)!
 
-	return NdrStructureString {
-		format: NdrFormatChar.fc_sstring
+	return NdrStructureString
+	{
+		format:       NdrFormatChar.fc_sstring
 		element_size: element_size
-		element_num: element_num
+		element_num:  element_num
 	}
 }
 
@@ -205,7 +211,8 @@ pub fn (str NdrStructureString) size() u32
 // NdrConformantStructureString is pretty similar to NdrStructureString, but
 // the element number is encoded within a correlation descriptor. Wherefore,
 // this struct extends NdrConformantString and not NdrStructureString.
-pub struct NdrConformantStructureString {
+pub struct NdrConformantStructureString
+{
 	NdrConformantString
 	element_size u8
 }
@@ -224,10 +231,11 @@ pub fn (context NdrContext) read_conformant_structure_string(mut addr &voidptr)!
 		c_desc = context.read_correlation_descriptor(.fc_c_sstring, mut addr)!
 	}
 
-	return NdrConformantStructureString {
-		format: NdrFormatChar.fc_c_sstring
+	return NdrConformantStructureString
+	{
+		format:       NdrFormatChar.fc_c_sstring
 		element_size: element_size
-		c_desc: c_desc
+		c_desc:       c_desc
 	}
 }
 

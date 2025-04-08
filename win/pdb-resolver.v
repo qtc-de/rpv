@@ -5,7 +5,8 @@ import utils
 // PdbResolver is used to resolve symbols using .pdb files. This
 // struct should be initialized by using the new_pdb_resolver
 // function.
-pub struct PdbResolver {
+pub struct PdbResolver
+{
 	process_handle	HANDLE
 	module_base		voidptr
 	module_size		u32
@@ -31,10 +32,11 @@ pub fn new_pdb_resolver(process_handle HANDLE, symbol_path string, module_base v
 		return error('Call to SymLoadModuleEx failed.')
 	}
 
-	return PdbResolver {
+	return PdbResolver
+	{
 		process_handle: process_handle
-		module_base: module_base
-		module_size: module_size
+		module_base:    module_base
+		module_size:    module_size
 	}
 }
 
@@ -59,7 +61,8 @@ pub fn (context PdbResolver) load_symbol(symbol u64)! string
 {
 	mut disp := u64(0)
 
-	symbol_info := SymbolInfoV{
+	symbol_info := SymbolInfoV
+	{
 		size_of_struct: sizeof(C.SYMBOL_INFO)
 	}
 
@@ -78,7 +81,8 @@ pub fn (context PdbResolver) load_symbols(symbol u64)! []string
 	symbols := []string{}
 	symbols_ref := &symbols
 
-	frame := C.IMAGEHLP_STACK_FRAME{
+	frame := C.IMAGEHLP_STACK_FRAME
+	{
 		InstructionOffset: symbol
 	}
 
@@ -87,8 +91,10 @@ pub fn (context PdbResolver) load_symbols(symbol u64)! []string
 		return error('Unable to set symbol context to 0x${symbol}')
 	}
 
-	symbol_closure := fn [symbols_ref] (symbol_info &SymbolInfoV, symbol_size u32) {
-		unsafe {
+	symbol_closure := fn [symbols_ref] (symbol_info &SymbolInfoV, symbol_size u32)
+	{
+		unsafe
+		{
 			symbols_ref << cstring_to_vstring(&char(symbol_info.name[..].data))
 		}
 	}

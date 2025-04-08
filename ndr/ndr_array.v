@@ -6,10 +6,11 @@ import utils
 // a NdrBaseType that describes the NdrArray itself and an element_type
 // that describes the contained elements. Additionally, a pointer layout
 // can be contained.
-pub struct NdrArray {
+pub struct NdrArray
+{
 	NdrBaseType
-	alignment u8
-	element_type NdrType = NdrNone{}
+	alignment      u8
+	element_type   NdrType          = NdrNone{}
 	pointer_layout MaybePointerInfo = NdrNone{}
 }
 
@@ -34,7 +35,8 @@ pub fn(mut context NdrContext) read_array(format NdrFormatChar, alignment u8, mu
 		{
 			element_type := context.read_type_ext(mut addr)!
 
-			return NdrArray {
+			return NdrArray
+			{
 				format: format,
 				alignment: alignment,
 				element_type: element_type
@@ -44,7 +46,8 @@ pub fn(mut context NdrContext) read_array(format NdrFormatChar, alignment u8, mu
 
 		else
 		{
-			return NdrArray {
+			return NdrArray
+			{
 				format: format,
 				alignment: alignment,
 				element_type: ndr_type
@@ -55,7 +58,8 @@ pub fn(mut context NdrContext) read_array(format NdrFormatChar, alignment u8, mu
 
 // NdrSimpleArray extends NdrArray by adding a total_size member
 // that describes the size of the array.
-pub struct NdrSimpleArray {
+pub struct NdrSimpleArray
+{
 	NdrArray
 	total_size u32
 }
@@ -98,7 +102,8 @@ pub fn (mut context NdrContext) read_simple_array(format NdrFormatChar, mut addr
 		total_size = context.read[u32](mut addr)!
 	}
 
-	return NdrSimpleArray {
+	return NdrSimpleArray
+	{
 		NdrArray: context.read_array(format, alignment, mut addr)!
 		total_size: total_size
 	}
@@ -106,11 +111,12 @@ pub fn (mut context NdrContext) read_simple_array(format NdrFormatChar, mut addr
 
 // NdrConformantArray extends NdrArray and adds an additional element_size field
 // as well as two optional CorrelationDescriptors.
-pub struct NdrConformantArray {
+pub struct NdrConformantArray
+{
 	NdrArray
 	element_size u32
-	c_desc MaybeCorrelationDescriptor
-	v_desc MaybeCorrelationDescriptor
+	c_desc       MaybeCorrelationDescriptor
+	v_desc       MaybeCorrelationDescriptor
 }
 
 // read_conformant_array attempts to read an NdrConformantArray from the specified
@@ -128,7 +134,8 @@ pub fn (mut context NdrContext) read_conformant_array(format NdrFormatChar, mut 
 		v_desc = context.read_correlation_descriptor_ex(format, true, mut addr)!
 	}
 
-	return NdrConformantArray {
+	return NdrConformantArray
+	{
 		NdrArray: context.read_array(format, alignment, mut addr)!
 		element_size: element_size
 		c_desc: c_desc
@@ -140,12 +147,12 @@ pub fn (mut context NdrContext) read_conformant_array(format NdrFormatChar, mut 
 // Possible attributes are fetched from the two optional correlation descriptors.
 pub fn (array NdrConformantArray) attrs() []NdrAttr
 {
-    mut attrs := []NdrAttr{}
+	mut attrs := []NdrAttr{}
 
-    attrs << array.c_desc.attrs()
-    attrs << array.v_desc.attrs()
+	attrs << array.c_desc.attrs()
+	attrs << array.v_desc.attrs()
 
-    return attrs
+	return attrs
 }
 
 // comments returns an array of NdrComment associated with the NdrConformantArray.
@@ -207,7 +214,8 @@ pub fn (array NdrConformantArray) size() u32
 // NdrBogusArray is basically the same as NdrConformantArray, but instead of
 // holding an additional element_size member, the struct holds the element
 // number as member.
-pub struct NdrBogusArray {
+pub struct NdrBogusArray
+{
 	NdrConformantArray
 	element_num u32
 }
@@ -224,7 +232,8 @@ pub fn(mut context NdrContext) read_bogus_array(format NdrFormatChar, mut addr &
 
 	array := context.read_array(format, alignment, mut addr)!
 
-	return NdrBogusArray {
+	return NdrBogusArray
+	{
 		NdrArray: array
 		element_num: num
 		c_desc: c_desc
@@ -254,7 +263,8 @@ pub fn (array NdrBogusArray) size() u32
 }
 
 // NdrVaryingArray extends NdrBogusArray by adding an additional total_size field.
-pub struct NdrVaryingArray {
+pub struct NdrVaryingArray
+{
 	NdrBogusArray
 	total_size u32
 }
@@ -282,7 +292,8 @@ pub fn(mut context NdrContext) read_varying_array(format NdrFormatChar, mut addr
 	element_size := context.read[u16](mut addr)!
 	v_desc := context.read_correlation_descriptor_ex(format, true, mut addr)!
 
-	return NdrVaryingArray {
+	return NdrVaryingArray
+	{
 		NdrArray: context.read_array(format, alignment, mut addr)!
 		element_size: element_size
 		total_size: total_size

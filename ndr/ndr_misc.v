@@ -4,7 +4,8 @@ module ndr
 // and a lower limit. The actual wrapped type is contained within the
 // `typ` property. The lower limit is stored in `min` and the upper in
 // `max`. The inherited `NdrBaseType` property is always `.fc_range`
-pub struct NdrRange {
+pub struct NdrRange
+{
 	NdrBaseType
 	typ NdrBaseType
 	min int
@@ -42,7 +43,8 @@ pub fn (context NdrContext) read_range(mut addr &voidptr)! NdrRange
 	min := context.read[int](mut addr)!
 	max := context.read[int](mut addr)!
 
-	return NdrRange {
+	return NdrRange
+	{
 		format: .fc_range
 		typ: NdrBaseType { format: typ }
 		min: min
@@ -51,9 +53,10 @@ pub fn (context NdrContext) read_range(mut addr &voidptr)! NdrRange
 }
 
 // NdrPipe represents the NDR type for a pipe,
-pub struct NdrPipe {
+pub struct NdrPipe
+{
 	NdrBaseType
-	typ NdrType
+	typ       NdrType
 	alignment u8
 }
 
@@ -85,9 +88,10 @@ pub fn (mut context NdrContext) read_pipe(mut addr &voidptr)! NdrPipe
 	alignment := context.read[u8](mut addr)!
 	typ := context.read_offset(mut addr)!
 
-	return NdrPipe {
-		format: .fc_pipe
-		typ: typ
+	return NdrPipe
+	{
+		format:    .fc_pipe
+		typ:       typ
 		alignment: alignment
 	}
 }
@@ -96,12 +100,13 @@ pub fn (mut context NdrContext) read_pipe(mut addr &voidptr)! NdrPipe
 // This information always consists out of two parts. For context types, the
 // first part are flags whereas the second part is the context id. For
 // string types, the first part is the lower, the second the upper bound.
-pub struct NdrSupplement {
+pub struct NdrSupplement
+{
 	NdrBaseType
-	typ NdrFormatChar
+	typ        NdrFormatChar
 	supplement NdrType
-	part_one u32
-	part_two u32
+	part_one   u32
+	part_two   u32
 }
 
 // attrs returns multiple NdrAttr describing the supplement. Currently
@@ -182,11 +187,12 @@ pub fn (mut context NdrContext) read_supplement(mut addr &voidptr)! NdrSupplemen
 	part_one := context.read[u32](mut addr)!
 	part_two := context.read[u32](mut addr)!
 
-	return NdrSupplement {
-		format: .fc_supplement
-		typ: typ
+	return NdrSupplement
+	{
+		format:     .fc_supplement
+		typ:        typ
 		supplement: supplement
-		part_one: part_one
-		part_two: part_two
+		part_one:   part_one
+		part_two:   part_two
 	}
 }

@@ -27,8 +27,9 @@ type NdrAttr = NdrStrAttr | NdrGlobalOffsetAttr | NdrRelativeOffsetAttr | NdrCon
 // NdrStrAttr is probably the most simple NDR attribute. It just
 // contains a plain string that needs to be displayed when formatting
 // the attribute.
-pub struct NdrStrAttr {
-	pub:
+pub struct NdrStrAttr
+{
+pub:
 	value string
 }
 
@@ -39,12 +40,13 @@ pub struct NdrStrAttr {
 // depending on the NdrType it is attached to. Therefore, the struct
 // contains an NdrFormatChar member to indicate how the attribute needs
 // to be used.
-pub struct NdrGlobalOffsetAttr {
-	pub:
-	offset		int
-	typ			NdrFormatChar
-	operator	NdrFormatChar
-	is_varying	bool
+pub struct NdrGlobalOffsetAttr
+{
+pub:
+	offset     int
+	typ        NdrFormatChar
+	operator   NdrFormatChar
+	is_varying bool
 }
 
 // format returns the string representation of an NdrGlobalOffsetAttr.
@@ -101,12 +103,13 @@ pub fn (attr NdrGlobalOffsetAttr) format(members []NdrMember) string
 // differs depending on the NdrType it is attached to. Therefore, the
 // struct contains an NdrFormatChar member to indicate how the attribute
 // needs to be used.
-pub struct NdrRelativeOffsetAttr {
-	pub:
-	offset		int
-	typ			NdrFormatChar
-	operator	NdrFormatChar
-	is_varying	bool
+pub struct NdrRelativeOffsetAttr
+{
+pub:
+	offset     int
+	typ        NdrFormatChar
+	operator   NdrFormatChar
+	is_varying bool
 }
 
 // format returns the string representation of an NdrRelativeOffsetAttr.
@@ -159,11 +162,12 @@ pub fn (attr NdrRelativeOffsetAttr) format(self NdrStructMember, members []NdrSt
 // value is contained inside the offset member. Despite the attribute seems
 // always to have the same meaning in any context [size_is(offset)], the
 // associated type is still included within the struct.
-pub struct NdrConstantAttr {
-	pub:
-	offset		int
-	typ			NdrFormatChar
-	is_varying	bool
+pub struct NdrConstantAttr
+{
+pub:
+	offset     int
+	typ        NdrFormatChar
+	is_varying bool
 }
 
 // format returns the string representation of an NdrConstantAttr. This is
@@ -176,10 +180,11 @@ pub fn (attr NdrConstantAttr) format() string
 
 // NdrRangeAttr is an attribute that just contains a range that is defined
 // by too integer values.
-pub struct NdrRangeAttr {
-	pub:
-	start	int
-	end		int
+pub struct NdrRangeAttr
+{
+pub:
+	start int
+	end   int
 }
 
 // format returns the string representation of an NdrRangeAttr. This is
@@ -196,12 +201,13 @@ pub fn (attr NdrRangeAttr) format() string
 // members within a struct. NdrExprAttr contains the actual expression as string
 // and also the arguments as NdrExpression types. When formatting the NdrExprAttr,
 // the arguments need to be resolved and inserted into the expression string.
-pub struct NdrExprAttr {
-	arguments			[]NdrExpression
-	expression			string
-	correlation_type	NdrCorrelationType
-	typ					NdrFormatChar
-	is_varying			bool
+pub struct NdrExprAttr
+{
+	arguments        []NdrExpression
+	expression       string
+	correlation_type NdrCorrelationType
+	typ              NdrFormatChar
+	is_varying       bool
 }
 
 // format returns the string representation of an NdrExprAttr. The skeleton for

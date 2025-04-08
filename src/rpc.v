@@ -10,18 +10,19 @@ import internals { RpcServer, RpcInterface, RpcAddress, RpcServerInterface }
 // that holds the RPC information that is associated with the corresponding
 // process. If no RPC servers are present in the process, the RpcInfo struct
 // has an rpc_type attribute with value no_rpc.
-pub struct RpvProcessInformation {
-	pub mut:
-	pid		u32
-	ppid	u32
-	childs  []u32
-	arch	win.Arch = win.Arch.unk
-	name	string
-	path	string
-	cmdline string
-	user	string
-	version u64
-	desc	string
+pub struct RpvProcessInformation
+{
+pub mut:
+	pid      u32
+	ppid     u32
+	childs   []u32
+	arch     win.Arch = win.Arch.unk
+	name     string
+	path     string
+	cmdline  string
+	user     string
+	version  u64
+	desc     string
 	rpc_info RpcInfo
 }
 
@@ -30,87 +31,94 @@ pub struct RpvProcessInformation {
 // or no_rpc. General RPC server information is stored in the RpcServerInfo struct.
 // RPC interface information is stored in an RpcInterfaceInfo array with one element
 // per RPC interface
-pub struct RpcInfo {
-	pub:
-	server_info RpcServerInfo
+pub struct RpcInfo
+{
+pub:
+	server_info     RpcServerInfo
 	interface_infos []RpcInterfaceInfo
-	rpc_type RpcType
+	rpc_type        RpcType
 }
 
 // RpcServerInfo contains general information about an RPC server. This includes its
 // base address, authentication and endpoint information and the internal RpcServer
 // struct that contains more low level information.
-pub struct RpcServerInfo {
-	pub:
-	base voidptr
-	server RpcServer
+pub struct RpcServerInfo
+{
+pub:
+	base       voidptr
+	server     RpcServer
 	intf_count int
 	auth_infos []RpcAuthInfo
-	endpoints []RpcEndpoint
+	endpoints  []RpcEndpoint
 }
 
 // RpcInterfaceInfo contains general information about an RPC interface. This includes its
 // uuid, base address, name, security callback and other information. Moreover it contains
 // the MIDL_STUB_DESC that is required for decompiling the RPC methods of the interface.
-pub struct RpcInterfaceInfo {
-	pub:
-	base voidptr
+pub struct RpcInterfaceInfo
+{
+pub:
+	base                voidptr
 	dispatch_table_addr voidptr
-	location win.LocationInfo
-	id string
-	version string
-	annotation string
-	ep_registered bool
-	intf RpcInterface
-	ndr_info NdrInfo
-	typ RpcType
-	methods []RpcMethod
-	midl_stub_desc C.MIDL_STUB_DESC
-	pub mut:
-	name string
+	location            win.LocationInfo
+	id                  string
+	version             string
+	annotation          string
+	ep_registered       bool
+	intf                RpcInterface
+	ndr_info            NdrInfo
+	typ                 RpcType
+	methods             []RpcMethod
+	midl_stub_desc      C.MIDL_STUB_DESC
+pub mut:
+	name         string
 	sec_callback SecurityCallback
 }
 
 // RpcInterfaceInfo contains general information about an RPC interface. This includes its
 // uuid, base address, name, security callback and other information. Moreover it contains
 // the MIDL_STUB_DESC that is required for decompiling the RPC methods of the interface.
-pub struct RpcBasicInfo {
-	pub:
-	server_info RpcServerBasicInfo
+pub struct RpcBasicInfo
+{
+pub:
+	server_info     RpcServerBasicInfo
 	interface_infos []RpcInterfaceBasicInfo
-	rpc_type RpcType
+	rpc_type        RpcType
 }
 
 // RpcServerBasicInfo is a reduced version of RpcServerInfo with only a subset of fields
 // available. When enumerating RPC servers, RpcServerBasicInfo structs are generated.
 // These can then be enriched to create RpcServerInfo structs.
-pub struct RpcServerBasicInfo {
-	pub:
-	base voidptr
-	server RpcServer
+pub struct RpcServerBasicInfo
+{
+pub:
+	base       voidptr
+	server     RpcServer
 	intf_count int
 }
 
 // RpcInterfaceBasicInfo is a reduced version of RpcInterfaceInfo with only a subset of fields
 // available. When enumerating RPC servers, RpcInterfaceBasicInfo structs are generated.
 // These can then be enriched to create RpcInterfaceInfo structs.
-pub struct RpcInterfaceBasicInfo {
-	pub:
+pub struct RpcInterfaceBasicInfo
+{
+pub:
 	base voidptr
 	intf RpcInterface
-	typ RpcType
+	typ  RpcType
 }
 
 // RpcMethod represents a method defined on an RPC interface. RpcMethods have a base address
 // with their corresponding executable code and a format address that contains information
 // on how the method has to be called. The format address is used during decompilation.
-pub struct RpcMethod {
-	pub:
-	addr voidptr
-	fmt voidptr
+pub struct RpcMethod
+{
+pub:
+	addr   voidptr
+	fmt    voidptr
 	offset u32
-	pub mut:
-	name string
+pub mut:
+	name    string
 	symbols []string
 }
 
@@ -118,7 +126,8 @@ pub struct RpcMethod {
 // Processes without RPC server have an RPC type of no_rpc. DCOM servers have type dcom
 // and mixed servers (RPC + DCOM) have type hybrid. Moreover, there is the type wrong_arch,
 // since x64/x86 rpv is currently only capable of enumerating x64/x86 processes.
-pub enum RpcType {
+pub enum RpcType
+{
 	rpc
 	dcom
 	hybrid
@@ -127,46 +136,50 @@ pub enum RpcType {
 }
 
 // RpcAuthInfo contains authentication information that is used by the RPC server.
-pub struct RpcAuthInfo {
-	pub:
-	principal string
-	dll string
-	package win.SecurityPackage
+pub struct RpcAuthInfo
+{
+pub:
+	principal  string
+	dll        string
+	package    win.SecurityPackage
 	get_key_fn voidptr
-	arg voidptr
+	arg        voidptr
 }
 
 // SecurityCallback contains information about an RPC security callback. When registering
 // RPC interfaces, a security callback can be specified that is called before RPC clients
 // can invoke methods. The callback can check different attributes of the caller and then
 // determine whether the call should be allowed.
-pub struct SecurityCallback {
-	pub mut:
-	name string
-	addr voidptr
-	offset u32
+pub struct SecurityCallback
+{
+pub mut:
+	name     string
+	addr     voidptr
+	offset   u32
 	location win.LocationInfo
 }
 
 // RpcEndpoint contains information on an RPC endpoint that can be used to call an RPC server.
 // RPC servers can have multiple endpoints associated where each endpoint can use different
 // transport protocols (named pipe, TCP, HTTP, ...).
-pub struct RpcEndpoint {
-	pub:
-	name string
+pub struct RpcEndpoint
+{
+pub:
+	name     string
 	protocol string
 }
 
 // NdrInfo contains information on the Network Data Representation (NDR) of an RPC interface.
 // NDR is used for marshalling and unmarshalling types during RPC calls. NDR information is
 // also what allows RPC methods to be decompiled.
-pub struct NdrInfo {
-	pub:
-	ndr_version u32
+pub struct NdrInfo
+{
+pub:
+	ndr_version  u32
 	midl_version u32
-	flags usize
-	syntax string
-	syntax_name string
+	flags        usize
+	syntax       string
+	syntax_name  string
 }
 
 // get_rpc_process_infos returns an RpvProcessInformation array containing
@@ -189,7 +202,8 @@ pub fn get_rpv_process_infos_ex(mut resolver SymbolResolver)! []RpvProcessInform
 	arr_size := u32(0)
 	mut processes := []u32{len: 1024}
 
-	if !C.EnumProcesses(processes.data, u32(processes.cap) * sizeof(u32), &arr_size) {
+	if !C.EnumProcesses(processes.data, u32(processes.cap) * sizeof(u32), &arr_size)
+	{
 		return error('Failed to enumerate processes.')
 	}
 
@@ -200,7 +214,8 @@ pub fn get_rpv_process_infos_ex(mut resolver SymbolResolver)! []RpvProcessInform
 
 	for pid in processes
 	{
-		if pid == rpv_pid {
+		if pid == rpv_pid
+		{
 			continue
 		}
 
@@ -218,7 +233,8 @@ pub fn get_rpv_process_info(pid u32, mut resolver SymbolResolver)! RpvProcessInf
 {
 	process_handle := win.open_process_ext(u32(C.PROCESS_VM_READ | C.PROCESS_QUERY_INFORMATION), false, pid)!
 
-	defer {
+	defer
+	{
 		C.CloseHandle(process_handle)
 	}
 
@@ -233,23 +249,26 @@ pub fn get_rpv_process_info(pid u32, mut resolver SymbolResolver)! RpvProcessInf
 	version := win.get_module_version(path) or { u64(0) }
 	description := win.get_module_description(path) or { '' }
 
-	mut error_obj := RpvProcessInformation {
-		pid: pid
-		ppid: ppid
-		childs: childs
-		arch: arch
-		name: name
-		path: path
+	mut error_obj := RpvProcessInformation
+	{
+		pid:     pid
+		ppid:    ppid
+		childs:  childs
+		arch:    arch
+		name:    name
+		path:    path
 		cmdline: cmdline
-		user: user
+		user:    user
 		version: version
-		desc: description
+		desc:    description
 	}
 
-	$if x64 {
+	$if x64
+	{
 		if arch == win.Arch.x86
 		{
-			error_obj.rpc_info = RpcInfo {
+			error_obj.rpc_info = RpcInfo
+			{
 				rpc_type: .wrong_arch
 			}
 
@@ -257,10 +276,12 @@ pub fn get_rpv_process_info(pid u32, mut resolver SymbolResolver)! RpvProcessInf
 		}
 	}
 
-	$if x32 {
+	$if x32
+	{
 		if arch == win.Arch.x64
 		{
-			error_obj.rpc_info = RpcInfo {
+			error_obj.rpc_info = RpcInfo
+			{
 				rpc_type: .wrong_arch
 			}
 
@@ -270,7 +291,8 @@ pub fn get_rpv_process_info(pid u32, mut resolver SymbolResolver)! RpvProcessInf
 
 	rpc_basic_info := get_process_rpc_server_h(process_handle) or
 	{
-		error_obj.rpc_info = RpcInfo {
+		error_obj.rpc_info = RpcInfo
+		{
 			rpc_type: .no_rpc
 		}
 
@@ -279,17 +301,18 @@ pub fn get_rpv_process_info(pid u32, mut resolver SymbolResolver)! RpvProcessInf
 
 	rpc_info := rpc_basic_info.enrich_h(process_handle, mut resolver)!
 
-	return RpvProcessInformation {
-		pid: pid
-		ppid: ppid
-		childs: childs
-		arch: arch
-		name: name
-		path: path
-		cmdline: cmdline
-		user: user
-		version: version
-		desc: description
+	return RpvProcessInformation
+	{
+		pid:      pid
+		ppid:     ppid
+		childs:   childs
+		arch:     arch
+		name:     name
+		path:     path
+		cmdline:  cmdline
+		user:     user
+		version:  version
+		desc:     description
 		rpc_info: rpc_info
 	}
 }
@@ -302,7 +325,8 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 {
 	process_handle := win.open_process_ext(u32(C.PROCESS_ALL_ACCESS), false, pi.pid)!
 
-	defer {
+	defer
+	{
 		C.CloseHandle(process_handle)
 	}
 
@@ -312,7 +336,8 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 	{
 		for mut intf_info in pi.rpc_info.interface_infos
 		{
-			resolver.attach_pdb(process_handle, intf_info.location.base, intf_info.location.size) or {
+			resolver.attach_pdb(process_handle, intf_info.location.base, intf_info.location.size) or
+			{
 				utils.log_debug('Failed to attach PDB resolver: ${err}')
 			}
 
@@ -332,8 +357,10 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 
 			if intf_info.sec_callback.addr != &voidptr(0)
 			{
-				if intf_info.sec_callback.location.base != intf_info.location.base {
-					resolver.attach_pdb(process_handle, intf_info.sec_callback.location.base, intf_info.sec_callback.location.size) or {
+				if intf_info.sec_callback.location.base != intf_info.location.base
+				{
+					resolver.attach_pdb(process_handle, intf_info.sec_callback.location.base, intf_info.sec_callback.location.size) or
+					{
 						utils.log_debug('Failed to attach PDB resolver: ${err}')
 					}
 				}
@@ -360,7 +387,8 @@ pub fn get_process_rpc_server(pid u32)! RpcBasicInfo
 {
 	process_handle := win.open_process_ext(u32(C.PROCESS_ALL_ACCESS), false, pid)!
 
-	defer {
+	defer
+	{
 		C.CloseHandle(process_handle)
 	}
 
@@ -394,7 +422,8 @@ pub fn get_process_rpc_server_h(process_handle win.HANDLE)! RpcBasicInfo
 	{
 		p_module_name := unsafe { &char(malloc(C.MAX_PATH)) }
 
-		defer {
+		defer
+		{
 			unsafe { free(p_module_name) }
 		}
 
@@ -426,7 +455,8 @@ fn find_rpc_server(process_handle win.HANDLE, section_info win.ModuleSectionInfo
 			p_rpc_server := win.read_proc_mem_s[u64](process_handle, section_info.base + cts) or { continue }
 			rpc_server := win.read_proc_mem_s[RpcServer](process_handle, voidptr(p_rpc_server)) or { continue }
 
-			return validate_rpc_server(process_handle, rpc_server, voidptr(p_rpc_server)) or {
+			return validate_rpc_server(process_handle, rpc_server, voidptr(p_rpc_server)) or
+			{
 				continue
 			}
 		}
@@ -484,43 +514,50 @@ fn validate_rpc_server(process_handle win.HANDLE, rpc_server RpcServer, p_rpc_se
 			contains_dcom = true
 		}
 
-		else {
+		else
+		{
 			contains_rpc = true
 		}
 
-		rpc_interface_infos << RpcInterfaceBasicInfo {
+		rpc_interface_infos << RpcInterfaceBasicInfo
+		{
 			base: p_table[ctr]
 			intf: rpc_interface
-			typ: interface_type
+			typ:  interface_type
 		}
 	}
 
-	if rpc_interface_infos.len < 1 {
+	if rpc_interface_infos.len < 1
+	{
 		return error('RPC server candidate does not contain any interfaces.')
 	}
 
 	utils.log_debug('Found global RpcServer at 0x${p_rpc_server} with ${rpc_interface_infos.len} interfaces.')
 
-	rpc_server_info := RpcServerBasicInfo {
-		base: p_rpc_server
-		server: rpc_server
+	rpc_server_info := RpcServerBasicInfo
+	{
+		base:       p_rpc_server
+		server:     rpc_server
 		intf_count: rpc_interface_infos.len
 	}
 
 	mut rpc_type := RpcType.rpc
 
-	if contains_dcom && !contains_rpc {
+	if contains_dcom && !contains_rpc
+	{
 		rpc_type = RpcType.dcom
 	}
 
-	else if contains_dcom && contains_rpc {
+	else if contains_dcom && contains_rpc
+	{
 		rpc_type = RpcType.hybrid
 	}
 
-	return RpcBasicInfo {
-		server_info: rpc_server_info
+	return RpcBasicInfo
+	{
+		server_info:     rpc_server_info
 		interface_infos: rpc_interface_infos
-		rpc_type: rpc_type
+		rpc_type:        rpc_type
 	}
 }
 
@@ -540,10 +577,11 @@ pub fn (rpc_info RpcBasicInfo) enrich(pid u32, mut resolver SymbolResolver)! Rpc
 		enriched_interface_infos << interface_info.enrich(pid, mut resolver)!
 	}
 
-	return RpcInfo {
-		server_info: enriched_server_info
+	return RpcInfo
+	{
+		server_info:     enriched_server_info
 		interface_infos: enriched_interface_infos
-		rpc_type: rpc_info.rpc_type
+		rpc_type:        rpc_info.rpc_type
 	}
 }
 
@@ -563,10 +601,11 @@ pub fn (rpc_info RpcBasicInfo) enrich_h(process_handle win.HANDLE, mut resolver 
 		enriched_interface_infos << interface_info.enrich_h(process_handle, mut resolver)!
 	}
 
-	return RpcInfo {
-		server_info: enriched_server_info
+	return RpcInfo
+	{
+		server_info:     enriched_server_info
 		interface_infos: enriched_interface_infos
-		rpc_type: rpc_info.rpc_type
+		rpc_type:        rpc_info.rpc_type
 	}
 }
 
@@ -580,12 +619,13 @@ pub fn (server_info RpcServerBasicInfo) enrich(pid u32)! RpcServerInfo
 	rpc_auth_info := server_info.get_rpc_auth_info(pid)!
 	rpc_endpoints := server_info.get_rpc_endpoints(pid)!
 
-	return RpcServerInfo {
-		base: server_info.base
-		server: server_info.server
+	return RpcServerInfo
+	{
+		base:       server_info.base
+		server:     server_info.server
 		intf_count: server_info.intf_count
 		auth_infos: rpc_auth_info
-		endpoints: rpc_endpoints
+		endpoints:  rpc_endpoints
 	}
 }
 
@@ -599,12 +639,13 @@ pub fn (server_info RpcServerBasicInfo) enrich_h(process_handle win.HANDLE)! Rpc
 	rpc_auth_info := server_info.get_rpc_auth_info_h(process_handle)!
 	rpc_endpoints := server_info.get_rpc_endpoints_h(process_handle)!
 
-	return RpcServerInfo {
-		base: server_info.base
-		server: server_info.server
+	return RpcServerInfo
+	{
+		base:       server_info.base
+		server:     server_info.server
 		intf_count: server_info.intf_count
 		auth_infos: rpc_auth_info
-		endpoints: rpc_endpoints
+		endpoints:  rpc_endpoints
 	}
 }
 
@@ -617,7 +658,8 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich(pid u32, mut resolver Symbo
 {
 	process_handle := win.open_process_ext(u32(C.PROCESS_VM_READ | C.PROCESS_QUERY_INFORMATION), false, pid)!
 
-	defer {
+	defer
+	{
 		C.CloseHandle(process_handle)
 	}
 
@@ -641,7 +683,8 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 	mut midl_stub_desc := C.MIDL_STUB_DESC{}
 
 	mut rpc_methods := []RpcMethod{cap: int(dispatch_table.DispatchTableCount)}
-	resolver.attach_pdb(process_handle, location_info.base, location_info.size) or {
+	resolver.attach_pdb(process_handle, location_info.base, location_info.size) or
+	{
 		utils.log_debug('Failed to attach PDB resolver: ${err}')
 	}
 
@@ -666,19 +709,22 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 			name := resolver.load_symbol(location_info.path, u64(base)) or { 'Proc${ctr}' }
 			symbols := resolver.load_symbols(location_info.path, u64(base)) or { []string{} }
 
-			unsafe {
-				rpc_methods << RpcMethod {
-					addr: voidptr(base)
-					fmt: voidptr(&u8(midl_server_info.ProcString) + fmt)
+			unsafe
+			{
+				rpc_methods << RpcMethod
+				{
+					addr:    voidptr(base)
+					fmt:     voidptr(&u8(midl_server_info.ProcString) + fmt)
 					offset:  u32(usize(base) - usize(location_info.base))
-					name: name
+					name:    name
 					symbols: symbols
 				}
 			}
 		}
 	}
 
-	mut sec_callback := SecurityCallback {
+	mut sec_callback := SecurityCallback
+	{
 		addr: voidptr(interface_info.intf.sec_callback)
 		name: ''
 	}
@@ -689,8 +735,10 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 		{
 			sec_callback.location = sec_location
 
-			if location_info.base != sec_location.base {
-				resolver.attach_pdb(process_handle, sec_location.base, sec_location.size) or {
+			if location_info.base != sec_location.base
+			{
+				resolver.attach_pdb(process_handle, sec_location.base, sec_location.size) or
+				{
 					utils.log_debug('Failed to attach PDB resolver: ${err}')
 				}
 			}
@@ -707,28 +755,31 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 
 	if ep_registred
 	{
-		unsafe {
+		unsafe
+		{
 			annotation = cstring_to_vstring(interface_info.intf.annotation[..].data)
 		}
 	}
 
-	return RpcInterfaceInfo {
-		base: interface_info.base
-		id: win.uuid_to_str(interface_info.intf.server_interface.interface_id) or { 'unknown' }
-		version: win.get_interface_version(interface_info.intf.server_interface.interface_id)
-		intf: interface_info.intf
-		typ: interface_info.typ
+	return RpcInterfaceInfo
+	{
+		base:                interface_info.base
+		id:                  win.uuid_to_str(interface_info.intf.server_interface.interface_id) or { 'unknown' }
+		version:             win.get_interface_version(interface_info.intf.server_interface.interface_id)
+		intf:                interface_info.intf
+		typ:                 interface_info.typ
 		dispatch_table_addr: dispatch_table.DispatchTable
-		location: location_info
-		name: intf_name
-		ep_registered: ep_registred
-		annotation: annotation
-		ndr_info: NdrInfo {
-			ndr_version: midl_stub_desc.Version
+		location:            location_info
+		name:                intf_name
+		ep_registered:       ep_registred
+		annotation:          annotation
+		ndr_info:            NdrInfo
+		{
+			ndr_version:  midl_stub_desc.Version
 			midl_version: midl_stub_desc.MIDLVersion
-			flags: usize(midl_stub_desc.mFlags)
-			syntax: win.uuid_to_str(interface_info.intf.server_interface.transfer_syntax) or { 'unknown' }
-			syntax_name: if interface_info.intf.server_interface.transfer_syntax.equals(internals.ndr64_transfer_syntax)
+			flags:        usize(midl_stub_desc.mFlags)
+			syntax:       win.uuid_to_str(interface_info.intf.server_interface.transfer_syntax) or { 'unknown' }
+			syntax_name:  if interface_info.intf.server_interface.transfer_syntax.equals(internals.ndr64_transfer_syntax)
 			{
 				'NDR64'
 			}
@@ -738,9 +789,9 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 				'DCE'
 			}
 		}
-		midl_stub_desc: midl_stub_desc
-		sec_callback: sec_callback
-		methods: rpc_methods
+		midl_stub_desc:      midl_stub_desc
+		sec_callback:        sec_callback
+		methods:             rpc_methods
 	}
 }
 
@@ -751,7 +802,8 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_auth_info(pid u32)! []RpcAuthInf
 {
 	process_handle := win.open_process_ext(u32(C.PROCESS_VM_READ | C.PROCESS_QUERY_INFORMATION), false, pid)!
 
-	defer {
+	defer
+	{
 		C.CloseHandle(process_handle)
 	}
 
@@ -773,7 +825,8 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_auth_info_h(process_handle win.H
 		return error('Unable to obten SecurityService key via RegOpenKeyExA')
 	}
 
-	defer {
+	defer
+	{
 		C.RegCloseKey(key_handle)
 	}
 
@@ -791,8 +844,8 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_auth_info_h(process_handle win.H
 	utils.log_debug('Starting to walk through RpcAuthInfo table at ${dict.p_array} (len: ${dict.number_of_entries})')
 
 	mut rpc_auth_infos := []RpcAuthInfo{}
-	unsafe {
-
+	unsafe
+	{
 		for ctr := 0; ctr < dict.number_of_entries; ctr++
 		{
 			auth_info := win.read_proc_mem_s[internals.RPC_AUTH_INFO](process_handle, p_table[ctr]) or { continue }
@@ -809,7 +862,8 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_auth_info_h(process_handle win.H
 				size := C.MAX_PATH
 				p_buffer := &char(malloc(C.MAX_PATH))
 
-				defer {
+				defer
+				{
 					free(p_buffer)
 				}
 
@@ -826,12 +880,13 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_auth_info_h(process_handle win.H
 					principal = string_from_wide(&u16(p_buffer))
 				}
 
-				rpc_auth_infos << RpcAuthInfo {
-					principal: principal
-					dll: dll_name
-					package: sec_package
+				rpc_auth_infos << RpcAuthInfo
+				{
+					principal:  principal
+					dll:        dll_name
+					package:    sec_package
 					get_key_fn: auth_info.get_key_fn
-					arg: auth_info.arg
+					arg:        auth_info.arg
 				}
 			}
 		}
@@ -848,7 +903,8 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_endpoints(pid u32)! []RpcEndpoin
 {
 	process_handle := win.open_process_ext(u32(C.PROCESS_VM_READ | C.PROCESS_QUERY_INFORMATION), false, pid)!
 
-	defer {
+	defer
+	{
 		C.CloseHandle(process_handle)
 	}
 
@@ -874,10 +930,12 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_endpoints_h(process_handle win.H
 
 	mut rpc_endpoints := []RpcEndpoint{}
 
-	unsafe {
+	unsafe
+	{
 		p_buffer := &u16(malloc(C.MAX_PATH))
 
-		defer {
+		defer
+		{
 			free(p_buffer)
 		}
 
@@ -891,8 +949,9 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_endpoints_h(process_handle win.H
 			win.read_process_memory(process_handle, rpc_addr.protocol, p_buffer, 0x100) or { continue }
 			protocol := string_from_wide(p_buffer)
 
-			rpc_endpoints << RpcEndpoint {
-				name: name
+			rpc_endpoints << RpcEndpoint
+			{
+				name:     name
 				protocol: protocol
 			}
 		}

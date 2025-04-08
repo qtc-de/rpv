@@ -18,10 +18,10 @@ import utils
 // https://learn.microsoft.com/en-us/windows/win32/rpc/correlation-descriptors-tfs
 pub enum NdrCorrelationType as u8
 {
-	fc_normal_conformance = 0
-	fc_pointer_conformance = 0x10
-	fc_top_level_conformance = 0x20
-	fc_constant_conformance = 0x40
+	fc_normal_conformance           = 0
+	fc_pointer_conformance          = 0x10
+	fc_top_level_conformance        = 0x20
+	fc_constant_conformance         = 0x40
 	fc_top_level_multid_conformance = 0x80
 }
 
@@ -70,7 +70,8 @@ pub fn (context NdrContext) read_correlation_descriptor_range(mut addr &voidptr)
 		return NdrNone{}
 	}
 
-	return NdrCorrelationDescriptorRange {
+	return NdrCorrelationDescriptorRange
+	{
 		min_value: min_value
 		max_value: max_value
 	}
@@ -82,16 +83,16 @@ pub fn (context NdrContext) read_correlation_descriptor_range(mut addr &voidptr)
 // an optional correlation expression.
 struct NdrCorrelationDescriptor
 {
-	correlation_type	NdrCorrelationType
-	value_type			NdrFormatChar
-	operator			NdrFormatChar
-	offset				int
-	flags				NdrCorrelationFlags
-	range				MaybeCorrelationDescriptorRange
-	expression			MaybeExpression = MaybeExpression(NdrNone{})
-	parent				NdrFormatChar
-	mut:
-	is_varying			bool
+	correlation_type NdrCorrelationType
+	value_type       NdrFormatChar
+	operator         NdrFormatChar
+	offset           int
+	flags            NdrCorrelationFlags
+	range            MaybeCorrelationDescriptorRange
+	expression       MaybeExpression = MaybeExpression(NdrNone{})
+	parent           NdrFormatChar
+mut:
+	is_varying       bool
 }
 
 // MaybeCorrelationDescriptor represents the possible presence of a
@@ -100,7 +101,6 @@ struct NdrCorrelationDescriptor
 // is discarded and NdrNone is returned instead. This sum type
 // combines both types together.
 type MaybeCorrelationDescriptor = NdrCorrelationDescriptor | NdrNone
-
 
 // read_correlation_descriptor attempts to read an NdrCorrelationDescriptor
 // from the specified address. If it succeeds, the parsed NdrCorrelationDescriptor
@@ -163,16 +163,17 @@ pub fn (context NdrContext) read_correlation_descriptor_ex(format NdrFormatChar,
 		return NdrNone{}
 	}
 
-	return NdrCorrelationDescriptor {
+	return NdrCorrelationDescriptor
+	{
 		correlation_type: correlation_type
-		value_type: value_type
-		operator: operator
-		offset: offset
-		flags: unsafe { NdrCorrelationFlags(flags) }
-		range: range
-		expression: expression
-		parent: format
-		is_varying: varying
+		value_type:       value_type
+		operator:         operator
+		offset:           offset
+		flags:            unsafe { NdrCorrelationFlags(flags) }
+		range:            range
+		expression:       expression
+		parent:           format
+		is_varying:       varying
 	}
 }
 
@@ -195,11 +196,11 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 			{
 				ndr_attributes << NdrExprAttr
 				{
-					arguments: expr.arguments
-					expression: expr.format()
+					arguments:        expr.arguments
+					expression:       expr.format()
 					correlation_type: desc.correlation_type
-					typ: desc.parent
-					is_varying: desc.is_varying
+					typ:              desc.parent
+					is_varying:       desc.is_varying
 				}
 			}
 
@@ -219,9 +220,9 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 			{
 				ndr_attributes << NdrGlobalOffsetAttr
 				{
-					offset: desc.offset
-					typ: desc.parent
-					operator: desc.operator
+					offset:     desc.offset
+					typ:        desc.parent
+					operator:   desc.operator
 					is_varying: desc.is_varying
 				}
 			}
@@ -230,9 +231,9 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 			{
 				ndr_attributes << NdrRelativeOffsetAttr
 				{
-					offset: desc.offset
-					typ: desc.parent
-					operator: desc.operator
+					offset:     desc.offset
+					typ:        desc.parent
+					operator:   desc.operator
 					is_varying: desc.is_varying
 				}
 			}
@@ -241,8 +242,8 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 			{
 				ndr_attributes << NdrConstantAttr
 				{
-					offset: desc.offset
-					typ: desc.parent
+					offset:     desc.offset
+					typ:        desc.parent
 					is_varying: desc.is_varying
 				}
 			}
@@ -260,7 +261,7 @@ pub fn (desc NdrCorrelationDescriptor) attrs() []NdrAttr
 				ndr_attributes << NdrRangeAttr
 				{
 					start: desc.range.min_value
-					end: desc.range.max_value
+					end:   desc.range.max_value
 				}
 			}
 
