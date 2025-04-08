@@ -4,7 +4,8 @@ import utils
 
 // NdrFormatChar contains a list of possible types that can be encountered
 // within an NDR type definition.
-pub enum NdrFormatChar as u8 {
+pub enum NdrFormatChar as u8
+{
 	fc_zero                   = u8(0x00)
 	fc_byte                   = u8(0x01)
 	fc_char                   = u8(0x02)
@@ -160,7 +161,8 @@ pub fn (format NdrFormatChar) format() string
 // Some NDR types can have optional additional types associated. To indicate
 // whether they exist or not, rpv uses Maybe structs that fallback to NdrNone
 // if the type is not present.
-pub struct NdrNone {
+pub struct NdrNone
+{
 	NdrBaseType
 }
 
@@ -173,7 +175,8 @@ pub fn (none_type NdrNone) format() string
 
 // NdrBaseType is the most basic NDR type. It just consists out of a NdrFormatChar.
 // By default, the type is initialized with a format char with value .fc_zero.
-pub struct NdrBaseType {
+pub struct NdrBaseType
+{
 	format NdrFormatChar = .fc_zero
 }
 
@@ -263,7 +266,8 @@ pub fn (base_type NdrBaseType) size() u32
 
 // NdrUnknownType extends NdrBaseType and is used if the decompilation process found
 // an unknown NdrRepresentation. This should actually not happen and indicates a bug.
-pub struct NdrUnknownType {
+pub struct NdrUnknownType
+{
 	NdrBaseType
 }
 
@@ -278,7 +282,8 @@ pub fn (unk_typ NdrUnknownType) format() string
 // it was created and whether NdrBaseType could also be used instead. Should be
 // investigated in future. At the first glance, it adds no additional functionality
 // to NdrBaseType.
-pub struct NdrSimpleType {
+pub struct NdrSimpleType
+{
 	NdrBaseType
 }
 
@@ -301,7 +306,8 @@ pub fn (simple_type NdrSimpleType) format() string
 // was copied from the type cache implementation of James Forshaw and is probably
 // used to allow the cache to work correctly for recursive type definitions. I
 // think it is currently not fully implemented in rpv. This should be investigated.
-pub struct NdrIndirectTypeReference {
+pub struct NdrIndirectTypeReference
+{
 	NdrBaseType
 }
 
@@ -318,12 +324,13 @@ pub fn (indirect_type NdrIndirectTypeReference) format() string
 // makes sure that each NdrType has an underlying NdrFormatChar and that it supports
 // the format, attrs, comments and size methods. These methods are required to create
 // the string representation of the NdrType.
-pub interface NdrType {
-	format     NdrFormatChar
-	format()   string
-	attrs()    []NdrAttr
-	comments() []NdrComment
-	size()     u32
+pub interface NdrType
+{
+	format      NdrFormatChar
+	format()    string
+	attrs()     []NdrAttr
+	comments()  []NdrComment
+	size()      u32
 }
 
 // array returns an array modifier if the underlying NdrType is an array type.

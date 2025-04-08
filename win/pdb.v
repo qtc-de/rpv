@@ -6,46 +6,49 @@ import os
 // debug directory of an executable. rpv is especially interested in
 // the pdb_path member, that contains the file system path of an
 // associated .pdb file. rpv reads this struct from process memory.
-struct CV_INFO_PDB70{
+struct CV_INFO_PDB70
+{
 	v_signature u32
-	signature C.GUID
-	age u32
-	pdb_path [260]char
+	signature   C.GUID
+	age         u32
+	pdb_path    [260]char
 }
 
 // C.IMAGE_DEBUG_DIRECTORY contains the formatting of the debug
 // directory of an executable.
 @[typedef]
-struct C.IMAGE_DEBUG_DIRECTORY {
-  Characteristics DWORD
-  TimeDateStamp DWORD
-  MajorVersion WORD
-  MinorVersion WORD
-  Type DWORD
-  SizeOfData DWORD
-  AddressOfRawData DWORD
-  PointerToRawData DWORD
+struct C.IMAGE_DEBUG_DIRECTORY
+{
+	Characteristics  DWORD
+	TimeDateStamp    DWORD
+	MajorVersion     WORD
+	MinorVersion     WORD
+	Type             DWORD
+	SizeOfData       DWORD
+	AddressOfRawData DWORD
+	PointerToRawData DWORD
 }
 
 // SymbolInfoV contains information on a resolved symbol. This
 // struct is used by the C.SymFomAddr function, that attempts
 // to resolve a symbol.
-struct SymbolInfoV {
-       size_of_struct ULONG
-       type_index ULONG
-       reserved [2]ULONG64
-       info ULONG
-       size ULONG
-       mod_base ULONG64
-       flags ULONG
-       value ULONG64
-       address ULONG64
-       register ULONG
-       scope ULONG
-       tag ULONG
-       name_len ULONG
-       max_name_len ULONG = u32(512)
-       name [512]CHAR
+struct SymbolInfoV
+{
+	size_of_struct ULONG
+	type_index     ULONG
+	reserved       [2]ULONG64
+	info           ULONG
+	size           ULONG
+	mod_base       ULONG64
+	flags          ULONG
+	value          ULONG64
+	address        ULONG64
+	register       ULONG
+	scope          ULONG
+	tag            ULONG
+	name_len       ULONG
+	max_name_len   ULONG = u32(512)
+	name           [512]CHAR
 }
 
 // get_module_pdb_info attempts to obtain debug information from the debug directory

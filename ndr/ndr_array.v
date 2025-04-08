@@ -6,7 +6,8 @@ import utils
 // a NdrBaseType that describes the NdrArray itself and an element_type
 // that describes the contained elements. Additionally, a pointer layout
 // can be contained.
-pub struct NdrArray {
+pub struct NdrArray
+{
 	NdrBaseType
 	alignment      u8
 	element_type   NdrType          = NdrNone{}
@@ -57,7 +58,8 @@ pub fn(mut context NdrContext) read_array(format NdrFormatChar, alignment u8, mu
 
 // NdrSimpleArray extends NdrArray by adding a total_size member
 // that describes the size of the array.
-pub struct NdrSimpleArray {
+pub struct NdrSimpleArray
+{
 	NdrArray
 	total_size u32
 }
@@ -109,7 +111,8 @@ pub fn (mut context NdrContext) read_simple_array(format NdrFormatChar, mut addr
 
 // NdrConformantArray extends NdrArray and adds an additional element_size field
 // as well as two optional CorrelationDescriptors.
-pub struct NdrConformantArray {
+pub struct NdrConformantArray
+{
 	NdrArray
 	element_size u32
 	c_desc       MaybeCorrelationDescriptor
@@ -144,12 +147,12 @@ pub fn (mut context NdrContext) read_conformant_array(format NdrFormatChar, mut 
 // Possible attributes are fetched from the two optional correlation descriptors.
 pub fn (array NdrConformantArray) attrs() []NdrAttr
 {
-    mut attrs := []NdrAttr{}
+	mut attrs := []NdrAttr{}
 
-    attrs << array.c_desc.attrs()
-    attrs << array.v_desc.attrs()
+	attrs << array.c_desc.attrs()
+	attrs << array.v_desc.attrs()
 
-    return attrs
+	return attrs
 }
 
 // comments returns an array of NdrComment associated with the NdrConformantArray.
@@ -211,7 +214,8 @@ pub fn (array NdrConformantArray) size() u32
 // NdrBogusArray is basically the same as NdrConformantArray, but instead of
 // holding an additional element_size member, the struct holds the element
 // number as member.
-pub struct NdrBogusArray {
+pub struct NdrBogusArray
+{
 	NdrConformantArray
 	element_num u32
 }
@@ -259,7 +263,8 @@ pub fn (array NdrBogusArray) size() u32
 }
 
 // NdrVaryingArray extends NdrBogusArray by adding an additional total_size field.
-pub struct NdrVaryingArray {
+pub struct NdrVaryingArray
+{
 	NdrBogusArray
 	total_size u32
 }

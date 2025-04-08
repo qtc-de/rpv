@@ -12,14 +12,16 @@ type RpcCallbackFunction = fn (intf_handle voidptr, context voidptr) RPC_STATUS
 
 // ListEntry represents one node in a list with a forward and a backward pointer.
 // It is used within RtlCriticalSectionDebug and the RpcServer struct.
-pub struct ListEntry {
+pub struct ListEntry
+{
 	f_link &ListEntry = unsafe { nil }
 	b_link &ListEntry = unsafe { nil }
 }
 
 // RtlCriticalSectionDebug is a mutex related structure. It is not really used by rpv
 // but needs to be defined as it is part of other RpcStructures.
-pub struct RtlCriticalSectionDebug {
+pub struct RtlCriticalSectionDebug
+{
 	section_type                  u16
 	creator_back_trace_index      u16
 	critical_section              &RtlCriticalSection = unsafe { nil }
@@ -33,7 +35,8 @@ pub struct RtlCriticalSectionDebug {
 
 // RtlCriticalSection is a mutex related structure. It is not really used by rpv
 // but needs to be defined as it is part of other RpcStructures.
-pub struct RtlCriticalSection {
+pub struct RtlCriticalSection
+{
 	debug_info      &RtlCriticalSectionDebug = unsafe { nil }
 	lock_count      u32
 	recursion_count u32
@@ -45,7 +48,8 @@ pub struct RtlCriticalSection {
 // Mutex is a synchronization struct to signal ownership of a thread on a
 // critical section. It is not really used by rpv but needs to be defined
 // as it is part of other RpcStructures.
-pub struct Mutex {
+pub struct Mutex
+{
 	critical_section RtlCriticalSection
 }
 
@@ -53,7 +57,8 @@ pub struct Mutex {
 // like an array than a dictionary, as contained elements are simply references
 // by the p_array (pointer array) member. Internal RPC structs use this struct
 // to reference to different elements like e.g. their interfaces.
-pub struct SimpleDict {
+pub struct SimpleDict
+{
 pub:
 	p_array           &voidptr = unsafe { nil }
 	array_size        u32
@@ -63,7 +68,8 @@ pub:
 
 // RpcProtSeqEndpoint is an internal RPC structure. It is not really used
 // by rpv but needs to be defined as it is part of other RpcStructures.
-pub struct RpcProtSeqEndpoint {
+pub struct RpcProtSeqEndpoint
+{
 	rpc_protocol_sequence &char = unsafe { nil }
 	endpoint              &char = unsafe { nil }
 }
@@ -71,7 +77,8 @@ pub struct RpcProtSeqEndpoint {
 // RpcServerInterface is an internal RPC structure that stores interface related
 // information. It is contained within the RpcInterface struct and provides
 // information such as the interface id, it's transfer syntax and RPC flags.
-pub struct RpcServerInterface {
+pub struct RpcServerInterface
+{
 pub:
 	length             u32
 	interface_id       C.RPC_IF_ID
@@ -87,7 +94,8 @@ pub:
 // C.RPC_IF_ID represents an ID of an RPC interface. This is basically an GUID
 // but also contains a major and minor version.
 @[typedef]
-pub struct C.RPC_IF_ID {
+pub struct C.RPC_IF_ID
+{
 	Uuid      C.GUID
 	VersMajor u16
 	VersMinor u16
@@ -104,7 +112,8 @@ pub fn (this C.RPC_IF_ID) equals(other C.RPC_IF_ID) bool
 // RPC interface. rpv uses it to determine the method count, that can be obtained
 // from the DispatchTableCount property.
 @[typedef]
-pub struct C.RPC_DISPATCH_TABLE {
+pub struct C.RPC_DISPATCH_TABLE
+{
 	DispatchTableCount u32
 	DispatchTable      voidptr
 	Reserved           isize
@@ -117,7 +126,8 @@ pub struct C.RPC_DISPATCH_TABLE {
 // property, which contains the offset of the different methods within the ProcString,
 // to decompile RPC methods.
 @[typedef]
-pub struct C.MIDL_SERVER_INFO {
+pub struct C.MIDL_SERVER_INFO
+{
 	pStubDesc       &C.MIDL_STUB_DESC = unsafe { nil }
 	DispatchTable   &voidptr          = unsafe { nil }
 	ProcString      &char             = unsafe { nil }
@@ -134,7 +144,8 @@ pub struct C.MIDL_SERVER_INFO {
 // RPC methods. Moreover, Reserved5 is required for parsing NDR expressions. Actually the
 // member is named pExprInfo by Microsoft, but within the mingw libraries it is Reserved5.
 @[typedef]
-pub struct C.MIDL_STUB_DESC {
+pub struct C.MIDL_STUB_DESC
+{
 	RpcInterfaceInformation     voidptr = unsafe { nil }
 	pfnAllocate                 voidptr = unsafe { nil }
 	pfnFree                     voidptr = unsafe { nil }
@@ -164,7 +175,8 @@ pub struct C.MIDL_STUB_DESC {
 
 // NDR_EXPR_DESC is the struct that is pointed to by C.MIDL_STUB_DESC.Reserved5, alias
 // pExprInfo. It is used by rpv to parse NDR expressions. 
-pub struct NDR_EXPR_DESC {
+pub struct NDR_EXPR_DESC
+{
 pub:
 	p_offset      voidptr
 	p_format_expr voidptr
@@ -173,7 +185,8 @@ pub:
 // C.MIDL_SYNTAX_INFO is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
 @[typedef]
-pub struct C.MIDL_SYNTAX_INFO {
+pub struct C.MIDL_SYNTAX_INFO
+{
 	TransferSyntax        C.RPC_SYNTAX_IDENTIFIER
 	DispatchTable         &C.RPC_DISPATCH_TABLE
 	ProcString            &char
@@ -186,7 +199,8 @@ pub struct C.MIDL_SYNTAX_INFO {
 // C.MIDL_INTERFACE_METHOD_PROPERTIES is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
 @[typedef]
-pub struct C.MIDL_INTERFACE_METHOD_PROPERTIES {
+pub struct C.MIDL_INTERFACE_METHOD_PROPERTIES
+{
 	MethodCount      u16
 	MethodProperties &C.MIDL_METHOD_PROPERTY_MAP
 }
@@ -194,7 +208,8 @@ pub struct C.MIDL_INTERFACE_METHOD_PROPERTIES {
 // C.MIDL_METHOD_PROPERTY_MAP is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
 @[typedef]
-pub struct C.MIDL_METHOD_PROPERTY_MAP {
+pub struct C.MIDL_METHOD_PROPERTY_MAP
+{
 	count      u32
 	Properties &C.MIDL_METHOD_PROPERTY
 }
@@ -202,7 +217,8 @@ pub struct C.MIDL_METHOD_PROPERTY_MAP {
 // C.MIDL_METHOD_PROPERTY is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
 @[typedef]
-pub struct C.MIDL_METHOD_PROPERTY {
+pub struct C.MIDL_METHOD_PROPERTY
+{
 	Id    u32
 	value usize
 }
@@ -210,7 +226,8 @@ pub struct C.MIDL_METHOD_PROPERTY {
 // C.UUID_VECTOR is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
 @[typedef]
-pub struct C.UUID_VECTOR {
+pub struct C.UUID_VECTOR
+{
 	Count u32
 	Uuid  [1]&C.GUID
 }
@@ -218,7 +235,8 @@ pub struct C.UUID_VECTOR {
 // C.RPC_SYNTAX_IDENTIFIER is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
 @[typedef]
-pub struct C.RPC_SYNTAX_IDENTIFIER {
+pub struct C.RPC_SYNTAX_IDENTIFIER
+{
 	SyntaxGUID    C.GUID
 	SyntaxVersion C.RPC_VERSION
 }
@@ -226,7 +244,8 @@ pub struct C.RPC_SYNTAX_IDENTIFIER {
 // C.RPC_VERSION is a struct that is used within internal RPC struct definitions.
 // It is currently not used by rpv.
 @[typedef]
-pub struct C.RPC_VERSION {
+pub struct C.RPC_VERSION
+{
 	MajorVersion u16
 	MinorVersion u16
 }
@@ -235,7 +254,8 @@ pub struct C.RPC_VERSION {
 // This includes for example the utilized security packages and the associated
 // principal. rpv uses this struct only to parse the information and makes it
 // accessible within the RpcAuthInfo struct.
-pub struct RPC_AUTH_INFO {
+pub struct RPC_AUTH_INFO
+{
 pub:
 	principal  &u16 = unsafe { nil }
 	auth_svc   u32

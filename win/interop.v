@@ -4,12 +4,10 @@ import os
 import utils
 import encoding.base64
 
-/*
- * interop.v contains all the low level code where we call Win32 API
- * from v. This file has grown other time and the defined methods
- * probably use different type definitions and calling conventions.
- * It works, but probably requires a cleanup at some point in time :)
- */
+// interop.v contains all the low level code where we call Win32 API
+// from v. This file has grown other time and the defined methods
+// probably use different type definitions and calling conventions.
+// It works, but probably requires a cleanup at some point in time :)
 
 #flag -lversion
 #flag -lpsapi
@@ -68,7 +66,8 @@ pub type KPRIORITY = u32
 
 // Arch represents an CPU architecture. Architectures can be x86
 // x64 or are unknown.
-pub enum Arch {
+pub enum Arch
+{
 	x86
 	x64
 	unk
@@ -79,7 +78,8 @@ pub enum Arch {
 // assigned to or retrieved from an access token. Using enum's
 // with C prefix in v seems not to be supported at the time of
 // writing. Therefore, we need to redefine it.
-pub enum TOKEN_INFORMATION_CLASS {
+pub enum TOKEN_INFORMATION_CLASS
+{
 	token_user = 1
 	token_groups
 	token_privileges
@@ -135,7 +135,8 @@ pub enum TOKEN_INFORMATION_CLASS {
 // enum. It is used to identify the type of an SID. Using
 // enum's with C prefix in v seems not to be supported at
 // the time of writing. Therefore, we need to redefine it.
-pub enum SID_NAME_USE {
+pub enum SID_NAME_USE
+{
 	sid_type_user = 1
 	sid_type_group
 	sid_type_domain
@@ -152,14 +153,16 @@ pub enum SID_NAME_USE {
 // PS_PROTECTION is an internally used windows struct that is used
 // to determine the protection level of a process. We re-implement it
 // here to get access to it.
-pub struct PS_PROTECTION {
+pub struct PS_PROTECTION
+{
 	level u8
 }
 
 // C.RGBQUAD represents the well known RGBQUAD struct from widows. In rpv
 // it is not used, but definition is required for C interop.
 @[typedef]
-pub struct C.RGBQUAD {
+pub struct C.RGBQUAD
+{
 	rgbBlue		BYTE
 	rgbGreen	BYTE
 	rgbRed		BYTE
@@ -169,30 +172,33 @@ pub struct C.RGBQUAD {
 // C.RGBQUAD represents the well known COMM_FAULT_OFFSETS struct from widows.
 // In rpv it is not used, but definition is required for C interop.
 @[typedef]
-pub struct C.COMM_FAULT_OFFSETS {
+pub struct C.COMM_FAULT_OFFSETS
+{
 	CommOffset	u16
 	FaultOffset u16
 }
 
 @[typedef]
-pub struct C.IMAGEHLP_STACK_FRAME {
-  InstructionOffset  ULONG64
-  ReturnOffset		 ULONG64
-  FrameOffset		 ULONG64
-  StackOffset		 ULONG64
-  BackingStoreOffset ULONG64
-  FuncTableEntry	 ULONG64
-  Params[4]			 ULONG64
-  Reserved[5]		 ULONG64
-  Virtual			 BOOL
-  Reserved2			 ULONG
+pub struct C.IMAGEHLP_STACK_FRAME
+{
+	InstructionOffset  ULONG64
+	ReturnOffset       ULONG64
+	FrameOffset        ULONG64
+	StackOffset        ULONG64
+	BackingStoreOffset ULONG64
+	FuncTableEntry     ULONG64
+	Params             [4]ULONG64
+	Reserved           [5]ULONG64
+	Virtual            BOOL
+	Reserved2          ULONG
 }
 
 // C.GUID represents the well known GUID struct from widows. In rpv,
 // it is used for different purposes. Mainly to identify RPC interfaces,
 // that all contain GUIDs as part of their internal definition.
 @[typedef]
-pub struct C.GUID {
+pub struct C.GUID
+{
 	Data1 u32
 	Data2 u16
 	Data3 u16
@@ -223,26 +229,27 @@ pub fn (this C.GUID) equals(other C.GUID) bool
 // rpv is especially interested in the e_lfanew member, as this contains the
 // offset to the C.IMAGE_NT_HEADERS.
 @[typedef]
-pub struct C.IMAGE_DOS_HEADER {
-	e_magic WORD
-	e_cblp WORD
-	e_cp WORD
-	e_crlc WORD
-	e_cparhdr WORD
+pub struct C.IMAGE_DOS_HEADER
+{
+	e_magic    WORD
+	e_cblp     WORD
+	e_cp       WORD
+	e_crlc     WORD
+	e_cparhdr  WORD
 	e_minalloc WORD
 	e_maxalloc WORD
-	e_ss WORD
-	e_sp WORD
-	e_csum WORD
-	e_ip WORD
-	e_cs WORD
-	e_lfarlc WORD
-	e_ovno WORD
-	e_res [4]WORD
-	e_oemid WORD
-	e_oeminfo WORD
-	e_res2 [10]WORD
-	e_lfanew LONG
+	e_ss       WORD
+	e_sp       WORD
+	e_csum     WORD
+	e_ip       WORD
+	e_cs       WORD
+	e_lfarlc   WORD
+	e_ovno     WORD
+	e_res      [4]WORD
+	e_oemid    WORD
+	e_oeminfo  WORD
+	e_res2     [10]WORD
+	e_lfanew   LONG
 }
 
 // IMAGE_SECTION_HEADER represents the header of an image section. rpv uses
@@ -250,111 +257,116 @@ pub struct C.IMAGE_DOS_HEADER {
 // contained in. At the time of writing I'm no longer sure why the struct was
 // defined without C prefix, but probably because the union member contained
 // in C.IMAGE_SECTION_HEADER caused problems.
-pub struct IMAGE_SECTION_HEADER {
-	name	[8]char
-	misc DWORD
-	virtual_address DWORD
-	size_of_raw_data DWORD
-	ptr_to_raw_data DWORD
-	ptr_to_reloc DWORD
-	ptr_to_line_nums DWORD
-	numer_of_relos WORD
+pub struct IMAGE_SECTION_HEADER
+{
+	name               [8]char
+	misc               DWORD
+	virtual_address    DWORD
+	size_of_raw_data   DWORD
+	ptr_to_raw_data    DWORD
+	ptr_to_reloc       DWORD
+	ptr_to_line_nums   DWORD
+	numer_of_relos     WORD
 	numer_of_line_nums WORD
-	characteristics DWORD
+	characteristics    DWORD
 }
 
 // C.IMAGE_NT_HEADERS represents the PE header format. rpv uses it to determine
 // the architecture the PE was compiled for and to locate the different sections
 // within the PE file.
 @[typedef]
-pub struct C.IMAGE_NT_HEADERS {
-	Signature DWORD
-	FileHeader C.IMAGE_FILE_HEADER
+pub struct C.IMAGE_NT_HEADERS
+{
+	Signature      DWORD
+	FileHeader     C.IMAGE_FILE_HEADER
 	OptionalHeader C.IMAGE_OPTIONAL_HEADER
 }
 
 // C.IMAGE_OPTIONAL_HEADER is actually not used by rpv and is only defined to
 // complete the C.IMAGE_NT_HEADERS struct definition.
 @[typedef]
-pub struct C.IMAGE_OPTIONAL_HEADER {
-	Magic WORD
-	MajorLinkerVersion BYTE
-	MinorLinkerVersion BYTE
-	SizeOfCode DWORD
-	SizeOfInitializedData DWORD
-	SizeOfUninitializedData DWORD
-	AddressOfEntryPoint DWORD
-	BaseOfCode DWORD
-	BaseOfData DWORD
-	ImageBase voidptr
-	SectionAlignment DWORD
-	FileAlignment DWORD
+pub struct C.IMAGE_OPTIONAL_HEADER
+{
+	Magic                       WORD
+	MajorLinkerVersion          BYTE
+	MinorLinkerVersion          BYTE
+	SizeOfCode                  DWORD
+	SizeOfInitializedData       DWORD
+	SizeOfUninitializedData     DWORD
+	AddressOfEntryPoint         DWORD
+	BaseOfCode                  DWORD
+	BaseOfData                  DWORD
+	ImageBase                   voidptr
+	SectionAlignment            DWORD
+	FileAlignment               DWORD
 	MajorOperatingSystemVersion WORD
 	MinorOperatingSystemVersion WORD
-	MajorImageVersion WORD
-	MinorImageVersion WORD
-	MajorSubsystemVersion WORD
-	MinorSubsystemVersion WORD
-	Win32VersionValue DWORD
-	SizeOfImage DWORD
-	SizeOfHeaders DWORD
-	CheckSum DWORD
-	Subsystem WORD
-	DllCharacteristics WORD
-	SizeOfStackReserve usize
-	SizeOfStackCommit usize
-	SizeOfHeapReserve usize
-	SizeOfHeapCommit usize
-	LoaderFlags DWORD
-	NumberOfRvaAndSizes DWORD
-    DataDirectory &C.IMAGE_DATA_DIRECTORY = unsafe { nil }
+	MajorImageVersion           WORD
+	MinorImageVersion           WORD
+	MajorSubsystemVersion       WORD
+	MinorSubsystemVersion       WORD
+	Win32VersionValue           DWORD
+	SizeOfImage                 DWORD
+	SizeOfHeaders               DWORD
+	CheckSum                    DWORD
+	Subsystem                   WORD
+	DllCharacteristics          WORD
+	SizeOfStackReserve          usize
+	SizeOfStackCommit           usize
+	SizeOfHeapReserve           usize
+	SizeOfHeapCommit            usize
+	LoaderFlags                 DWORD
+	NumberOfRvaAndSizes         DWORD
+	DataDirectory               &C.IMAGE_DATA_DIRECTORY = unsafe { nil }
 }
 
 // C.IMAGE_NT_HEADERS32 represents the PE header format. rpv uses it to determine
 // the architecture the PE was compiled for and to locate the different sections
 // within the PE file.
 @[typedef]
-pub struct C.IMAGE_NT_HEADERS32 {
-	Signature DWORD
-	FileHeader C.IMAGE_FILE_HEADER
+pub struct C.IMAGE_NT_HEADERS32
+{
+	Signature      DWORD
+	FileHeader     C.IMAGE_FILE_HEADER
 	OptionalHeader C.IMAGE_OPTIONAL_HEADER32
 }
 
 // C.IMAGE_OPTIONAL_HEADER32 is actually not used by rpv and is only defined to
 // complete the C.IMAGE_NT_HEADERS32 struct definition.
 @[typedef]
-pub struct C.IMAGE_OPTIONAL_HEADER32 {
-	Magic WORD
-	MajorLinkerVersion BYTE
-	MinorLinkerVersion BYTE
-	SizeOfCode DWORD
-	SizeOfInitializedData DWORD
-	SizeOfUninitializedData DWORD
-	AddressOfEntryPoint DWORD
-	BaseOfCode DWORD
-	BaseOfData DWORD
-	ImageBase DWORD
-	SectionAlignment DWORD
-	FileAlignment DWORD
+pub struct C.IMAGE_OPTIONAL_HEADER32
+{
+	Magic                       WORD
+	MajorLinkerVersion          BYTE
+	MinorLinkerVersion          BYTE
+	SizeOfCode                  DWORD
+	SizeOfInitializedData       DWORD
+	SizeOfUninitializedData     DWORD
+	AddressOfEntryPoint         DWORD
+	BaseOfCode                  DWORD
+	BaseOfData                  DWORD
+	ImageBase                   DWORD
+	SectionAlignment            DWORD
+	FileAlignment               DWORD
 	MajorOperatingSystemVersion WORD
 	MinorOperatingSystemVersion WORD
-	MajorImageVersion WORD
-	MinorImageVersion WORD
-	MajorSubsystemVersion WORD
-	MinorSubsystemVersion WORD
-	Win32VersionValue DWORD
-	SizeOfImage DWORD
-	SizeOfHeaders DWORD
-	CheckSum DWORD
-	Subsystem WORD
-	DllCharacteristics WORD
-	SizeOfStackReserve DWORD
-	SizeOfStackCommit DWORD
-	SizeOfHeapReserve DWORD
-	SizeOfHeapCommit DWORD
-	LoaderFlags DWORD
-	NumberOfRvaAndSizes DWORD
-    DataDirectory &C.IMAGE_DATA_DIRECTORY = unsafe { nil }
+	MajorImageVersion           WORD
+	MinorImageVersion           WORD
+	MajorSubsystemVersion       WORD
+	MinorSubsystemVersion       WORD
+	Win32VersionValue           DWORD
+	SizeOfImage                 DWORD
+	SizeOfHeaders               DWORD
+	CheckSum                    DWORD
+	Subsystem                   WORD
+	DllCharacteristics          WORD
+	SizeOfStackReserve          DWORD
+	SizeOfStackCommit           DWORD
+	SizeOfHeapReserve           DWORD
+	SizeOfHeapCommit            DWORD
+	LoaderFlags                 DWORD
+	NumberOfRvaAndSizes         DWORD
+	DataDirectory               &C.IMAGE_DATA_DIRECTORY = unsafe { nil }
 }
 
 // C.IMAGE_DATA_DIRECTORY represents a data directory. This struct is actually
@@ -363,29 +375,31 @@ pub struct C.IMAGE_OPTIONAL_HEADER32 {
 pub struct C.IMAGE_DATA_DIRECTORY
 {
 	VirtualAddress DWORD
-	Size DWORD
+	Size           DWORD
 }
 
 // C.IMAGE_FILE_HEADER represents the COFF header and is used by rpv to
 // obtain the architecture the PE was compiled for and the number of it's
 // contained sections.
 @[typedef]
-pub struct C.IMAGE_FILE_HEADER {
-	Machine WORD
-	NumberOfSections WORD
-	TimeDateStamp DWORD
+pub struct C.IMAGE_FILE_HEADER
+{
+	Machine              WORD
+	NumberOfSections     WORD
+	TimeDateStamp        DWORD
 	PointerToSymbolTable DWORD
-	NumberOfSymbols DWORD
+	NumberOfSymbols      DWORD
 	SizeOfOptionalHeader WORD
-	Characteristics WORD
+	Characteristics      WORD
 }
 
 // ModuleSectionInfo contains information about a section within a module.
 // rpv mainly uses this to encapsulate related information on the .data
 // section of a module. This information contains the base address of the
 // section as well as it's size and architecture.
-pub struct ModuleSectionInfo{
-	pub:
+pub struct ModuleSectionInfo
+{
+pub:
 	base &u8
 	size u32
 	arch Arch
@@ -394,110 +408,119 @@ pub struct ModuleSectionInfo{
 // C.SHFILEINFOA contains information on a file object. rpv uses this struct
 // to obtain a handle to the icon of a file.
 @[typedef]
-pub struct C.SHFILEINFOA {
-	hIcon	voidptr
-	iIcon int
-	dwAttributes DWORD
+pub struct C.SHFILEINFOA
+{
+	hIcon         voidptr
+	iIcon         int
+	dwAttributes  DWORD
 	szDisplayName [260]WCHAR
-	szTypeName [80]WCHAR
+	szTypeName    [80]WCHAR
 }
 
 // C.PEB is the well known process environment block struct. rpv uses it to
 // to obtain the cmdline a process was started with.
 @[typedef]
-pub struct C.PEB {
-	Reserved1 [2]BYTE
-	BeingDebugged BYTE
-	Reserved2 [1]BYTE
-	Reserved3 [2]PVOID
-	Ldr voidptr
-	ProcessParameters &C.RTL_USER_PROCESS_PARAMETERS = unsafe { nil }
-	Reserved4 [3]PVOID
-	AtlThunkSListPtr PVOID
-	Reserved5 PVOID
-	Reserved6 ULONG
-	Reserved7 PVOID
-	Reserved8 ULONG
-	AtlThunkSListPtr32 ULONG
-	Reserved9 [45]PVOID
-	Reserved10 [96]BYTE
+pub struct C.PEB
+{
+	Reserved1              [2]BYTE
+	BeingDebugged          BYTE
+	Reserved2              [1]BYTE
+	Reserved3              [2]PVOID
+	Ldr                    voidptr
+	ProcessParameters      &C.RTL_USER_PROCESS_PARAMETERS = unsafe { nil }
+	Reserved4              [3]PVOID
+	AtlThunkSListPtr       PVOID
+	Reserved5              PVOID
+	Reserved6              ULONG
+	Reserved7              PVOID
+	Reserved8              ULONG
+	AtlThunkSListPtr32     ULONG
+	Reserved9              [45]PVOID
+	Reserved10             [96]BYTE
 	PostProcessInitRoutine voidptr
-	Reserved11 [128]BYTE
-	Reserved12 [1]PVOID
-	SessionId ULONG
+	Reserved11             [128]BYTE
+	Reserved12             [1]PVOID
+	SessionId              ULONG
 }
 
 // C.PEB64 is the well known process environment block struct. rpv uses it to
 // to obtain the cmdline a process was started with. Not all fields of the
 // struct were defined, as access is only required to the first few fields.
 @[typedef]
-pub struct C.PEB64 {
-	Reserved1 [4]BYTE
-	Reserved2 [2]u64
-	LdrData u64
+pub struct C.PEB64
+{
+	Reserved1         [4]BYTE
+	Reserved2         [2]u64
+	LdrData           u64
 	ProcessParameters u64
 }
 
 // C.RTL_USER_PROCESS_PARAMETERS is contained within the PEB structures and
 // can be used to retrieve the cmdline of a process.
 @[typedef]
-pub struct C.RTL_USER_PROCESS_PARAMETERS {
-	Reserved1 [16]BYTE
-	Reserved2 [10]PVOID
-    ImagePathName C.UNICODE_STRING
-    CommandLine C.UNICODE_STRING
+pub struct C.RTL_USER_PROCESS_PARAMETERS
+{
+	Reserved1     [16]BYTE
+	Reserved2     [10]PVOID
+	ImagePathName C.UNICODE_STRING
+	CommandLine   C.UNICODE_STRING
 }
 
 // C.RTL_USER_PROCESS_PARAMETERS_WOW64 is contained within the PEB structures and
 // can be used to retrieve the cmdline of a process. This version of the struct
 // is required when accessing an x64 process from a x32 process.
 @[typedef]
-pub struct C.RTL_USER_PROCESS_PARAMETERS_WOW64 {
-	Reserved1 [16]BYTE
-	Reserved2 [10]u64
-    ImagePathName C.UNICODE_STRING_WOW64
-    CommandLine C.UNICODE_STRING_WOW64
+pub struct C.RTL_USER_PROCESS_PARAMETERS_WOW64
+{
+	Reserved1     [16]BYTE
+	Reserved2     [10]u64
+	ImagePathName C.UNICODE_STRING_WOW64
+	CommandLine   C.UNICODE_STRING_WOW64
 }
 
 // C.UNICODE_STRING is a well known struct to represent a unicode string.
 @[typedef]
-pub struct C.UNICODE_STRING {
-   Length USHORT
-   MaximumLength USHORT
-   Buffer PWSTR
+pub struct C.UNICODE_STRING
+{
+	Length        USHORT
+	MaximumLength USHORT
+	Buffer        PWSTR
 }
 
 // C.UNICODE_STRING_WOW64 is a well known struct to represent a unicode string.
 // This version of the struct is required by C.RTL_USER_PROCESS_PARAMETERS_WOW64,
 // that is used when reading x64 command line arguments from a x32 process.
 @[typedef]
-pub struct C.UNICODE_STRING_WOW64 {
-   Length USHORT
-   MaximumLength USHORT
-   Buffer u64
+pub struct C.UNICODE_STRING_WOW64
+{
+	Length        USHORT
+	MaximumLength USHORT
+	Buffer        u64
 }
 
 // C.PROCESS_BASIC_INFORMATION is another well known Windows structure. rpv uses
 // it to find the process environment block of a process.
 @[typedef]
-pub struct C.PROCESS_BASIC_INFORMATION {
-	ExitStatus NTSTATUS
-	PebBaseAddress &C.PEB = unsafe { nil }
-	AffinityMask PULONG
-	BasePriority KPRIORITY
-	UniqueProcessId PULONG
+pub struct C.PROCESS_BASIC_INFORMATION
+{
+	ExitStatus                   NTSTATUS
+	PebBaseAddress               &C.PEB = unsafe { nil }
+	AffinityMask                 PULONG
+	BasePriority                 KPRIORITY
+	UniqueProcessId              PULONG
 	InheritedFromUniqueProcessId PULONG
 }
 
 // C.PROCESS_BASIC_INFORMATION_WOW64 is another well known Windows structure. rpv uses
 // it to find the process environment block of a x64 process when running as x32.
 @[typedef]
-pub struct C.PROCESS_BASIC_INFORMATION_WOW64 {
-	ExitStatus NTSTATUS
-	PebBaseAddress u64
-	AffinityMask u64
-	BasePriority KPRIORITY
-	UniqueProcessId u64
+pub struct C.PROCESS_BASIC_INFORMATION_WOW64
+{
+	ExitStatus                   NTSTATUS
+	PebBaseAddress               u64
+	AffinityMask                 u64
+	BasePriority                 KPRIORITY
+	UniqueProcessId              u64
 	InheritedFromUniqueProcessId u64
 }
 
@@ -505,9 +528,10 @@ pub struct C.PROCESS_BASIC_INFORMATION_WOW64 {
 // represented by this struct. The definition actually contains a union, which needs
 // to be expressed as plain struct members in v at the time of writing.
 @[typedef]
-pub union C.LARGE_INTEGER {
-	mut:
-	LowPart DWORD
+pub union C.LARGE_INTEGER
+{
+mut:
+	LowPart  DWORD
 	HighPart LONG
 	QuadPart u64
 }
@@ -516,25 +540,28 @@ pub union C.LARGE_INTEGER {
 // witch process privileges. rpv needs it, to enable debug privileges for the
 // current process.
 @[typedef]
-pub struct C.LUID {
-	mut:
-	LowPart DWORD
+pub struct C.LUID
+{
+mut:
+	LowPart  DWORD
 	HighPart LONG
 }
 
 // C.LUID_AND_ATTRIBUTES merges a C.LUID struct with it's associated attributes.
 // This struct is used within the C.TOKEN_PRIVILEGES struct.
 @[typedef]
-pub struct C.LUID_AND_ATTRIBUTES {
-	mut:
-	  Luid C.LUID
-	  Attributes DWORD
+pub struct C.LUID_AND_ATTRIBUTES
+{
+mut:
+	Luid       C.LUID
+	Attributes DWORD
 }
 
 // C.TOKEN_PRIVILEGES contains information on privileges that are held by a token.
 @[typedef]
-pub struct C.TOKEN_PRIVILEGES {
-	mut:
+pub struct C.TOKEN_PRIVILEGES
+{
+mut:
 	PrivilegeCount DWORD
 	Privileges     [1]C.LUID_AND_ATTRIBUTES
 }
@@ -542,116 +569,126 @@ pub struct C.TOKEN_PRIVILEGES {
 // C.TOKEN_USER contains information on the user that is associated with an access
 // token.
 @[typedef]
-pub struct C.TOKEN_USER {
+pub struct C.TOKEN_USER
+{
 	User C.SID_AND_ATTRIBUTES
 }
 
 // C.SID_AND_ATTRIBUTES is contained in C.TOKEN_USER and is used to obtain
 // information on the user an access token is associated with.
 @[typedef]
-pub struct C.SID_AND_ATTRIBUTES {
-	Sid PSID
+pub struct C.SID_AND_ATTRIBUTES
+{
+	Sid        PSID
 	Attributes DWORD
 }
 
 // C.SID is the well known security identifier structure. It is used to
 // identify groups and users.
 @[typedef]
-pub struct C.SID {
+pub struct C.SID
+{
 }
 
 // C.PROCESSENTRY32 is used when creating snapshots. It is one entry in the
 // list of processes, that were available when the snapshot was taken.
 @[typedef]
-pub struct C.PROCESSENTRY32 {
-	dwSize DWORD
-	cntUsage DWORD
-	th32ProcessID DWORD
-	th32DefaultHeapID ULONG_PTR
-	th32ModuleID DWORD
-	cntThreads DWORD
+pub struct C.PROCESSENTRY32
+{
+	dwSize              DWORD
+	cntUsage            DWORD
+	th32ProcessID       DWORD
+	th32DefaultHeapID   ULONG_PTR
+	th32ModuleID        DWORD
+	cntThreads          DWORD
 	th32ParentProcessID DWORD
-	pcPriClassBase LONG
-	dwFlags DWORD
-	szExeFile &WCHAR = unsafe { nil }
+	pcPriClassBase      LONG
+	dwFlags             DWORD
+	szExeFile           &WCHAR = unsafe { nil }
 }
 
 // C.MODULEENTRY32 is used when creating snapshots. It is one entry of a
 // module list from a process.
 @[typedef]
-pub struct C.MODULEENTRY32 {
-	dwSize DWORD
-	th32ModuleID DWORD
+pub struct C.MODULEENTRY32
+{
+	dwSize        DWORD
+	th32ModuleID  DWORD
 	th32ProcessID DWORD
-	GlblcntUsage DWORD
-	ProccntUsage DWORD
-	modBaseAddr &BYTE = unsafe { nil }
-	modBaseSize DWORD
-	hModule HANDLE
-	szModule &WCHAR = unsafe { nil }
-	szExePath &WCHAR = unsafe { nil }
+	GlblcntUsage  DWORD
+	ProccntUsage  DWORD
+	modBaseAddr   &BYTE = unsafe { nil }
+	modBaseSize   DWORD
+	hModule       HANDLE
+	szModule      &WCHAR = unsafe { nil }
+	szExePath     &WCHAR = unsafe { nil }
 }
 
 // C.VS_FIXEDFILEINFO contains version information of a file. rpv uses
 // this struct to obtain the module version of a file.
 @[typedef]
-pub struct C.VS_FIXEDFILEINFO {
-	dwSignature DWORD
-	dwStrucVersion DWORD
-	dwFileVersionMS DWORD
-	dwFileVersionLS DWORD
+pub struct C.VS_FIXEDFILEINFO
+{
+	dwSignature        DWORD
+	dwStrucVersion     DWORD
+	dwFileVersionMS    DWORD
+	dwFileVersionLS    DWORD
 	dwProductVersionMS DWORD
 	dwProductVersionLS DWORD
-	dwFileFlagsMask DWORD
-	dwFileFlags DWORD
-	dwFileOS DWORD
-	dwFileType DWORD
-	dwFileSubtype DWORD
-	dwFileDateMS DWORD
-	dwFileDateLS DWORD
+	dwFileFlagsMask    DWORD
+	dwFileFlags        DWORD
+	dwFileOS           DWORD
+	dwFileType         DWORD
+	dwFileSubtype      DWORD
+	dwFileDateMS       DWORD
+	dwFileDateLS       DWORD
 }
 
 // C.SecPkgInfoA describes a security package. Security packages can be
 // associated with RPC servers and rpv uses this struct to determine this.
 @[typedef]
-pub struct C.SecPkgInfoA {
+pub struct C.SecPkgInfoA
+{
 	fCapabilities u32
-	wVersion u16
-	wRPCID u16
-	cbMaxToken u32
-	Name &char
-	Comment &char
+	wVersion      u16
+	wRPCID        u16
+	cbMaxToken    u32
+	Name          &char
+	Comment       &char
 }
 
 // C.MEMORY_BASIC_INFORMATION contains information about a specific memory
 // region within the virtual address space.
 @[typedef]
-pub struct C.MEMORY_BASIC_INFORMATION {
-	BaseAddress PVOID
-	AllocationBase PVOID
+pub struct C.MEMORY_BASIC_INFORMATION
+{
+	BaseAddress       PVOID
+	AllocationBase    PVOID
 	AllocationProtect DWORD
-	RegionSize SIZE_T
-	State DWORD
-	Protect DWORD
-	Type DWORD
+	RegionSize        SIZE_T
+	State             DWORD
+	Protect           DWORD
+	Type              DWORD
 }
 
 // SecurityPackage is used by rpv to represent an SecurityPackage. It is
 // basically similar to SecPkgInfoA, but the char pointers are replaced
 // with string types.
-pub struct SecurityPackage {
-	pub:
-	caps u32
-	version u16
-	rpc_id u16
+pub struct SecurityPackage
+{
+pub:
+	caps      u32
+	version   u16
+	rpc_id    u16
 	max_token u32
-	name string
-	comment string
+	name      string
+	comment   string
 }
 
 // LanguageCodePage is used by rpv when obtaining module descriptions
 // from files.
-pub struct LanguageCodePage {
+pub struct LanguageCodePage
+{
 	language WORD
 	codepage WORD
 }
@@ -661,98 +698,105 @@ pub struct LanguageCodePage {
 // the size of the section, the memory location is located in. The path member
 // contains the file system path of the associated file. The desc member
 // contains the module description.
-pub struct LocationInfo {
-	pub:
-	base voidptr
-	size u32
+pub struct LocationInfo
+{
+pub:
+	base     voidptr
+	size     u32
 	mem_info C.MEMORY_BASIC_INFORMATION
-	path string
-	desc string
+	path     string
+	desc     string
 }
 
 // C.ICONINFO contains icon information.
 @[typedef]
-pub struct C.ICONINFO {
-	fIcon bool
+pub struct C.ICONINFO
+{
+	fIcon    bool
 	xHotspot u32
 	yHotspot u32
-	hbmMask HANDLE
+	hbmMask  HANDLE
 	hbmColor HANDLE
 }
 
 // C.BITMAP describes an array of bytes that forms an icon. When processing
 // file system icons, this type is used to encode the icons.
 @[typedef]
-pub struct C.BITMAP {
-	mut:
-	bmType int
-	bmWidth int
-	bmHeight int
+pub struct C.BITMAP
+{
+mut:
+	bmType       int
+	bmWidth      int
+	bmHeight     int
 	bmWidthBytes int
-	bmPlanes u16
-	bmBitsPixel u16
-	bmBits voidptr = unsafe { nil }
+	bmPlanes     u16
+	bmBitsPixel  u16
+	bmBits       voidptr = unsafe { nil }
 }
 
 // BITMAPINFO contains additional information that describes the BITMAP.
-pub struct BITMAPINFO {
-	mut:
+pub struct BITMAPINFO
+{
+mut:
 	bmi_header BITMAPV4INFOHEADER
 	bmi_colors [1]C.RGBQUAD
 }
 
 // BITMAPV4INFOHEADER contains additional information that describes
 // the BITMAP.
-pub struct BITMAPV4INFOHEADER {
-	mut:
-	bv4_size DWORD
-	bv4_width LONG
-	bv4_height LONG
-	bv4_planes WORD
-	bv4_bit_count WORD
-	bv4_compression DWORD
-	bv4_size_image DWORD
+pub struct BITMAPV4INFOHEADER
+{
+mut:
+	bv4_size             DWORD
+	bv4_width            LONG
+	bv4_height           LONG
+	bv4_planes           WORD
+	bv4_bit_count        WORD
+	bv4_compression      DWORD
+	bv4_size_image       DWORD
 	bv4_x_pels_per_meter LONG
 	bv4_y_pels_per_meter LONG
-	bv4_clr_used DWORD
-	bv4_clr_important DWORD
-	bv4_red_mask DWORD = 0x00ff0000
-	bv4_green_mask DWORD = 0x0000ff00
-	bv4_blue_mask DWORD = 0x000000ff
-	bv4_alpha_mask DWORD = 0xff000000
-	bv4_cs_type DWORD
-	bv4_endpoints [36]BYTE
-	bv4_gamma_red DWORD
-	bv4_gamma_green DWORD
-	bv4_gamma_blue DWORD
+	bv4_clr_used         DWORD
+	bv4_clr_important    DWORD
+	bv4_red_mask         DWORD = 0x00ff0000
+	bv4_green_mask       DWORD = 0x0000ff00
+	bv4_blue_mask        DWORD = 0x000000ff
+	bv4_alpha_mask       DWORD = 0xff000000
+	bv4_cs_type          DWORD
+	bv4_endpoints        [36]BYTE
+	bv4_gamma_red        DWORD
+	bv4_gamma_green      DWORD
+	bv4_gamma_blue       DWORD
 }
 
 // BITMAPFILEHEADER describes the first few bytes of a bitmap file.
 @[typedef]
-pub struct C.BITMAPFILEHEADER {
-	mut:
-	bfType WORD
-	bfSize DWORD
+pub struct C.BITMAPFILEHEADER
+{
+mut:
+	bfType      WORD
+	bfSize      DWORD
 	bfReserved1 WORD
 	bfReserved2 WORD
-	bfOffBits DWORD
+	bfOffBits   DWORD
 }
 
 // SYSTEM_INFO contains information on the currently operating system
 // and the underlying hardware. rpv uses it, to obtain the process
 // architecture.
-pub struct SYSTEM_INFO {
-	processor_architecture WORD
-	reserved WORD
-	page_size DWORD
+pub struct SYSTEM_INFO
+{
+	processor_architecture      WORD
+	reserved                    WORD
+	page_size                   DWORD
 	minimum_application_address LPVOID
 	maximum_application_address LPVOID
-	active_processor_mask &DWORD = unsafe { nil }
-	number_of_processors DWORD
-	processor_type DWORD
-	allocation_granularity DWORD
-	processor_level WORD
-	processor_revision WORD
+	active_processor_mask       &DWORD = unsafe { nil }
+	number_of_processors        DWORD
+	processor_type              DWORD
+	allocation_granularity      DWORD
+	processor_level             WORD
+	processor_revision          WORD
 }
 
 pub const ioctl_open_process = u32(0x8335003C)
@@ -766,28 +810,29 @@ pub const rpc_is_wow64 = false
 // it first attempts to open a handle to the specified PID via OpenProcess directly.
 // if this does not work, it attempts to open the handle via the PROCEXP152.sys driver.
 // this allows to open handles even for protected processes.
-pub fn open_process_ext(desired_access u32, inherit_handle bool, pid u32) !HANDLE {
-
+pub fn open_process_ext(desired_access u32, inherit_handle bool, pid u32) !HANDLE
+{
 	utils.log_debug('Opening handle to process ${pid} with access mask 0x${desired_access.hex()}')
 
 	bytes_returned := u32(0)
 	process := C.OpenProcess(desired_access, inherit_handle, pid)
 
-	if process == HANDLE(0) {
-
+	if process == HANDLE(0)
+	{
 		utils.log_debug('OpenProcess failed. Trying via process explorer')
 
-		procexp := C.CreateFileA('\\\\.\\PROCEXP152'.str, C.GENERIC_READ, 0, 0, C.OPEN_EXISTING,
-			C.FILE_ATTRIBUTE_NORMAL, 0)
+		procexp := C.CreateFileA('\\\\.\\PROCEXP152'.str, C.GENERIC_READ, 0, 0, C.OPEN_EXISTING, C.FILE_ATTRIBUTE_NORMAL, 0)
 
-		if int(procexp) == C.INVALID_HANDLE_VALUE {
+		if int(procexp) == C.INVALID_HANDLE_VALUE
+		{
 			return error('Could not open process explorer pipe.')
 		}
 
 		h_pid := HANDLE(pid)
 		result := C.DeviceIoControl(procexp, ioctl_open_process, &h_pid, sizeof(h_pid), &process, sizeof(HANDLE), &bytes_returned, 0)
 
-		if !result {
+		if !result
+		{
 			last_error := C.GetLastError()
 			return error('DeviceIOControl returned error code 0x${last_error.hex()}')
 		}
@@ -800,55 +845,62 @@ pub fn open_process_ext(desired_access u32, inherit_handle bool, pid u32) !HANDL
 
 // adjust_privilege adjusts a Windows privilege by name. Within rpv, this is mainly used to
 // enable the SeDebugPrivilege that is required to inspect other processes.
-pub fn adjust_privilege(privilege_name string, enable_privilege bool) ! {
-
+pub fn adjust_privilege(privilege_name string, enable_privilege bool)!
+{
 	utils.log_debug('Setting privilege ${privilege_name} to ${enable_privilege}')
 
 	mut luid := C.LUID{}
 	mut p_token := HANDLE(0)
 	mut token_privilege := C.TOKEN_PRIVILEGES{}
 
-	if !C.OpenProcessToken(C.GetCurrentProcess(), C.TOKEN_ALL_ACCESS, &p_token) {
+	if !C.OpenProcessToken(C.GetCurrentProcess(), C.TOKEN_ALL_ACCESS, &p_token)
+	{
 		return error('OpenProcessToken failed.')
 	}
 
-	defer {
+	defer
+	{
 		C.CloseHandle(p_token)
 	}
 
-	if !C.LookupPrivilegeValueA(&char(0), privilege_name.str, &luid) {
+	if !C.LookupPrivilegeValueA(&char(0), privilege_name.str, &luid)
+	{
 		return error('LookupPrivilegeValue failed.')
 	}
 
 	token_privilege.PrivilegeCount = 1
 	token_privilege.Privileges[0].Luid = luid
 
-	if enable_privilege {
+	if enable_privilege
+	{
 		token_privilege.Privileges[0].Attributes = C.SE_PRIVILEGE_ENABLED
-	} else {
+	}
+
+	else
+	{
 		token_privilege.Privileges[0].Attributes = C.SE_PRIVILEGE_REMOVED
 	}
 
-	if !C.AdjustTokenPrivileges(p_token, false, &token_privilege, 0, &C.TOKEN_PRIVILEGES(unsafe { nil }), &u32(0)) {
+	if !C.AdjustTokenPrivileges(p_token, false, &token_privilege, 0, &C.TOKEN_PRIVILEGES(unsafe { nil }), &u32(0))
+	{
 		return error('AdjustTokenPrivileges failed.')
 	}
 
 	last_error := C.GetLastError()
 
-	if last_error != C.ERROR_SUCCESS {
+	if last_error != C.ERROR_SUCCESS
+	{
 		return error('AdjustTokenPrivileges caused OS error: 0x${last_error.hex()}')
 	}
 
 	utils.log_debug('Privilege was adjusted successfully')
 }
 
-
 // get_process_name returns the process name associated to the specified
 // process id.
 pub fn get_process_name(pid u32)! string
 {
 	utils.log_debug('Obtaining process name of process ${pid}')
-
 	snapshot_handle := C.CreateToolhelp32Snapshot(th32cs_snapprocess, 0)
 
 	if int(snapshot_handle) == C.INVALID_HANDLE_VALUE
@@ -861,7 +913,8 @@ pub fn get_process_name(pid u32)! string
 		C.CloseHandle(snapshot_handle)
 	}
 
-	process_entry := C.PROCESSENTRY32{
+	process_entry := C.PROCESSENTRY32
+	{
 		dwSize: sizeof(C.PROCESSENTRY32)
 	}
 
@@ -906,7 +959,8 @@ pub fn get_process_ppid(pid u32)! u32
 		C.CloseHandle(snapshot_handle)
 	}
 
-	process_entry := C.PROCESSENTRY32{
+	process_entry := C.PROCESSENTRY32
+	{
 		dwSize: sizeof(C.PROCESSENTRY32)
 	}
 
@@ -935,7 +989,6 @@ pub fn get_process_ppid(pid u32)! u32
 pub fn get_process_childs(pid u32)! []u32
 {
 	utils.log_debug('Obtaining child pids of process ${pid}')
-
 	snapshot_handle := C.CreateToolhelp32Snapshot(th32cs_snapprocess, 0)
 
 	if int(snapshot_handle) == C.INVALID_HANDLE_VALUE
@@ -948,7 +1001,8 @@ pub fn get_process_childs(pid u32)! []u32
 		C.CloseHandle(snapshot_handle)
 	}
 
-	process_entry := C.PROCESSENTRY32{
+	process_entry := C.PROCESSENTRY32
+	{
 		dwSize: sizeof(C.PROCESSENTRY32)
 	}
 
@@ -1430,9 +1484,10 @@ pub fn get_module_data_section(h_process HANDLE, module_ptr voidptr)! ModuleSect
 				return error('Unable to read ImageSectionHeader from 0x${section_headers[ctr]}.')
 			}
 
-			if (&char(section_header.name[..].data)).vstring() == '.data' {
-
-				return ModuleSectionInfo{
+			if (&char(section_header.name[..].data)).vstring() == '.data'
+			{
+				return ModuleSectionInfo
+				{
 					base: &u8(module_ptr) + u32(section_header.virtual_address)
 					size: section_header.misc
 					arch: arch
@@ -1529,14 +1584,14 @@ pub fn enum_security_packages()! []SecurityPackage
 		for ctr := 0; ctr < sec_package_count; ctr++
 		{
 			sec_package := &C.SecPkgInfoA(walking_pointer)
-
-			sec_packages << SecurityPackage {
-				caps: sec_package.fCapabilities
-				version: sec_package.wVersion
-				rpc_id: sec_package.wRPCID
+			sec_packages << SecurityPackage
+			{
+				caps:      sec_package.fCapabilities
+				version:   sec_package.wVersion
+				rpc_id:    sec_package.wRPCID
 				max_token: sec_package.cbMaxToken
-				name: cstring_to_vstring(sec_package.Name)
-				comment: cstring_to_vstring(sec_package.Comment)
+				name:      cstring_to_vstring(sec_package.Name)
+				comment:   cstring_to_vstring(sec_package.Comment)
 			}
 
 			walking_pointer++
@@ -1629,7 +1684,8 @@ pub fn get_location_info_h(process_handle HANDLE, address voidptr)! LocationInfo
 			C.CloseHandle(snapshot_handle)
 		}
 
-		module_entry := C.MODULEENTRY32{
+		module_entry := C.MODULEENTRY32
+		{
 			dwSize: sizeof(C.MODULEENTRY32)
 		}
 
@@ -1654,12 +1710,13 @@ pub fn get_location_info_h(process_handle HANDLE, address voidptr)! LocationInfo
 		}
 	}
 
-	return LocationInfo {
-		base: base_addr
-		size: base_size
+	return LocationInfo
+	{
+		base:     base_addr
+		size:     base_size
 		mem_info: mem_info
-		path: location
-		desc: module_description
+		path:     location
+		desc:     module_description
 	}
 }
 
@@ -1691,21 +1748,21 @@ pub fn icon_to_bmp(icon HANDLE)! string
 		}
 	}
 
-    if clr_bits < 32
+	if clr_bits < 32
 	{
 		return error('Icons with less than 32 bit per pixel are currently not supported.')
 	}
 
 	mut bmi := BITMAPINFO{}
 
-    bmi.bmi_header.bv4_size = sizeof(BITMAPV4INFOHEADER)
-    bmi.bmi_header.bv4_width = bmp.bmWidth
-    bmi.bmi_header.bv4_height = bmp.bmHeight
-    bmi.bmi_header.bv4_planes = bmp.bmPlanes
-    bmi.bmi_header.bv4_bit_count = bmp.bmBitsPixel
+	bmi.bmi_header.bv4_size = sizeof(BITMAPV4INFOHEADER)
+	bmi.bmi_header.bv4_width = bmp.bmWidth
+	bmi.bmi_header.bv4_height = bmp.bmHeight
+	bmi.bmi_header.bv4_planes = bmp.bmPlanes
+	bmi.bmi_header.bv4_bit_count = bmp.bmBitsPixel
 
-    bmi.bmi_header.bv4_compression = u32(C.BI_BITFIELDS)
-    bmi.bmi_header.bv4_size_image = u32(((bmi.bmi_header.bv4_width * clr_bits + 31) & ~31) / 8 * bmi.bmi_header.bv4_height)
+	bmi.bmi_header.bv4_compression = u32(C.BI_BITFIELDS)
+	bmi.bmi_header.bv4_size_image = u32(((bmi.bmi_header.bv4_width * clr_bits + 31) & ~31) / 8 * bmi.bmi_header.bv4_height)
 
 	mut color_bits := []int{len: int(bmi.bmi_header.bv4_size_image)}
 
@@ -1718,12 +1775,13 @@ pub fn icon_to_bmp(icon HANDLE)! string
 	bmi.bmi_header.bv4_size = sizeof(BITMAPV4INFOHEADER)
 	bmi.bmi_header.bv4_alpha_mask = 0xff000000
 
-	file_header := C.BITMAPFILEHEADER{
-		bfType: 0x4d42
-		bfSize: u32(sizeof(C.BITMAPFILEHEADER) + bmi.bmi_header.bv4_size + bmi.bmi_header.bv4_size_image)
+	file_header := C.BITMAPFILEHEADER
+	{
+		bfType:      0x4d42
+		bfSize:      u32(sizeof(C.BITMAPFILEHEADER) + bmi.bmi_header.bv4_size + bmi.bmi_header.bv4_size_image)
 		bfReserved1: 0
 		bfReserved2: 0
-		bfOffBits: u32(sizeof(C.BITMAPFILEHEADER) + bmi.bmi_header.bv4_size)
+		bfOffBits:   u32(sizeof(C.BITMAPFILEHEADER) + bmi.bmi_header.bv4_size)
 	}
 
 	final_bitmap := []u8{len: int(sizeof(C.BITMAPFILEHEADER) + sizeof(BITMAPV4INFOHEADER) + bmi.bmi_header.bv4_size_image)}
@@ -1890,7 +1948,8 @@ pub fn new_guid(guid_str string)! C.GUID
 		data4[ctr / 2] = u8(data4_str[ctr..ctr+2].parse_uint(16, 8)!)
 	}
 
-	return C.GUID {
+	return C.GUID
+	{
 		Data1: u32(split[0].parse_uint(16, 32)!)
 		Data2: u16(split[1].parse_uint(16, 16)!)
 		Data3: u16(split[2].parse_uint(16, 16)!)
@@ -1898,11 +1957,9 @@ pub fn new_guid(guid_str string)! C.GUID
 	}
 }
 
-/*
- * The following lines contain WIN32 API function definitions that are used
- * by this file. This list has grown over time and is probably inconsistent
- * regarding method formatting.
- */
+// The following lines contain WIN32 API function definitions that are used
+// by this file. This list has grown over time and is probably inconsistent
+// regarding method formatting.
 fn C.AdjustTokenPrivileges(token_handle HANDLE, disable_all bool, new_state &C.TOKEN_PRIVILEGES, length DWORD, old_state &C.TOKEN_PRIVILEGES, return_length &DWORD) bool
 fn C.CoInitialize(reserved LPVOID) HRESULT
 fn C.CreateFileA(file_name &char, desired_access DWORD, share_mode DWORD, security_attributes voidptr, creation_disposition DWORD, flags DWORD, tempate_file voidptr) HANDLE

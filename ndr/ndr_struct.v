@@ -90,7 +90,8 @@ pub fn (mut context NdrContext) read_pointer_info(mut addr &voidptr)! NdrPointer
 
 	for context.read[NdrFormatChar](mut addr)! != NdrFormatChar.fc_end {}
 
-	return NdrPointerInfo{
+	return NdrPointerInfo
+	{
 		format:        NdrFormatChar.fc_pp
 		base_ptr_type: base_ptr_type
 		sub_ptr_type:  sub_ptr_type

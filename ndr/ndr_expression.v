@@ -5,7 +5,8 @@ import internals
 
 
 // NdrExpressionType represents possible types an NDR Expression can take.
-pub enum NdrExpressionType as u8 {
+pub enum NdrExpressionType as u8
+{
 	fc_expr_const32 = 0x01
 	fc_expr_const64 = 0x02
 	fc_expr_var     = 0x03
@@ -16,7 +17,8 @@ pub enum NdrExpressionType as u8 {
 // NdrExpressionOperator contains the different operator types that can
 // occur in NDR Expressions. These operators can be unary, binary or
 // ternary.
-pub enum NdrExpressionOperator as u8 {
+pub enum NdrExpressionOperator as u8
+{
 	op_unary_plus        = 0x01
 	op_unary_minus       = 0x02
 	op_unary_not         = 0x03
@@ -57,7 +59,8 @@ pub enum NdrExpressionOperator as u8 {
 // NdrBaseExpression represents the base type all other NdrExpression types
 // are branched of from. It only contains the NdrExpressionType as member
 // and is actually unused.
-pub struct NdrBaseExpression {
+pub struct NdrBaseExpression
+{
 	typ NdrExpressionType
 }
 
@@ -138,7 +141,8 @@ pub fn (context NdrContext) read_context_expression(index int)! MaybeExpression
 // Depending on the operator type (unary, binary, ternary) a corresponding
 // amount of arguments is required, which are stored within the arguments
 // member.
-pub struct NdrOperatorExpression {
+pub struct NdrOperatorExpression
+{
 	NdrBaseExpression
 	operator  NdrExpressionOperator
 	format    NdrFormatChar
@@ -322,7 +326,8 @@ pub fn (context NdrContext) read_operator_expression(mut addr &voidptr)! MaybeEx
 // NdrVariableExpression represents an expression that is connected to
 // another variable. This connection is represented by an offset, that
 // needs to be resolved when displaying the expression.
-pub struct NdrVariableExpression {
+pub struct NdrVariableExpression
+{
 	NdrBaseExpression
 	format NdrFormatChar
 	offset i16
@@ -354,7 +359,8 @@ pub fn (context NdrContext) read_variable_expression(mut addr &voidptr)! NdrVari
 }
 
 // NdrConstantExpression represents an expression that holds a constant value.
-pub struct NdrConstantExpression {
+pub struct NdrConstantExpression
+{
 	NdrBaseExpression
 	format NdrFormatChar
 	offset i16
@@ -401,6 +407,7 @@ pub fn (const_expr NdrConstantExpression) format() string
 // expressions. It requires it's implementors to implement the
 // format method, that is used to obtain the string representation
 // of the associated expression.
-interface NdrExpression {
+interface NdrExpression
+{
 	format() string
 }

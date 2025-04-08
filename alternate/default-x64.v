@@ -84,7 +84,8 @@ pub const compatible_rpc_versions = [
 // available in future. Up to this point, we need to keep the x64 and x86
 // struct definitions in separate files.
 @[if x64]
-pub struct RpcInterface {
+pub struct RpcInterface
+{
 pub:
 	p_rpc_server                  &RpcServer = unsafe { nil }
 	flags                         u32
@@ -125,7 +126,8 @@ pub:
 // available in future. Up to this point, we need to keep the x64 and x86
 // struct definitions in separate files.
 @[if x64]
-pub struct RpcServer {
+pub struct RpcServer
+{
 pub:
 	mutex                   Mutex
 	is_listening1           u32
@@ -169,7 +171,8 @@ pub:
 // available in future. Up to this point, we need to keep the x64 and x86
 // struct definitions in separate files.
 @[if x64]
-pub struct RpcAddress {
+pub struct RpcAddress
+{
 pub:
 	vtable       voidptr
 	magic        u32

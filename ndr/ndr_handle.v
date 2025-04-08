@@ -169,7 +169,8 @@ pub fn (handle NdrSystemHandle) get_attr_name() string
 // handles can be found within the MIDL language reference by Microsoft:
 //
 // https://learn.microsoft.com/en-us/windows/win32/midl/midl-language-reference
-pub struct NdrHandle {
+pub struct NdrHandle
+{
 	NdrBaseType
 }
 

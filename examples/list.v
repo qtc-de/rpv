@@ -2,10 +2,8 @@ module main
 
 import qtc_de.rpv
 
-/*
- * This example attempts to list all running processes that
- * expose RPC endpoints.
- */
+// This example attempts to list all running processes that
+// expose RPC endpoints.
 
 fn main()
 {

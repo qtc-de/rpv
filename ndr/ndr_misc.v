@@ -4,7 +4,8 @@ module ndr
 // and a lower limit. The actual wrapped type is contained within the
 // `typ` property. The lower limit is stored in `min` and the upper in
 // `max`. The inherited `NdrBaseType` property is always `.fc_range`
-pub struct NdrRange {
+pub struct NdrRange
+{
 	NdrBaseType
 	typ NdrBaseType
 	min int
@@ -186,7 +187,8 @@ pub fn (mut context NdrContext) read_supplement(mut addr &voidptr)! NdrSupplemen
 	part_one := context.read[u32](mut addr)!
 	part_two := context.read[u32](mut addr)!
 
-	return NdrSupplement{
+	return NdrSupplement
+	{
 		format:     .fc_supplement
 		typ:        typ
 		supplement: supplement

@@ -422,7 +422,8 @@ pub fn get_process_rpc_server_h(process_handle win.HANDLE)! RpcBasicInfo
 	{
 		p_module_name := unsafe { &char(malloc(C.MAX_PATH)) }
 
-		defer {
+		defer
+		{
 			unsafe { free(p_module_name) }
 		}
 
@@ -843,8 +844,8 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_auth_info_h(process_handle win.H
 	utils.log_debug('Starting to walk through RpcAuthInfo table at ${dict.p_array} (len: ${dict.number_of_entries})')
 
 	mut rpc_auth_infos := []RpcAuthInfo{}
-	unsafe {
-
+	unsafe
+	{
 		for ctr := 0; ctr < dict.number_of_entries; ctr++
 		{
 			auth_info := win.read_proc_mem_s[internals.RPC_AUTH_INFO](process_handle, p_table[ctr]) or { continue }
