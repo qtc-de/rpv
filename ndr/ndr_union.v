@@ -291,7 +291,7 @@ pub fn (mut context NdrContext) read_union(format NdrFormatChar, mut addr &voidp
 		NdrComplexType: NdrComplexType
 		{
 			format:       format
-			name:         'Union_${id}'
+			name:         'Union_${*addr}'
 			member_count: u32(arms.arms.len)
 		}
 		id: id
