@@ -355,7 +355,7 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver)!
 				method.symbols = resolver.load_symbols(intf_info.location.path, method.addr) or { []string{} }
 			}
 
-			if intf_info.sec_callback.addr != &voidptr(0)
+			if intf_info.sec_callback.addr != unsafe { nil }
 			{
 				if intf_info.sec_callback.location.base != intf_info.location.base
 				{
@@ -403,7 +403,7 @@ pub fn get_process_rpc_server_h(process_handle win.HANDLE)! RpcBasicInfo
 {
 	module_array_size := u32(0)
 
-	if !C.EnumProcessModulesEx(process_handle, &voidptr(0), 0, &module_array_size, u32(C.LIST_MODULES_ALL))
+	if !C.EnumProcessModulesEx(process_handle, unsafe { nil }, 0, &module_array_size, u32(C.LIST_MODULES_ALL))
 	{
 		return error('Unable to enumerate process modules.')
 	}
@@ -688,7 +688,7 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 		utils.log_debug('Failed to attach PDB resolver: ${err}')
 	}
 
-	if interface_info.intf.server_interface.interpreter_info != &voidptr(0)
+	if interface_info.intf.server_interface.interpreter_info != unsafe { nil }
 	{
 		utils.log_debug('Interface is interpreted stub.')
 
@@ -729,7 +729,7 @@ pub fn (interface_info RpcInterfaceBasicInfo) enrich_h(process_handle win.HANDLE
 		name: ''
 	}
 
-	if sec_callback.addr != &voidptr(0)
+	if sec_callback.addr != unsafe { nil }
 	{
 		if sec_location := win.get_location_info_h(process_handle, sec_callback.addr)
 		{
@@ -870,12 +870,12 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_auth_info_h(process_handle win.H
 				mut dll_name := ''
 				mut principal := ''
 
-				if C.RegQueryValueExA(key_handle, &char(auth_info.auth_svc.str().str), &voidptr(0), &voidptr(0), p_buffer, &size) == C.ERROR_SUCCESS
+				if C.RegQueryValueExA(key_handle, &char(auth_info.auth_svc.str().str), nil, nil, p_buffer, &size) == C.ERROR_SUCCESS
 				{
 					dll_name = cstring_to_vstring(p_buffer)
 				}
 
-				if C.ReadProcessMemory(process_handle, auth_info.principal, p_buffer, C.MAX_PATH, &voidptr(0))
+				if C.ReadProcessMemory(process_handle, auth_info.principal, p_buffer, C.MAX_PATH, nil)
 				{
 					principal = string_from_wide(&u16(p_buffer))
 				}
