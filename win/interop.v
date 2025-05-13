@@ -863,7 +863,7 @@ pub fn adjust_privilege(privilege_name string, enable_privilege bool)!
 		C.CloseHandle(p_token)
 	}
 
-	if !C.LookupPrivilegeValueA(&char(0), privilege_name.str, &luid)
+	if !C.LookupPrivilegeValueA(unsafe { nil }, privilege_name.str, &luid)
 	{
 		return error('LookupPrivilegeValue failed.')
 	}
@@ -881,7 +881,7 @@ pub fn adjust_privilege(privilege_name string, enable_privilege bool)!
 		token_privilege.Privileges[0].Attributes = C.SE_PRIVILEGE_REMOVED
 	}
 
-	if !C.AdjustTokenPrivileges(p_token, false, &token_privilege, 0, &C.TOKEN_PRIVILEGES(unsafe { nil }), &u32(0))
+	if !C.AdjustTokenPrivileges(p_token, false, &token_privilege, 0, &C.TOKEN_PRIVILEGES(unsafe { nil }), unsafe { nil })
 	{
 		return error('AdjustTokenPrivileges failed.')
 	}
@@ -1156,7 +1156,7 @@ pub fn get_module_description(path string)! string
 	{
 		unsafe
 		{
-			result := &char(0)
+			result := nil
 			result_size := u32(0)
 
 			prop := "\\StringFileInfo\\${translate_info.language:04x}${translate_info.codepage:04x}\\FileDescription"
@@ -1222,7 +1222,7 @@ pub fn get_process_user_h(process_handle HANDLE)! string
 	domain_size := u32(0)
 	sid_name_use := SID_NAME_USE.sid_type_user
 
-	C.LookupAccountSidA(&char(0), p_token_user.User.Sid, &char(0), &user_size, &char(0), &domain_size, &sid_name_use)
+	C.LookupAccountSidA(unsafe { nil }, p_token_user.User.Sid, unsafe { nil }, &user_size, unsafe { nil }, &domain_size, &sid_name_use)
 
 	user_name := unsafe { malloc(user_size) }
 	domain_name := unsafe { malloc(domain_size) }
@@ -1236,7 +1236,7 @@ pub fn get_process_user_h(process_handle HANDLE)! string
 		}
 	}
 
-	if !C.LookupAccountSidA(&char(0), p_token_user.User.Sid, &char(user_name), &user_size, &char(domain_name), &domain_size, &sid_name_use)
+	if !C.LookupAccountSidA(unsafe { nil }, p_token_user.User.Sid, &char(user_name), &user_size, &char(domain_name), &domain_size, &sid_name_use)
 	{
 		return error('LookupAccountSidA failed')
 	}
@@ -1304,7 +1304,7 @@ pub fn get_process_cmdline_ha(process_handle HANDLE, arch Arch)! string
 			unsafe
 			{
 				utils.log_debug('Obtaining process information via NtWow64QueryInformationProcess64.')
-				status := C.NtWow64QueryInformationProcess64(process_handle, C.ProcessBasicInformation, &voidptr(&basic_info), sizeof(C.basic_info), &voidptr(0))
+				status := C.NtWow64QueryInformationProcess64(process_handle, C.ProcessBasicInformation, &voidptr(&basic_info), sizeof(C.basic_info), nil)
 
 				if status != C.STATUS_SUCCESS
 				{
@@ -1437,7 +1437,7 @@ pub fn get_module_data_section(h_process HANDLE, module_ptr voidptr)! ModuleSect
 	mut arch := Arch.x86
 	dos_header := C.IMAGE_DOS_HEADER{}
 
-	if !C.ReadProcessMemory(h_process, module_ptr, &dos_header, sizeof(C.IMAGE_DOS_HEADER), &voidptr(0))
+	if !C.ReadProcessMemory(h_process, module_ptr, &dos_header, sizeof(C.IMAGE_DOS_HEADER), unsafe { nil })
 	{
 		return error('Unable to read ImageDosHeader from 0x${module_ptr}.')
 	}
@@ -1452,7 +1452,7 @@ pub fn get_module_data_section(h_process HANDLE, module_ptr voidptr)! ModuleSect
 		ptr := &u8(module_ptr) + u32(dos_header.e_lfanew)
 		nt_header := C.IMAGE_NT_HEADERS{}
 
-		if !C.ReadProcessMemory(h_process, ptr, &nt_header, sizeof(C.IMAGE_NT_HEADERS), &voidptr(0))
+		if !C.ReadProcessMemory(h_process, ptr, &nt_header, sizeof(C.IMAGE_NT_HEADERS), nil)
 		{
 			return error('Unable to read NtHeader from 0x${module_ptr}.')
 		}
@@ -1479,7 +1479,7 @@ pub fn get_module_data_section(h_process HANDLE, module_ptr voidptr)! ModuleSect
 		{
 			section_header := IMAGE_SECTION_HEADER{}
 
-			if !C.ReadProcessMemory(h_process, &section_headers[ctr], &section_header, sizeof(C.IMAGE_SECTION_HEADER), &voidptr(0))
+			if !C.ReadProcessMemory(h_process, &section_headers[ctr], &section_header, sizeof(C.IMAGE_SECTION_HEADER), nil)
 			{
 				return error('Unable to read ImageSectionHeader from 0x${section_headers[ctr]}.')
 			}
@@ -1549,7 +1549,7 @@ pub fn get_com_interface_name(interface_id C.RPC_IF_ID)! string
 			free(p_result)
 		}
 
-		if C.RegQueryValueExA(key_handle, &voidptr(0), &voidptr(0), &voidptr(0), p_result, &size) != C.ERROR_SUCCESS
+		if C.RegQueryValueExA(key_handle, nil, nil, nil, p_result, &size) != C.ERROR_SUCCESS
 		{
 			return error('Unable to read value from ${key} via RegQueryValueExA')
 		}
@@ -1667,7 +1667,7 @@ pub fn get_location_info_h(process_handle HANDLE, address voidptr)! LocationInfo
 	}
 
 	module_description := get_module_description(location)!
-	mut base_addr := &voidptr(0)
+	mut base_addr := unsafe { nil }
 	mut base_size := u32(0)
 
 	if location != ''
@@ -1766,7 +1766,7 @@ pub fn icon_to_bmp(icon HANDLE)! string
 
 	mut color_bits := []int{len: int(bmi.bmi_header.bv4_size_image)}
 
-	if C.GetDIBits(C.GetDC(&voidptr(0)), icon_info.hbmColor, 0, bmp.bmHeight, color_bits.data, &bmi, C.DIB_RGB_COLORS) == 0
+	if C.GetDIBits(C.GetDC(unsafe { nil }), icon_info.hbmColor, 0, bmp.bmHeight, color_bits.data, &bmi, C.DIB_RGB_COLORS) == 0
 	{
 		return error('Unable to obtain bitmap data via GetDIBits')
 	}
@@ -1834,7 +1834,7 @@ pub fn get_process_arch(process_handle HANDLE)! Arch
 // dest pointer.
 pub fn read_process_memory(process_handle HANDLE, src voidptr, dest voidptr, size u32)!
 {
-	if !C.ReadProcessMemory(process_handle, src, dest, size, &voidptr(0))
+	if !C.ReadProcessMemory(process_handle, src, dest, size, unsafe { nil })
 	{
 		return error('Unable to read process memory at 0x${voidptr(src)}')
 	}
@@ -1850,7 +1850,7 @@ pub fn read_proc_mem[T](process_handle HANDLE, mut src &voidptr)! T
 		{
 			dest := T(0)
 
-			if !C.ReadProcessMemory(process_handle, *src, &dest, sizeof(T), &voidptr(0))
+			if !C.ReadProcessMemory(process_handle, *src, &dest, sizeof(T), nil)
 			{
 				return error('Unable to read process memory at 0x${voidptr(src)}')
 			}
@@ -1864,7 +1864,7 @@ pub fn read_proc_mem[T](process_handle HANDLE, mut src &voidptr)! T
 		{
 			dest := T{}
 
-			if !C.ReadProcessMemory(process_handle, *src, &dest, sizeof(T), &voidptr(0))
+			if !C.ReadProcessMemory(process_handle, *src, &dest, sizeof(T), nil)
 			{
 				return error('Unable to read process memory at 0x${voidptr(src)}')
 			}
@@ -1885,7 +1885,7 @@ pub fn read_proc_mem_s[T](process_handle HANDLE, src voidptr)! T
 	{
 		dest := T(0)
 
-		if !C.ReadProcessMemory(process_handle, src, &dest, sizeof(T), &voidptr(0))
+		if !C.ReadProcessMemory(process_handle, src, &dest, sizeof(T), unsafe { nil })
 		{
 			return error('Unable to read process memory at 0x${voidptr(src)}')
 		}
@@ -1897,7 +1897,7 @@ pub fn read_proc_mem_s[T](process_handle HANDLE, src voidptr)! T
 	{
 		dest := T{}
 
-		if !C.ReadProcessMemory(process_handle, src, &dest, sizeof(T), &voidptr(0))
+		if !C.ReadProcessMemory(process_handle, src, &dest, sizeof(T), unsafe { nil })
 		{
 			return error('Unable to read process memory at 0x${voidptr(src)}')
 		}
@@ -1909,7 +1909,7 @@ pub fn read_proc_mem_s[T](process_handle HANDLE, src voidptr)! T
 // uuid_to_str converts the binary UUID of an RPC_IF_ID into a string
 pub fn uuid_to_str(interface_id C.RPC_IF_ID)! string
 {
-	p_uuid_str := &char(0)
+	p_uuid_str := &char(unsafe { nil })
 
 	defer
 	{

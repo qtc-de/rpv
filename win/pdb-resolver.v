@@ -18,7 +18,7 @@ pub struct PdbResolver
 // RPV_SYMBOL_PATH.
 pub fn new_pdb_resolver(process_handle HANDLE, symbol_path string, module_base voidptr, module_size u32)! PdbResolver
 {
-	if !C.SymInitialize(process_handle, &voidptr(0), false)
+	if !C.SymInitialize(process_handle, unsafe { nil }, false)
 	{
 		return error('SymInitialize failed.')
 	}
@@ -26,7 +26,7 @@ pub fn new_pdb_resolver(process_handle HANDLE, symbol_path string, module_base v
 	pdb_path := get_pdb_path(process_handle, symbol_path, module_base)!
 	utils.log_debug('Trying to load symbols from: ${pdb_path}')
 
-	if C.SymLoadModuleEx(process_handle, &voidptr(0), &char(pdb_path.str), &voidptr(0), u64(module_base), module_size, &voidptr(0), 0) == 0
+	if C.SymLoadModuleEx(process_handle, unsafe { nil }, &char(pdb_path.str), unsafe { nil }, u64(module_base), module_size, unsafe { nil }, 0) == 0
 	{
 		C.SymCleanup(process_handle)
 		return error('Call to SymLoadModuleEx failed.')
@@ -86,7 +86,7 @@ pub fn (context PdbResolver) load_symbols(symbol u64)! []string
 		InstructionOffset: symbol
 	}
 
-	if !C.SymSetContext(context.process_handle, &frame, &voidptr(0))
+	if !C.SymSetContext(context.process_handle, &frame, unsafe { nil })
 	{
 		return error('Unable to set symbol context to 0x${symbol}')
 	}
@@ -99,7 +99,7 @@ pub fn (context PdbResolver) load_symbols(symbol u64)! []string
 		}
 	}
 
-	if !C.SymEnumSymbols(context.process_handle, 0, &voidptr(0), symbol_closure, &voidptr(0))
+	if !C.SymEnumSymbols(context.process_handle, 0, unsafe { nil }, symbol_closure, unsafe { nil })
 	{
 		return error('Unable to resolve symbols at 0x${symbol} via SymEnumSymbolsForAddr')
 	}

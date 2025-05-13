@@ -182,7 +182,7 @@ pub fn (mut context NdrContext) read_base_struct(format NdrFormatChar, mut addr 
 	{
 		id:          id
 		format:      format
-		name:        'Struct_${id}'
+		name:        'Struct_${*addr}'
 		alignment:   alignment
 		memory_size: memory_size
 		location:    location

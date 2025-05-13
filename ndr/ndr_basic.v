@@ -129,6 +129,7 @@ pub fn (format NdrFormatChar) format() string
 		.fc_char { 'char' }
 		.fc_small,
 		.fc_usmall { 'small' }
+		.fc_wstring,
 		.fc_c_wstring,
 		.fc_wchar { 'wchar_t' }
 		.fc_short,

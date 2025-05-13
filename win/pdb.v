@@ -56,12 +56,12 @@ struct SymbolInfoV
 pub fn get_module_pdb_info(process_handle HANDLE, module_base voidptr)! CV_INFO_PDB70
 {
 	pdb_info := CV_INFO_PDB70{}
-	mut debug_dir := &u8(0)
+	mut debug_dir := &u8(unsafe { nil })
 
 	dos_header := C.IMAGE_DOS_HEADER{}
 	debug_directory := C.IMAGE_DEBUG_DIRECTORY{}
 
-	if !C.ReadProcessMemory(process_handle, module_base, &dos_header, sizeof(dos_header), &voidptr(0))
+	if !C.ReadProcessMemory(process_handle, module_base, &dos_header, sizeof(dos_header), unsafe { nil })
 	{
 		return error('Failed to read IMAGE_DOS_HEADER.')
 	}
@@ -87,7 +87,7 @@ pub fn get_module_pdb_info(process_handle HANDLE, module_base voidptr)! CV_INFO_
 
 				//nt_headers32 := C.IMAGE_NT_HEADERS32{}
 
-				//if !C.ReadProcessMemory(process_handle, &u8(module_base) + u32(dos_header.e_lfanew), &nt_headers32, sizeof(nt_headers32), &voidptr(0))
+				//if !C.ReadProcessMemory(process_handle, &u8(module_base) + u32(dos_header.e_lfanew), &nt_headers32, sizeof(nt_headers32), nil)
 				//{
 				//	return error('Failed to read IMAGE_NT_HEADERS32.')
 				//}
@@ -99,7 +99,7 @@ pub fn get_module_pdb_info(process_handle HANDLE, module_base voidptr)! CV_INFO_
 
 		nt_headers := C.IMAGE_NT_HEADERS{}
 
-		if !C.ReadProcessMemory(process_handle, &u8(module_base) + u32(dos_header.e_lfanew), &nt_headers, sizeof(nt_headers), &voidptr(0))
+		if !C.ReadProcessMemory(process_handle, &u8(module_base) + u32(dos_header.e_lfanew), &nt_headers, sizeof(nt_headers), nil)
 		{
 			return error('Failed to read IMAGE_NT_HEADERS.')
 		}
@@ -108,12 +108,12 @@ pub fn get_module_pdb_info(process_handle HANDLE, module_base voidptr)! CV_INFO_
 
 		//Shared:
 
-		if !C.ReadProcessMemory(process_handle, debug_dir, &debug_directory, sizeof(debug_directory), &voidptr(0))
+		if !C.ReadProcessMemory(process_handle, debug_dir, &debug_directory, sizeof(debug_directory), nil)
 		{
 			return error('Unable to read IMAGE_DEBUG_DIR.')
 		}
 
-		if !C.ReadProcessMemory(process_handle, &u8(module_base) + u32(debug_directory.AddressOfRawData), &pdb_info, sizeof(pdb_info), &voidptr(0))
+		if !C.ReadProcessMemory(process_handle, &u8(module_base) + u32(debug_directory.AddressOfRawData), &pdb_info, sizeof(pdb_info), nil)
 		{
 			return error('Unable to read CV_INFO_PDB70.')
 		}

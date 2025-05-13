@@ -17,7 +17,7 @@ fn init()
 		panic('Failure while enabling SeDebugPrivilege: ${err}')
 	}
 
-	if C.CoInitialize(&voidptr(0)) != C.S_OK
+	if C.CoInitialize(unsafe { nil }) != C.S_OK
 	{
 		panic('Failure while initializing the COM library.')
 	}
