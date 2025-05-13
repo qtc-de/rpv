@@ -6,12 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## v1.3.1 - May 08, 2025
+## v1.3.1 - May 13, 2025
 
 ### Changed
 
 * Unions in idl get now suffixed by address
 * Structs in idl get now suffixed by address
+* Fix non-unsafe nil pointer references
+* Fix missing `fc_wstring` formatter
 
 
 ## v1.3.0 - Apr 08, 2025
