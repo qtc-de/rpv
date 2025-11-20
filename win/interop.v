@@ -2017,3 +2017,5 @@ fn C.UuidToStringA(uuid &C.GUID, out_string &&char) int
 fn C.VerQueryValueA(data voidptr, block &char, buffer voidptr, size &UINT) bool
 fn C.VirtualQueryEx(process_handle HANDLE, address LPVOID, mem_info &C.MEMORY_BASIC_INFORMATION, length SIZE_T) bool
 fn C.ZeroMemory(dest PVOID, length u32)
+fn C.MessageBoxA(window_handle HANDLE, message &char, title &char, uType UINT)
+fn C.ShellExecuteA(window_handle HANDLE, lpOperation &char, lpFile &char, lpParameters &char, lpDirectory &char, nShowCmd u32) HANDLE
