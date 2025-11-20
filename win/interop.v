@@ -781,10 +781,12 @@ mut:
 	bfOffBits   DWORD
 }
 
-// SYSTEM_INFO contains information on the currently operating system
+// RPV_SYSTEM_INFO contains information on the currently operating system
 // and the underlying hardware. rpv uses it, to obtain the process
-// architecture.
-pub struct SYSTEM_INFO
+// architecture. We cannot use the original C type C.SYSTEM_INFO here,
+// as it is defined already in the vlang stdlib, but with an incomplete
+// set of attributes
+pub struct RPV_SYSTEM_INFO
 {
 	processor_architecture      WORD
 	reserved                    WORD
@@ -1807,7 +1809,7 @@ pub fn icon_to_bmp(icon HANDLE)! string
 pub fn get_process_arch(process_handle HANDLE)! Arch
 {
 	mut wow64 := false
-	system_info := SYSTEM_INFO{}
+	system_info := RPV_SYSTEM_INFO{}
 
 	C.GetNativeSystemInfo(&system_info)
 
@@ -1979,7 +1981,6 @@ fn C.GetLastError() DWORD
 fn C.GetLogicalDrives() DWORD
 fn C.GetMappedFileNameA(process_handle HANDLE, addr LPVOID, filename &char, size DWORD) DWORD
 fn C.GetModuleFileNameExA(process_handle HANDLE, module_handle_array HANDLE, filename LPSTR, size DWORD) DWORD
-fn C.GetNativeSystemInfo(system_info &SYSTEM_INFO)
 fn C.GetObject(h HANDLE, c int, pv LPVOID) int
 fn C.GetProcessId(process_handle HANDLE) DWORD
 fn C.GetSystemDirectoryA(buffer LPSTR, size UINT) UINT
