@@ -1,5 +1,6 @@
 module rpv
 
+import os
 import win
 import utils
 import internals { validate_rpc_version }
@@ -14,7 +15,19 @@ fn init()
 
 	win.adjust_privilege("SeDebugPrivilege", true) or
 	{
-		panic('Failure while enabling SeDebugPrivilege: ${err}')
+		unsafe
+		{
+			executable := os.executable()
+			result := usize(C.ShellExecuteA(nil, 'runas'.str, executable.str, ''.str, nil, 1))
+
+			if result <= 32
+			{
+				C.MessageBoxA(nil, 'rpv requires admin privileges to inspect RPC processes.'.str, 'rpv Initialization Error'.str, C.MB_ICONERROR)
+				exit(1)
+			}
+
+			exit(0);
+		}
 	}
 
 	if C.CoInitialize(unsafe { nil }) != C.S_OK

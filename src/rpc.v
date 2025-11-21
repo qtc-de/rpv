@@ -864,7 +864,10 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_auth_info_h(process_handle win.H
 
 				defer
 				{
-					free(p_buffer)
+					unsafe
+					{
+						free(p_buffer)
+					}
 				}
 
 				mut dll_name := ''
@@ -936,7 +939,10 @@ pub fn (server_info RpcServerBasicInfo) get_rpc_endpoints_h(process_handle win.H
 
 		defer
 		{
-			free(p_buffer)
+			unsafe
+			{
+				free(p_buffer)
+			}
 		}
 
 		for entry in p_table
