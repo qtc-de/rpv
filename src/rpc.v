@@ -318,10 +318,10 @@ pub fn (mut pi RpvProcessInformation) update(mut resolver SymbolResolver) ! {
 				 * that only combase.dll contains such symbols, unless the retrieval logic is wrong.
 				 * Therefore, the symbol information is currently not further used, but might be in future.
 				 */
-				method.name = resolver.load_symbol(intf_info.location.path, method.addr) or {
+				method.name = resolver.load_symbol(intf_info.location.path, u64(method.addr)) or {
 					method.name
 				}
-				method.symbols = resolver.load_symbols(intf_info.location.path, method.addr) or {
+				method.symbols = resolver.load_symbols(intf_info.location.path, u64(method.addr)) or {
 					[]string{}
 				}
 			}

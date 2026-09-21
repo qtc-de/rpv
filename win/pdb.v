@@ -133,17 +133,17 @@ pub fn get_pdb_path(process_handle HANDLE, symbol_path string, module_base voidp
 
 	if symbol_path.starts_with('srv*') {
 		return os.join_path(symbol_path.trim_string_left('srv*'), pdb_path, [
-			'${pdb_info.signature.Data1:08X}',
-			'${pdb_info.signature.Data2:04X}',
-			'${pdb_info.signature.Data3:04X}',
-			'${pdb_info.signature.Data4[0]:02X}',
-			'${pdb_info.signature.Data4[1]:02X}',
-			'${pdb_info.signature.Data4[2]:02X}',
-			'${pdb_info.signature.Data4[3]:02X}',
-			'${pdb_info.signature.Data4[4]:02X}',
-			'${pdb_info.signature.Data4[5]:02X}',
-			'${pdb_info.signature.Data4[6]:02X}',
-			'${pdb_info.signature.Data4[7]:02X}',
+			'${pdb_info.signature.data1:08X}',
+			'${pdb_info.signature.data2:04X}',
+			'${pdb_info.signature.data3:04X}',
+			'${pdb_info.signature.data4[0]:02X}',
+			'${pdb_info.signature.data4[1]:02X}',
+			'${pdb_info.signature.data4[2]:02X}',
+			'${pdb_info.signature.data4[3]:02X}',
+			'${pdb_info.signature.data4[4]:02X}',
+			'${pdb_info.signature.data4[5]:02X}',
+			'${pdb_info.signature.data4[6]:02X}',
+			'${pdb_info.signature.data4[7]:02X}',
 			'${pdb_info.age:X}',
 		].join(''), pdb_path)
 	}
