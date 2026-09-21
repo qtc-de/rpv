@@ -5,8 +5,7 @@ module win
 
 // GenericAccessRights represents access masks for generic purposes
 @[flag]
-pub enum GenericAccessRights as u32
-{
+pub enum GenericAccessRights as u32 {
 	access0                // 0x00000001
 	access1                // 0x00000002
 	access2                // 0x00000004
@@ -43,8 +42,7 @@ pub enum GenericAccessRights as u32
 
 // FileAccessRights represents access masks used for file access
 @[flag]
-pub enum FileAccessRights as u32
-{
+pub enum FileAccessRights as u32 {
 	read_data              // 0x00000001
 	write_data             // 0x00000002
 	append_data            // 0x00000004
@@ -81,8 +79,7 @@ pub enum FileAccessRights as u32
 
 // ThreadAccessRights represents access masks used for thread access
 @[flag]
-pub enum ThreadAccessRights as u32
-{
+pub enum ThreadAccessRights as u32 {
 	terminate                 // 0x00000001
 	suspend_resume            // 0x00000002
 	alert                     // 0x00000004
@@ -119,8 +116,7 @@ pub enum ThreadAccessRights as u32
 
 // ProcessAccessRights represents access masks used for process access
 @[flag]
-pub enum ProcessAccessRights as u32
-{
+pub enum ProcessAccessRights as u32 {
 	terminate                 // 0x00000001
 	create_thread             // 0x00000002
 	set_session_id            // 0x00000004
@@ -157,8 +153,7 @@ pub enum ProcessAccessRights as u32
 
 // EventAccessRights represents access masks used for event access
 @[flag]
-pub enum EventAccessRights as u32
-{
+pub enum EventAccessRights as u32 {
 	query_state            // 0x00000001
 	modify_state           // 0x00000002
 	access2                // 0x00000004
@@ -195,8 +190,7 @@ pub enum EventAccessRights as u32
 
 // JobAccessRights represents access masks used for job access
 @[flag]
-pub enum JobAccessRights as u32
-{
+pub enum JobAccessRights as u32 {
 	assign_process         // 0x00000001
 	set_attributes         // 0x00000002
 	query                  // 0x00000004
@@ -233,8 +227,7 @@ pub enum JobAccessRights as u32
 
 // MutantAccessRights represents access masks used for mutant access
 @[flag]
-pub enum MutantAccessRights as u32
-{
+pub enum MutantAccessRights as u32 {
 	modify_state           // 0x00000001
 	access1                // 0x00000002
 	access2                // 0x00000004
@@ -271,8 +264,7 @@ pub enum MutantAccessRights as u32
 
 // KeyAccessRights represents access masks used for key access
 @[flag]
-pub enum KeyAccessRights as u32
-{
+pub enum KeyAccessRights as u32 {
 	query_value            // 0x00000001
 	set_value              // 0x00000002
 	create_sub_key         // 0x00000004
@@ -309,8 +301,7 @@ pub enum KeyAccessRights as u32
 
 // SectionAccessRights represents access masks used for section access
 @[flag]
-pub enum SectionAccessRights as u32
-{
+pub enum SectionAccessRights as u32 {
 	query                  // 0x00000001
 	map_write              // 0x00000002
 	map_read               // 0x00000004
@@ -347,8 +338,7 @@ pub enum SectionAccessRights as u32
 
 // SemaphoreAccessRights represents access masks used for semaphore access
 @[flag]
-pub enum SemaphoreAccessRights as u32
-{
+pub enum SemaphoreAccessRights as u32 {
 	query_state            // 0x00000001
 	modify_state           // 0x00000002
 	access2                // 0x00000004
@@ -385,8 +375,7 @@ pub enum SemaphoreAccessRights as u32
 
 // TokenAccessRights represents access masks used for token access
 @[flag]
-pub enum TokenAccessRights as u32
-{
+pub enum TokenAccessRights as u32 {
 	assign_primary         // 0x00000001
 	duplicate              // 0x00000002
 	impersonate            // 0x00000004
@@ -422,4 +411,14 @@ pub enum TokenAccessRights as u32
 }
 
 // AccessRights is a sum type that includes all different type of access rights
-type AccessRights = FileAccessRights | ThreadAccessRights | ProcessAccessRights | EventAccessRights | JobAccessRights | MutantAccessRights | KeyAccessRights | SectionAccessRights | SemaphoreAccessRights | TokenAccessRights | GenericAccessRights
+type AccessRights = FileAccessRights
+	| ThreadAccessRights
+	| ProcessAccessRights
+	| EventAccessRights
+	| JobAccessRights
+	| MutantAccessRights
+	| KeyAccessRights
+	| SectionAccessRights
+	| SemaphoreAccessRights
+	| TokenAccessRights
+	| GenericAccessRights

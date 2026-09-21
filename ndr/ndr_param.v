@@ -9,8 +9,7 @@ module ndr
 // types. However, this caused nondeterministic memory corruptions.
 // We may try this approach in future again.
 @[flag]
-pub enum NdrParamAttrs as u16
-{
+pub enum NdrParamAttrs as u16 {
 	must_size
 	must_free
 	is_pipe
@@ -28,8 +27,7 @@ pub enum NdrParamAttrs as u16
 // NdrBasicParam is the basis struct for each method parameter.
 // It contains the parameter attributes, the underlying NdrType,
 // the offset within the format string and the parameter name.
-pub struct NdrBasicParam
-{
+pub struct NdrBasicParam {
 pub mut:
 	attrs             NdrParamAttrs
 	typ               NdrType = NdrNone{}
@@ -44,17 +42,14 @@ pub mut:
 // time of writing, parameter specific attributes are only
 // [in] and [out]. Other attributes are obtained by calling
 // the attrs method on the inner type.
-pub fn (param NdrBasicParam) attrs() []NdrAttr
-{
+pub fn (param NdrBasicParam) attrs() []NdrAttr {
 	mut attrs := []NdrAttr{}
 
-	if param.attrs.has(.is_in)
-	{
+	if param.attrs.has(.is_in) {
 		attrs << NdrStrAttr{'[in]'}
 	}
 
-	if param.attrs.has(.is_out)
-	{
+	if param.attrs.has(.is_out) {
 		attrs << NdrStrAttr{'[out]'}
 	}
 
@@ -68,17 +63,14 @@ pub fn (param NdrBasicParam) attrs() []NdrAttr
 // an asterisk, if it is a reference type. Afterwards, the param
 // name follows with an optional array suffix, if the underlying
 // param type is an array type.
-pub fn (param NdrBasicParam) format() string
-{
+pub fn (param NdrBasicParam) format() string {
 	mut param_str := param.typ.format()
 
-	if param.attrs.has(.is_simple_ref)
-	{
+	if param.attrs.has(.is_simple_ref) {
 		param_str += '*'
 	}
 
-	if param.name == 'retval'
-	{
+	if param.name == 'retval' {
 		return '${param_str}'
 	}
 
@@ -89,13 +81,13 @@ pub fn (param NdrBasicParam) format() string
 // with the NdrBasicParam. At the time of writing, this comment
 // is only used if the param is the binding handle. In this case
 // the value 'binding' is returned.
-pub fn (param NdrBasicParam) comments() []NdrComment
-{
+pub fn (param NdrBasicParam) comments() []NdrComment {
 	mut comments := param.typ.comments()
 
-	if param.attrs.has(.is_binding)
-	{
-		comments << NdrComment { value: 'binding' }
+	if param.attrs.has(.is_binding) {
+		comments << NdrComment{
+			value: 'binding'
+		}
 	}
 
 	return comments
@@ -105,8 +97,7 @@ pub fn (param NdrBasicParam) comments() []NdrComment
 // used in NdrHandleParam. These flags add more information
 // to the underlying handle.
 @[flag]
-pub enum NdrHandleParamFlags as u8
-{
+pub enum NdrHandleParamFlags as u8 {
 	ndr_context_handle_cannot_be_null
 	ndr_context_handle_serialize
 	ndr_context_handle_noserialize
@@ -121,8 +112,7 @@ pub enum NdrHandleParamFlags as u8
 // It contains some additional attributes like the handle
 // flags and information whether it is a generic or explicit
 // handle.
-pub struct NdrHandleParam
-{
+pub struct NdrHandleParam {
 	NdrBasicParam
 pub mut:
 	flags    NdrHandleParamFlags

@@ -6,8 +6,7 @@ module ndr
 // ComplexType requires the implementing type to have a unique ID, a location
 // where the type has been found in process memory and a get_definition method
 // to obtain the string representation of the ComplexType as defined in IDL.
-pub interface ComplexType
-{
+pub interface ComplexType {
 	id       u32
 	location voidptr
 	get_definition() string
@@ -26,8 +25,7 @@ pub interface ComplexType
 // been encountered within an interface. This allows easy formatting of
 // decompilation results.
 @[heap]
-pub struct TypeCache
-{
+pub struct TypeCache {
 mut:
 	type_map   map[string]NdrType
 	types      []ComplexType
@@ -36,22 +34,16 @@ mut:
 
 // contains checks whether the specified address was already decompiled
 // and is contained inside the TypeCache.
-pub fn (cache TypeCache) contains(addr voidptr) bool
-{
+pub fn (cache TypeCache) contains(addr voidptr) bool {
 	return addr.str() in cache.type_map
 }
 
-pub fn (cache TypeCache) get(addr voidptr)! NdrType
-{
-	return cache.type_map[addr.str()] or
-	{
-		return error('Address ${addr.str()} was not found')
-	}
+pub fn (cache TypeCache) get(addr voidptr) !NdrType {
+	return cache.type_map[addr.str()] or { return error('Address ${addr.str()} was not found') }
 }
 
 // set adds a new address and the associated type to the type cache.
-pub fn (mut cache TypeCache) set(addr voidptr, typ NdrType)
-{
+pub fn (mut cache TypeCache) set(addr voidptr, typ NdrType) {
 	cache.type_map[addr.str()] = typ
 }
 
@@ -63,12 +55,9 @@ pub fn (mut cache TypeCache) set(addr voidptr, typ NdrType)
 // already decompiled, a new number is returned and the counter gets
 // incremented. If the type is already known, it's corresponding id
 // gets returned.
-pub fn (mut cache TypeCache) get_id(addr voidptr) u32
-{
-	for def in cache.types
-	{
-		if def.location == addr
-		{
+pub fn (mut cache TypeCache) get_id(addr voidptr) u32 {
+	for def in cache.types {
+		if def.location == addr {
 			return def.id
 		}
 	}
@@ -80,12 +69,9 @@ pub fn (mut cache TypeCache) get_id(addr voidptr) u32
 // The function first checks whether the complex type already exists within
 // the cache to ensure that the final type list only contains unique types.
 // If this is not the case, the specified complex type is added to the list.
-pub fn (mut cache TypeCache) add_complex(candidate ComplexType)
-{
-	for def in cache.types
-	{
-		if def.location == candidate.location
-		{
+pub fn (mut cache TypeCache) add_complex(candidate ComplexType) {
+	for def in cache.types {
+		if def.location == candidate.location {
 			return
 		}
 	}
@@ -96,7 +82,6 @@ pub fn (mut cache TypeCache) add_complex(candidate ComplexType)
 // get_types returns an array of ComplexType representing all types
 // that have been cached in the TypeCache. This list only contains unique
 // types and can be used to format type information for an interface.
-pub fn (cache TypeCache) get_types() []ComplexType
-{
+pub fn (cache TypeCache) get_types() []ComplexType {
 	return cache.types
 }

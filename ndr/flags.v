@@ -4,8 +4,7 @@ module ndr
 // Especially the has_return value is important for rpv,
 // as it indicates whether a method returns a value.
 @[flag]
-pub enum NdrFlags as u8
-{
+pub enum NdrFlags as u8 {
 	server_must_size
 	client_must_size
 	has_return
@@ -20,8 +19,7 @@ pub enum NdrFlags as u8
 // on how to interpret NDR data. rpv needs this struct to
 // determine how specific NDR types need to be parsed.
 @[flag]
-pub enum NdrInterpreterOptFlags2 as u8
-{
+pub enum NdrInterpreterOptFlags2 as u8 {
 	has_new_corr_desc
 	client_corr_check
 	server_corr_check
@@ -35,8 +33,7 @@ pub enum NdrInterpreterOptFlags2 as u8
 // NdrProcHeaderExts defines the header in front of a RPC
 // method definition. rpv mainly uses it to get access to
 // the NdrInterpreterOptFlags2 struct.
-pub struct NdrProcHeaderExts
-{
+pub struct NdrProcHeaderExts {
 pub:
 	size             u8
 	flags            NdrInterpreterOptFlags2

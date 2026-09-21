@@ -7,8 +7,7 @@ import internals
 // NdrPointer types. These flags add additional information to
 // the pointer that can be used during parsing and formatting.
 @[flag]
-pub enum NdrPointerFlags as u8
-{
+pub enum NdrPointerFlags as u8 {
 	fc_allocate_all_nodes
 	fc_dont_free
 	fc_alloced_on_stack
@@ -23,8 +22,7 @@ pub enum NdrPointerFlags as u8
 // information useful). The ref member represents the NdrType the
 // pointer is referencing to. The flags member contains additional
 // information describing the pointer.
-pub struct NdrPointer
-{
+pub struct NdrPointer {
 	NdrBaseType
 	ref   NdrType
 	flags NdrPointerFlags
@@ -33,10 +31,8 @@ pub struct NdrPointer
 // new creates a new instance of NdrPointer. A constructor for this type was
 // defined, because it is also initialized from other modules which are not able
 // to access the private format property.
-pub fn NdrPointer.new(format NdrFormatChar, ref NdrType, flags NdrPointerFlags) NdrPointer
-{
-	return NdrPointer
-	{
+pub fn NdrPointer.new(format NdrFormatChar, ref NdrType, flags NdrPointerFlags) NdrPointer {
+	return NdrPointer{
 		format: format
 		ref:    ref
 		flags:  flags
@@ -50,44 +46,33 @@ pub fn NdrPointer.new(format NdrFormatChar, ref NdrType, flags NdrPointerFlags) 
 // chained pointers, the pointer specific attributes [unique],
 // [ref] and [ptr] are not added from the referenced pointer type.
 // This causes duplicates, that are not allowed in IDL.
-pub fn (pointer NdrPointer) attrs() []NdrAttr
-{
+pub fn (pointer NdrPointer) attrs() []NdrAttr {
 	mut attrs := []NdrAttr{cap: 1}
 
-	match pointer.NdrBaseType.format
-	{
+	match pointer.NdrBaseType.format {
 		.fc_up { attrs << NdrStrAttr{'[unique]'} }
 		.fc_rp { attrs << NdrStrAttr{'[ref]'} }
 		.fc_fp { attrs << NdrStrAttr{'[ptr]'} }
 		else {}
 	}
 
-	match pointer.ref.format
-	{
-		.fc_char,
-		.fc_cstring,
-		.fc_bstring,
-		.fc_wstring,
-		.fc_c_cstring,
-		.fc_c_bstring,
-		.fc_c_wstring { attrs << NdrStrAttr{'[string]'} }
+	match pointer.ref.format {
+		.fc_char, .fc_cstring, .fc_bstring, .fc_wstring, .fc_c_cstring, .fc_c_bstring,
+		.fc_c_wstring {
+			attrs << NdrStrAttr{'[string]'}
+		}
 		else {}
 	}
 
 	child_attrs := pointer.ref.attrs()
 
-	for attr in child_attrs
-	{
-		match attr
-		{
-			NdrStrAttr
-			{
-				if attr.value in ['[unique]', '[ref]', '[ptr]']
-				{
+	for attr in child_attrs {
+		match attr {
+			NdrStrAttr {
+				if attr.value in ['[unique]', '[ref]', '[ptr]'] {
 					continue
 				}
 			}
-
 			else {}
 		}
 
@@ -100,45 +85,38 @@ pub fn (pointer NdrPointer) attrs() []NdrAttr
 // format returns the string representation of an NdrPointer. This
 // is just the string representation of the referenced type suffixed
 // with an asterisk.
-pub fn (pointer NdrPointer) format() string
-{
+pub fn (pointer NdrPointer) format() string {
 	return '${pointer.ref.format()}*'
 }
 
 // size returns the size of an NdrPointer. This is always the size
 // of a pointer type within the current architecture.
-pub fn (pointer NdrPointer) size() u32
-{
+pub fn (pointer NdrPointer) size() u32 {
 	return sizeof(usize)
 }
 
 // read_pointer attempts to read an NdrPointer at the specified
 // address from process memory.
-pub fn (mut context NdrContext) read_pointer(format NdrFormatChar, mut addr &voidptr)! NdrPointer
-{
+pub fn (mut context NdrContext) read_pointer(format NdrFormatChar, mut addr voidptr) !NdrPointer {
 	flags := context.read[NdrPointerFlags](mut addr)!
 
-	if flags.has(.fc_simple_pointer)
-	{
+	if flags.has(.fc_simple_pointer) {
 		ref_format := context.read[NdrFormatChar](mut addr)!
 		context.read[u8](mut addr)! // padding
 
 		utils.log_debug('  Pointer is simple pointer to: ${ref_format}')
 
-		return NdrPointer
-		{
+		return NdrPointer{
 			format: format
-			ref:    NdrBaseType{ format: ref_format }
+			ref:    NdrBaseType{
+				format: ref_format
+			}
 			flags:  flags
 		}
-	}
-
-	else
-	{
+	} else {
 		ref := context.read_offset(mut addr)!
 
-		return NdrPointer
-		{
+		return NdrPointer{
 			format: format
 			ref:    ref
 			flags:  flags
@@ -149,8 +127,7 @@ pub fn (mut context NdrContext) read_pointer(format NdrFormatChar, mut addr &voi
 // NdrInterfacePointer represents an NDR pointer that is referencing
 // an interface. This type of pointer contains the interface GUID within
 // the iid member and has an associated NdrCorrelationDescriptor.
-pub struct NdrInterfacePointer
-{
+pub struct NdrInterfacePointer {
 	NdrBaseType
 	iid         C.GUID
 	is_constant bool
@@ -159,26 +136,19 @@ pub struct NdrInterfacePointer
 
 // read_interface_pointer attempts to read an NdrInterfacePointer
 // from the specified address in process memory.
-pub fn(mut context NdrContext) read_interface_pointer(mut addr &voidptr)! NdrInterfacePointer
-{
+pub fn (mut context NdrContext) read_interface_pointer(mut addr voidptr) !NdrInterfacePointer {
 	typ := context.read[NdrFormatChar](mut addr)!
 
-	if typ == NdrFormatChar.fc_constant_iid
-	{
+	if typ == NdrFormatChar.fc_constant_iid {
 		iid := context.read[C.GUID](mut addr)!
 
-		return NdrInterfacePointer
-		{
+		return NdrInterfacePointer{
 			format:      NdrFormatChar.fc_ip
 			iid:         iid
 			is_constant: true
 		}
-	}
-
-	else
-	{
-		return NdrInterfacePointer
-		{
+	} else {
+		return NdrInterfacePointer{
 			format:      NdrFormatChar.fc_ip
 			iid:         internals.iid_iunknown
 			is_constant: false
@@ -191,37 +161,31 @@ pub fn(mut context NdrContext) read_interface_pointer(mut addr &voidptr)! NdrInt
 // NdrPointer is unused for this type and the attrs and comments
 // methods need to be re-implemented to include the correlation
 // descriptor.
-pub struct NdrByteCountPointer
-{
+pub struct NdrByteCountPointer {
 	NdrPointer
 	desc MaybeCorrelationDescriptor
 }
 
 // read_byte_count_pointer attempts to read an NdrByteCountPointer
 // at the specified address from process memory.
-pub fn (mut context NdrContext) read_byte_count_pointer(mut addr &voidptr)! NdrByteCountPointer
-{
+pub fn (mut context NdrContext) read_byte_count_pointer(mut addr voidptr) !NdrByteCountPointer {
 	format := context.read[NdrFormatChar](mut addr)!
 
-	match format
-	{
-		.fc_pad
-		{
-			return NdrByteCountPointer
-			{
+	match format {
+		.fc_pad {
+			return NdrByteCountPointer{
 				format: .fc_byte_count_pointer
-				ref:    NdrSimpleType{ format: format }
+				ref:    NdrSimpleType{
+					format: format
+				}
 				desc:   NdrNone{}
 			}
 		}
-
-		else
-		{
+		else {
 			desc := context.read_correlation_descriptor(.fc_byte_count_pointer, mut addr)!
 			ref := context.read_offset(mut addr)!
 
-			return NdrByteCountPointer
-			{
+			return NdrByteCountPointer{
 				format: .fc_byte_count_pointer
 				ref:    ref
 				desc:   desc
@@ -234,8 +198,7 @@ pub fn (mut context NdrContext) read_byte_count_pointer(mut addr &voidptr)! NdrB
 // NdrByteCountPointer. All possible attributes are obtained
 // by calling the attrs method on the potentially contained
 // NdrCorrelationDescriptor.
-pub fn (ptr NdrByteCountPointer) attrs() []NdrAttr
-{
+pub fn (ptr NdrByteCountPointer) attrs() []NdrAttr {
 	return ptr.desc.attrs()
 }
 
@@ -243,7 +206,6 @@ pub fn (ptr NdrByteCountPointer) attrs() []NdrAttr
 // NdrByteCountPointer. All possible comments are obtained
 // by calling the comments method on the potentially contained
 // NdrCorrelationDescriptor.
-pub fn (ptr NdrByteCountPointer) comments() []NdrComment
-{
+pub fn (ptr NdrByteCountPointer) comments() []NdrComment {
 	return ptr.desc.comments()
 }

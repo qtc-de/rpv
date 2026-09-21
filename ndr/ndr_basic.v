@@ -4,8 +4,7 @@ import utils
 
 // NdrFormatChar contains a list of possible types that can be encountered
 // within an NDR type definition.
-pub enum NdrFormatChar as u8
-{
+pub enum NdrFormatChar as u8 {
 	fc_zero                   = u8(0x00)
 	fc_byte                   = u8(0x01)
 	fc_char                   = u8(0x02)
@@ -119,40 +118,59 @@ pub enum NdrFormatChar as u8
 
 // format provides formatting for basic NDR types. This really only applies to
 // basic types, whereas complex type use their own format definitions.
-pub fn (format NdrFormatChar) format() string
-{
-	typ_str := match format
-	{
-		.fc_byte { 'byte' }
-		.fc_c_cstring,
-		.fc_cstring,
-		.fc_char { 'char' }
-		.fc_small,
-		.fc_usmall { 'small' }
-		.fc_wstring,
-		.fc_c_wstring,
-		.fc_wchar { 'wchar_t' }
-		.fc_short,
-		.fc_enum16 { 'short' }
-		.fc_ushort { 'unsigned short' }
-		.fc_long,
-		.fc_enum32 { 'long' }
-		.fc_ulong { 'unsigned long' }
-		.fc_float { 'float' }
-		.fc_hyper { 'hyper' }
-		.fc_double { 'double' }
-		.fc_error_status_t { 'error_status_t' }
-		.fc_ignore,
-		.fc_int3264 { '__int3264' }
-		.fc_uint3264 { 'unsigned __int3264' }
-		.fc_auto_handle,
-		.fc_callback_handle,
-		.fc_bind_primitive,
-		.fc_bind_generic { 'handle_t' }
-		.fc_bind_context,
-		.fc_system_handle { 'void*' }
-
-		else { format.str() }
+pub fn (format NdrFormatChar) format() string {
+	typ_str := match format {
+		.fc_byte {
+			'byte'
+		}
+		.fc_c_cstring, .fc_cstring, .fc_char {
+			'char'
+		}
+		.fc_small, .fc_usmall {
+			'small'
+		}
+		.fc_wstring, .fc_c_wstring, .fc_wchar {
+			'wchar_t'
+		}
+		.fc_short, .fc_enum16 {
+			'short'
+		}
+		.fc_ushort {
+			'unsigned short'
+		}
+		.fc_long, .fc_enum32 {
+			'long'
+		}
+		.fc_ulong {
+			'unsigned long'
+		}
+		.fc_float {
+			'float'
+		}
+		.fc_hyper {
+			'hyper'
+		}
+		.fc_double {
+			'double'
+		}
+		.fc_error_status_t {
+			'error_status_t'
+		}
+		.fc_ignore, .fc_int3264 {
+			'__int3264'
+		}
+		.fc_uint3264 {
+			'unsigned __int3264'
+		}
+		.fc_auto_handle, .fc_callback_handle, .fc_bind_primitive, .fc_bind_generic {
+			'handle_t'
+		}
+		.fc_bind_context, .fc_system_handle {
+			'void*'
+		}
+		else {
+			format.str()
+		}
 	}
 
 	return typ_str
@@ -162,43 +180,37 @@ pub fn (format NdrFormatChar) format() string
 // Some NDR types can have optional additional types associated. To indicate
 // whether they exist or not, rpv uses Maybe structs that fallback to NdrNone
 // if the type is not present.
-pub struct NdrNone
-{
+pub struct NdrNone {
 	NdrBaseType
 }
 
 // NdrNone if an NdrNone type needs to be formatted, it is always displayed as
 // void. This is especially important for methods without return value.
-pub fn (none_type NdrNone) format() string
-{
+pub fn (none_type NdrNone) format() string {
 	return 'void'
 }
 
 // NdrBaseType is the most basic NDR type. It just consists out of a NdrFormatChar.
 // By default, the type is initialized with a format char with value .fc_zero.
-pub struct NdrBaseType
-{
+pub struct NdrBaseType {
 	format NdrFormatChar = .fc_zero
 }
 
 // attrs returns attributes for NdrBaseType. Since NdrBaseType cannot have attributes,
 // the return value is always an empty NdrAttr array.
-pub fn (base_type NdrBaseType) attrs() []NdrAttr
-{
+pub fn (base_type NdrBaseType) attrs() []NdrAttr {
 	return []NdrAttr{}
 }
 
 // comment returns comments associated with the NdrBaseType. This is only used if
 // the underlying NdrFormatChar is an enum, to indicate whether it is enum_16
 // or enum_32.
-pub fn (base_type NdrBaseType) comments() []NdrComment
-{
+pub fn (base_type NdrBaseType) comments() []NdrComment {
 	mut comments := []NdrComment{}
 
-	match base_type.format
-	{
-		.fc_enum16 { comments << NdrComment { 'enum_16' } }
-		.fc_enum32 { comments << NdrComment { 'enum_32' } }
+	match base_type.format {
+		.fc_enum16 { comments << NdrComment{'enum_16'} }
+		.fc_enum32 { comments << NdrComment{'enum_32'} }
 		else {}
 	}
 
@@ -207,58 +219,30 @@ pub fn (base_type NdrBaseType) comments() []NdrComment
 
 // format returns the string representation of an NdrBaseType. This is always
 // the same, as the result of the format method for the underlying NdrFormatChar.
-pub fn (base_type NdrBaseType) format() string
-{
+pub fn (base_type NdrBaseType) format() string {
 	return base_type.format.format()
 }
 
 // size determines the size of the NdrBaseType. This is obviously the same as
 // the size of the underlying NdrFormatChar.
-pub fn (base_type NdrBaseType) size() u32
-{
-	match base_type.format
-	{
-		.fc_byte,
-		.fc_small,
-		.fc_char,
-		.fc_usmall,
-		.fc_c_cstring,
-		.fc_cstring
-		{
+pub fn (base_type NdrBaseType) size() u32 {
+	match base_type.format {
+		.fc_byte, .fc_small, .fc_char, .fc_usmall, .fc_c_cstring, .fc_cstring {
 			return 1
 		}
-
-		.fc_wchar,
-		.fc_short,
-		.fc_ushort
-		{
+		.fc_wchar, .fc_short, .fc_ushort {
 			return 2
 		}
-
-		.fc_long,
-		.fc_ulong,
-		.fc_float,
-		.fc_enum16,
-		.fc_enum32,
-		.fc_error_status_t
-		{
+		.fc_long, .fc_ulong, .fc_float, .fc_enum16, .fc_enum32, .fc_error_status_t {
 			return 4
 		}
-
-		.fc_hyper,
-		.fc_double
-		{
+		.fc_hyper, .fc_double {
 			return 8
 		}
-
-		.fc_int3264,
-		.fc_uint3264
-		{
+		.fc_int3264, .fc_uint3264 {
 			return sizeof(voidptr)
 		}
-
-		else
-		{
+		else {
 			utils.log_debug('Requested size() for non matched format: ${base_type.format}')
 			return 0
 		}
@@ -267,15 +251,13 @@ pub fn (base_type NdrBaseType) size() u32
 
 // NdrUnknownType extends NdrBaseType and is used if the decompilation process found
 // an unknown NdrRepresentation. This should actually not happen and indicates a bug.
-pub struct NdrUnknownType
-{
+pub struct NdrUnknownType {
 	NdrBaseType
 }
 
 // format returns the string representation of NdrUnknownType. Since this type is not
 // meant to be formatted, it returns a string indicating an internal error.
-pub fn (unk_typ NdrUnknownType) format() string
-{
+pub fn (unk_typ NdrUnknownType) format() string {
 	return 'Internal error O.x'
 }
 
@@ -283,23 +265,22 @@ pub fn (unk_typ NdrUnknownType) format() string
 // it was created and whether NdrBaseType could also be used instead. Should be
 // investigated in future. At the first glance, it adds no additional functionality
 // to NdrBaseType.
-pub struct NdrSimpleType
-{
+pub struct NdrSimpleType {
 	NdrBaseType
 }
 
 // new creates a new instance of NdrSimpleType. A constructor for this type was
 // defined, because it is also initialized from other modules which are not able
 // to access the private format property.
-pub fn NdrSimpleType.new(format NdrFormatChar) NdrSimpleType
-{
-	return NdrSimpleType { format: format }
+pub fn NdrSimpleType.new(format NdrFormatChar) NdrSimpleType {
+	return NdrSimpleType{
+		format: format
+	}
 }
 
 // format returns the string representation of NdrSimpleType. This is always the
 // same as the result of calling the format method on the underlying NdrBaseType.
-pub fn (simple_type NdrSimpleType) format() string
-{
+pub fn (simple_type NdrSimpleType) format() string {
 	return simple_type.NdrBaseType.format()
 }
 
@@ -307,8 +288,7 @@ pub fn (simple_type NdrSimpleType) format() string
 // was copied from the type cache implementation of James Forshaw and is probably
 // used to allow the cache to work correctly for recursive type definitions. I
 // think it is currently not fully implemented in rpv. This should be investigated.
-pub struct NdrIndirectTypeReference
-{
+pub struct NdrIndirectTypeReference {
 	NdrBaseType
 }
 
@@ -316,8 +296,7 @@ pub struct NdrIndirectTypeReference
 // is probably not meant to be formatted and an error should be returned. Currently,
 // this function returns the result of the format method, called on the underlying
 // NdrBaseType. Whether this makes sense needs to be investigated.
-pub fn (indirect_type NdrIndirectTypeReference) format() string
-{
+pub fn (indirect_type NdrIndirectTypeReference) format() string {
 	return indirect_type.NdrBaseType.format()
 }
 
@@ -325,53 +304,40 @@ pub fn (indirect_type NdrIndirectTypeReference) format() string
 // makes sure that each NdrType has an underlying NdrFormatChar and that it supports
 // the format, attrs, comments and size methods. These methods are required to create
 // the string representation of the NdrType.
-pub interface NdrType
-{
-	format      NdrFormatChar
-	format()    string
-	attrs()     []NdrAttr
-	comments()  []NdrComment
-	size()      u32
+pub interface NdrType {
+	format NdrFormatChar
+	format() string
+	attrs() []NdrAttr
+	comments() []NdrComment
+	size() u32
 }
 
 // array returns an array modifier if the underlying NdrType is an array type.
 // Corresponding types are expected to contain a length method, that can be used
 // to determine the length of the array. An array with length five returns for
 // example an modifier of [5]. Non array types return an empty modifier.
-pub fn (typ NdrType) array() string
-{
+pub fn (typ NdrType) array() string {
 	mut array_mod := ''
 
-	match typ
-	{
-		NdrBogusArray
-		{
+	match typ {
+		NdrBogusArray {
 			array_mod = '[${typ.length()}]'
 		}
-
-		NdrSimpleArray
-		{
+		NdrSimpleArray {
 			array_mod = '[${typ.length()}]'
 		}
-
-		NdrVaryingArray
-		{
+		NdrVaryingArray {
 			array_mod = '[${typ.length()}]'
 		}
-
-		NdrConformantArray
-		{
+		NdrConformantArray {
 			array_mod = '[${typ.length()}]'
 		}
-
-		else
-		{
+		else {
 			return ''
 		}
 	}
 
-	if array_mod == '[0]'
-	{
+	if array_mod == '[0]' {
 		return '[]'
 	}
 
