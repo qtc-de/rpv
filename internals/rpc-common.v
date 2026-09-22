@@ -212,8 +212,8 @@ pub struct C.MIDL_METHOD_PROPERTY {
 // It is currently not used by rpv.
 @[typedef]
 pub struct C.UUID_VECTOR {
-	count u32
-	uuid  [1]&C.GUID
+	Count u32
+	Uuid  [1]&C.GUID
 }
 
 // C.RPC_SYNTAX_IDENTIFIER is a struct that is used within internal RPC struct definitions.

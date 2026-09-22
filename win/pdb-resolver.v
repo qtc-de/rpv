@@ -69,7 +69,7 @@ pub fn (context PdbResolver) load_symbols(symbol u64) ![]string {
 	symbols_ref := &symbols
 
 	frame := C.IMAGEHLP_STACK_FRAME{
-		instructionOffset: symbol
+		InstructionOffset: symbol
 	}
 
 	if !C.SymSetContext(context.process_handle, &frame, unsafe { nil }) {

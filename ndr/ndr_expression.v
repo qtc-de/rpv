@@ -273,7 +273,7 @@ pub fn (context NdrContext) read_operator_expression(mut addr voidptr) !MaybeExp
 	format := unsafe { NdrFormatChar(offset & 0xff) }
 
 	mut arg_count := 0
-	mut argument_array := []NdrExpression{cap: 3}
+	mut arguments := []NdrExpression{cap: 3}
 
 	match operator {
 		.op_unary_indirection, .op_unary_minus, .op_unary_plus, .op_unary_cast,
@@ -301,13 +301,13 @@ pub fn (context NdrContext) read_operator_expression(mut addr voidptr) !MaybeExp
 				return NdrNone{}
 			}
 			NdrConstantExpression {
-				argument_array << argument
+				arguments << argument
 			}
 			NdrVariableExpression {
-				argument_array << argument
+				arguments << argument
 			}
 			NdrOperatorExpression {
-				argument_array << argument
+				arguments << argument
 			}
 		}
 	}
@@ -317,7 +317,7 @@ pub fn (context NdrContext) read_operator_expression(mut addr voidptr) !MaybeExp
 		operator:  operator
 		format:    format
 		offset:    offset
-		arguments: argument_array
+		arguments: arguments
 	}
 }
 

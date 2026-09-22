@@ -81,7 +81,7 @@ pub fn (mut context NdrContext) read_offset(mut addr voidptr) !NdrType {
 // the cached type is returned. Newly resolved types are automatically
 // added to the type cache.
 pub fn (mut context NdrContext) read_type(offset u16) !NdrType {
-	mut type_offset := unsafe { voidptr(&u8(context.stub_desc.pFormatTypes) + offset) }
+	type_offset := unsafe { voidptr(&u8(context.stub_desc.pFormatTypes) + offset) }
 
 	if context.type_cache.contains(type_offset) {
 		utils.log_debug('Found offset 0x${type_offset} in type cache!')

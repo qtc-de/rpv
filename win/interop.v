@@ -47,7 +47,6 @@ pub type LPDWORD = &u32
 pub type LPSTR = &char
 pub type PSID = &C.SID
 pub type PSID_NAME_USE = &SID_NAME_USE
-pub type INT = int
 pub type UINT = u32
 pub type ULONG = u32
 pub type ULONG64 = u64
@@ -175,16 +174,16 @@ pub struct C.COMM_FAULT_OFFSETS {
 
 @[typedef]
 pub struct C.IMAGEHLP_STACK_FRAME {
-	instructionOffset  ULONG64
-	returnOffset       ULONG64
-	frameOffset        ULONG64
-	stackOffset        ULONG64
-	backingStoreOffset ULONG64
-	funcTableEntry     ULONG64
-	params             [4]ULONG64
-	reserved           [5]ULONG64
-	virtual            BOOL
-	reserved2          ULONG
+	InstructionOffset  ULONG64
+	ReturnOffset       ULONG64
+	FrameOffset        ULONG64
+	StackOffset        ULONG64
+	BackingStoreOffset ULONG64
+	FuncTableEntry     ULONG64
+	Params             [4]ULONG64
+	Reserved           [5]ULONG64
+	Virtual            BOOL
+	Reserved2          ULONG
 }
 
 // C.GUID represents the well known GUID struct from widows. In rpv,
@@ -192,21 +191,21 @@ pub struct C.IMAGEHLP_STACK_FRAME {
 // that all contain GUIDs as part of their internal definition.
 @[typedef]
 pub struct C.GUID {
-	data1 u32
-	data2 u16
-	data3 u16
-	data4 [8]u8
+	Data1 u32
+	Data2 u16
+	Data3 u16
+	Data4 [8]u8
 }
 
 // equals checks whether two C.GUID structs are the same. This can especially
 // be used to compare RPC interfaces to each other.
 pub fn (this C.GUID) equals(other C.GUID) bool {
-	if this.data1 != other.data1 || this.data2 != other.data2 || this.data3 != other.data3 {
+	if this.Data1 != other.Data1 || this.Data2 != other.Data2 || this.Data3 != other.Data3 {
 		return false
 	}
 
 	for ctr := 0; ctr < 8; ctr++ {
-		if this.data4[ctr] != other.data4[ctr] {
+		if this.Data4[ctr] != other.Data4[ctr] {
 			return false
 		}
 	}
@@ -400,25 +399,25 @@ pub struct C.SHFILEINFOA {
 // to obtain the cmdline a process was started with.
 @[typedef]
 pub struct C.PEB {
-	reserved1              [2]BYTE
-	beingDebugged          BYTE
-	reserved2              [1]BYTE
-	reserved3              [2]PVOID
-	ldr                    voidptr
-	processParameters      &C.RTL_USER_PROCESS_PARAMETERS = unsafe { nil }
-	reserved4              [3]PVOID
-	atlThunkSListPtr       PVOID
-	reserved5              PVOID
-	reserved6              ULONG
-	reserved7              PVOID
-	reserved8              ULONG
-	atlThunkSListPtr32     ULONG
-	reserved9              [45]PVOID
-	reserved10             [96]BYTE
-	postProcessInitRoutine voidptr
-	reserved11             [128]BYTE
-	reserved12             [1]PVOID
-	sessionId              ULONG
+	Reserved1              [2]BYTE
+	BeingDebugged          BYTE
+	Reserved2              [1]BYTE
+	Reserved3              [2]PVOID
+	Ldr                    voidptr
+	ProcessParameters      &C.RTL_USER_PROCESS_PARAMETERS = unsafe { nil }
+	Reserved4              [3]PVOID
+	AtlThunkSListPtr       PVOID
+	Reserved5              PVOID
+	Reserved6              ULONG
+	Reserved7              PVOID
+	Reserved8              ULONG
+	AtlThunkSListPtr32     ULONG
+	Reserved9              [45]PVOID
+	Reserved10             [96]BYTE
+	PostProcessInitRoutine voidptr
+	Reserved11             [128]BYTE
+	Reserved12             [1]PVOID
+	SessionId              ULONG
 }
 
 // C.PEB64 is the well known process environment block struct. rpv uses it to
@@ -426,20 +425,20 @@ pub struct C.PEB {
 // struct were defined, as access is only required to the first few fields.
 @[typedef]
 pub struct C.PEB64 {
-	reserved1         [4]BYTE
-	reserved2         [2]u64
-	ldrData           u64
-	processParameters u64
+	Reserved1         [4]BYTE
+	Reserved2         [2]u64
+	LdrData           u64
+	ProcessParameters u64
 }
 
 // C.RTL_USER_PROCESS_PARAMETERS is contained within the PEB structures and
 // can be used to retrieve the cmdline of a process.
 @[typedef]
 pub struct C.RTL_USER_PROCESS_PARAMETERS {
-	reserved1     [16]BYTE
-	reserved2     [10]PVOID
-	imagePathName C.UNICODE_STRING
-	commandLine   C.UNICODE_STRING
+	Reserved1     [16]BYTE
+	Reserved2     [10]PVOID
+	ImagePathName C.UNICODE_STRING
+	CommandLine   C.UNICODE_STRING
 }
 
 // C.RTL_USER_PROCESS_PARAMETERS_WOW64 is contained within the PEB structures and
@@ -447,10 +446,10 @@ pub struct C.RTL_USER_PROCESS_PARAMETERS {
 // is required when accessing an x64 process from a x32 process.
 @[typedef]
 pub struct C.RTL_USER_PROCESS_PARAMETERS_WOW64 {
-	reserved1     [16]BYTE
-	reserved2     [10]u64
-	imagePathName C.UNICODE_STRING_WOW64
-	commandLine   C.UNICODE_STRING_WOW64
+	Reserved1     [16]BYTE
+	Reserved2     [10]u64
+	ImagePathName C.UNICODE_STRING_WOW64
+	CommandLine   C.UNICODE_STRING_WOW64
 }
 
 // C.UNICODE_STRING is a well known struct to represent a unicode string.
@@ -529,8 +528,8 @@ mut:
 @[typedef]
 pub struct C.TOKEN_PRIVILEGES {
 mut:
-	privilegeCount DWORD
-	privileges     [1]C.LUID_AND_ATTRIBUTES
+	PrivilegeCount DWORD
+	Privileges     [1]C.LUID_AND_ATTRIBUTES
 }
 
 // C.TOKEN_USER contains information on the user that is associated with an access
@@ -814,13 +813,13 @@ pub fn adjust_privilege(privilege_name string, enable_privilege bool) ! {
 		return error('LookupPrivilegeValue failed.')
 	}
 
-	token_privilege.privilegeCount = 1
-	token_privilege.privileges[0].Luid = luid
+	token_privilege.PrivilegeCount = 1
+	token_privilege.Privileges[0].Luid = luid
 
 	if enable_privilege {
-		token_privilege.privileges[0].Attributes = C.SE_PRIVILEGE_ENABLED
+		token_privilege.Privileges[0].Attributes = C.SE_PRIVILEGE_ENABLED
 	} else {
-		token_privilege.privileges[0].Attributes = C.SE_PRIVILEGE_REMOVED
+		token_privilege.Privileges[0].Attributes = C.SE_PRIVILEGE_REMOVED
 	}
 
 	if !C.AdjustTokenPrivileges(p_token, false, &token_privilege, 0,
@@ -1199,22 +1198,22 @@ pub fn get_process_cmdline_ha(process_handle HANDLE, arch Arch) !string {
 					return error('Failed to read PEB from: 0x${basic_info.PebBaseAddress}')
 				}
 
-				utils.log_debug('Reading process parameters from 0x${peb.processParameters.hex()}.')
-				if C.NtWow64ReadVirtualMemory64(process_handle, peb.processParameters,
+				utils.log_debug('Reading process parameters from 0x${peb.ProcessParameters.hex()}.')
+				if C.NtWow64ReadVirtualMemory64(process_handle, peb.ProcessParameters,
 					&process_params, sizeof(process_params), u64(&result_size) << 32) != 0 {
-					return error('Failed to read ProcessParameters from: 0x${peb.processParameters.hex()}')
+					return error('Failed to read ProcessParameters from: 0x${peb.ProcessParameters.hex()}')
 				}
 
-				cmdline := malloc(process_params.commandLine.Length)
+				cmdline := malloc(process_params.CommandLine.Length)
 
 				defer {
 					free(cmdline)
 				}
 
-				utils.log_debug('Reading command line from 0x${process_params.commandLine.Buffer.hex()}.')
-				if C.NtWow64ReadVirtualMemory64(process_handle, process_params.commandLine.Buffer,
-					cmdline, process_params.commandLine.Length, u64(&result_size) << 32) != 0 {
-					return error('Failed to read CommandLine from: 0x${process_params.commandLine.Buffer.hex()}')
+				utils.log_debug('Reading command line from 0x${process_params.CommandLine.Buffer.hex()}.')
+				if C.NtWow64ReadVirtualMemory64(process_handle, process_params.CommandLine.Buffer,
+					cmdline, process_params.CommandLine.Length, u64(&result_size) << 32) != 0 {
+					return error('Failed to read CommandLine from: 0x${process_params.CommandLine.Buffer.hex()}')
 				}
 
 				return string_from_wide(cmdline)
@@ -1229,7 +1228,7 @@ pub fn get_process_cmdline_ha(process_handle HANDLE, arch Arch) !string {
 
 	unsafe {
 		utils.log_debug('Obtaining process information via NtQueryInformationProcess.')
-		status := C.NtQueryInformationProcess(process_handle, u32(C.ProcessBasicInformation),
+		status := C.NtQueryInformationProcess(process_handle, C.ProcessBasicInformation,
 			&voidptr(&basic_info), sizeof(C.PROCESS_BASIC_INFORMATION), &result_size)
 
 		if status != C.STATUS_SUCCESS {
@@ -1242,24 +1241,22 @@ pub fn get_process_cmdline_ha(process_handle HANDLE, arch Arch) !string {
 			return error('Failed to read PEB from: 0x${basic_info.PebBaseAddress}')
 		}
 
-		utils.log_debug('Reading process parameters from 0x${&voidptr(peb.processParameters)}.')
-		if !C.ReadProcessMemory(process_handle, peb.processParameters, &process_params,
+		utils.log_debug('Reading process parameters from 0x${&voidptr(peb.ProcessParameters)}.')
+		if !C.ReadProcessMemory(process_handle, peb.ProcessParameters, &process_params,
 			sizeof(C.process_params), &result_size) {
-			return error('Failed to read ProcessParameters from: 0x${peb.processParameters}')
+			return error('Failed to read ProcessParameters from: 0x${peb.ProcessParameters}')
 		}
 
-		cmdline := malloc(process_params.commandLine.Length)
+		cmdline := malloc(process_params.CommandLine.Length)
 
 		defer {
-			unsafe {
-				free(cmdline)
-			}
+			free(cmdline)
 		}
 
-		utils.log_debug('Reading command line from 0x${&voidptr(process_params.commandLine.Buffer)}.')
-		if !C.ReadProcessMemory(process_handle, process_params.commandLine.Buffer, cmdline,
-			process_params.commandLine.Length, &result_size) {
-			return error('Failed to read CommandLine from: 0x${process_params.commandLine.Buffer}')
+		utils.log_debug('Reading command line from 0x${&voidptr(process_params.CommandLine.Buffer)}.')
+		if !C.ReadProcessMemory(process_handle, process_params.CommandLine.Buffer, cmdline,
+			process_params.CommandLine.Length, &result_size) {
+			return error('Failed to read CommandLine from: 0x${process_params.CommandLine.Buffer}')
 		}
 
 		return string_from_wide(cmdline)
@@ -1367,9 +1364,7 @@ pub fn get_rpc_runtime_version() !u64 {
 		buffer := &char(malloc(C.MAX_PATH))
 
 		defer {
-			unsafe {
-				free(buffer)
-			}
+			free(buffer)
 		}
 
 		if C.GetSystemDirectoryA(buffer, C.MAX_PATH) == 0 {
@@ -1387,7 +1382,7 @@ pub fn get_com_interface_name(interface_id C.RPC_IF_ID) !string {
 	key := 'Interface\\{${uuid}}'
 	key_handle := HANDLE(0)
 
-	if C.RegOpenKeyExA(HANDLE(C.HKEY_CLASSES_ROOT), &char(key.str), 0, C.KEY_READ, &key_handle) != C.ERROR_SUCCESS {
+	if C.RegOpenKeyExA(C.HKEY_CLASSES_ROOT, &char(key.str), 0, C.KEY_READ, &key_handle) != C.ERROR_SUCCESS {
 		return error('Unable to open ${key} via RegOpenKeyExA')
 	}
 
@@ -1400,9 +1395,7 @@ pub fn get_com_interface_name(interface_id C.RPC_IF_ID) !string {
 		p_result := &char(malloc(size))
 
 		defer {
-			unsafe {
-				free(p_result)
-			}
+			free(p_result)
 		}
 
 		if C.RegQueryValueExA(key_handle, nil, nil, nil, p_result, &size) != C.ERROR_SUCCESS {
@@ -1480,7 +1473,7 @@ pub fn get_location_info_h(process_handle HANDLE, address voidptr) !LocationInfo
 		unsafe { free(p_buffer) }
 	}
 
-	if C.GetMappedFileNameA(process_handle, address, p_buffer, u32(C.MAX_PATH)) != 0 {
+	if C.GetMappedFileNameA(process_handle, address, p_buffer, C.MAX_PATH) != 0 {
 		location = unsafe { cstring_to_vstring(p_buffer) }
 		drive_mask := C.GetLogicalDrives()
 
@@ -1491,7 +1484,7 @@ pub fn get_location_info_h(process_handle HANDLE, address voidptr) !LocationInfo
 
 			drive := '${u8(65 + ctr).ascii_str()}:'
 
-			if C.QueryDosDeviceA(&char(drive.str), p_buffer, u32(C.MAX_PATH)) == 0 {
+			if C.QueryDosDeviceA(&char(drive.str), p_buffer, C.MAX_PATH) == 0 {
 				continue
 			}
 
@@ -1592,7 +1585,7 @@ pub fn icon_to_bmp(icon HANDLE) !string {
 
 	mut color_bits := []int{len: int(bmi.bmi_header.bv4_size_image)}
 
-	if C.GetDIBits(C.GetDC(unsafe { nil }), icon_info.hbmColor, 0, u32(bmp.bmHeight), color_bits.data,
+	if C.GetDIBits(C.GetDC(unsafe { nil }), icon_info.hbmColor, 0, bmp.bmHeight, color_bits.data,
 		&bmi, C.DIB_RGB_COLORS) == 0 {
 		return error('Unable to obtain bitmap data via GetDIBits')
 	}
@@ -1746,10 +1739,10 @@ pub fn new_guid(guid_str string) !C.GUID {
 	}
 
 	return C.GUID{
-		data1: u32(split[0].parse_uint(16, 32)!)
-		data2: u16(split[1].parse_uint(16, 16)!)
-		data3: u16(split[2].parse_uint(16, 16)!)
-		data4: data4
+		Data1: u32(split[0].parse_uint(16, 32)!)
+		Data2: u16(split[1].parse_uint(16, 16)!)
+		Data3: u16(split[2].parse_uint(16, 16)!)
+		Data4: data4
 	}
 }
 
@@ -1775,9 +1768,9 @@ fn C.GetLastError() DWORD
 fn C.GetLogicalDrives() DWORD
 fn C.GetMappedFileNameA(process_handle HANDLE, addr LPVOID, filename &char, size DWORD) DWORD
 fn C.GetModuleFileNameExA(process_handle HANDLE, module_handle_array HANDLE, filename LPSTR, size DWORD) DWORD
-fn C.GetObject(h HANDLE, c DWORD, pv LPVOID) int
+fn C.GetObject(h HANDLE, c int, pv LPVOID) int
 fn C.GetProcessId(process_handle HANDLE) DWORD
-fn C.GetSystemDirectoryA(buffer LPSTR, size INT) UINT
+fn C.GetSystemDirectoryA(buffer LPSTR, size UINT) UINT
 fn C.GetTokenInformation(token HANDLE, token_information_class TOKEN_INFORMATION_CLASS, token_information voidptr, token_information_length DWORD, return_length &DWORD) bool
 fn C.IsWow64Process(process_handle HANDLE, is_wow64 bool) bool
 fn C.IsWow64Process(process_handle HANDLE, result &BOOL) bool
@@ -1785,7 +1778,7 @@ fn C.LookupAccountSidA(system_name LPCSTR, sid PSID, name LPSTR, name_length LPD
 fn C.LookupPrivilegeValueA(system_name &char, privilege_name &char, luid &C.LUID) bool
 fn C.Module32First(snapshot_handle HANDLE, module_entry &C.MODULEENTRY32) bool
 fn C.Module32Next(snapshot_handle HANDLE, module_entry &C.MODULEENTRY32) bool
-fn C.NtQueryInformationProcess(process_handle HANDLE, process_info_class u32, process_information PVOID, process_information_length ULONG, return_length PULONG) int
+fn C.NtQueryInformationProcess(process_handle HANDLE, process_info_class int, process_information PVOID, process_information_length ULONG, return_length PULONG) int
 fn C.NtWow64QueryInformationProcess64(process_handle HANDLE, process_info_class int, process_information voidptr, process_information_length ULONG, return_length PULONG) int
 fn C.NtWow64ReadVirtualMemory64(handle_process HANDLE, base_address u64, buffer voidptr, size u64, bytes_read &u64) int
 fn C.OpenProcess(desired_access DWORD, inherit_handle bool, pid DWORD) HANDLE
@@ -1798,7 +1791,7 @@ fn C.ReadProcessMemory(handle_process HANDLE, base_address voidptr, buffer voidp
 fn C.RegCloseKey(key_handle HANDLE) int
 fn C.RegOpenKeyExA(key HANDLE, sub_key LPCSTR, options DWORD, acess_type REGSAM, result &HANDLE) int
 fn C.RegQueryValueExA(key_handle HANDLE, value LPCSTR, resv &DWORD, reg_type &DWORD, data LPSTR, length PLONG) int
-fn C.SHGetFileInfoA(path &char, file_attrs DWORD, fileinfo &C.SHFILEINFOA, file_info_size UINT, flags int) bool
+fn C.SHGetFileInfoA(path &char, file_attrs DWORD, fileinfo &C.SHFILEINFOA, file_info_size UINT, flags UINT) bool
 fn C.SymCleanup(process_handle HANDLE)
 fn C.SymFromAddr(process_handle HANDLE, address DWORD64, displacement &DWORD64, symbol &SymbolInfoV) bool
 fn C.SymEnumSymbolsForAddr(process_handle HANDLE, address DWORD64, callback fn (&SymbolInfoV, ULONG), context voidptr) bool

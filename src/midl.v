@@ -310,7 +310,7 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 		context := ndr.NdrContext.new(process_handle, intf.midl_stub_desc, header_exts.flags, mut
 			type_cache)
 
-		mut param_list := []ndr.NdrBasicParam{cap: int(arg_num) + 1}
+		param_list := []ndr.NdrBasicParam{cap: int(arg_num) + 1}
 		utils.log_debug('Parsing ${arg_num} procedure parameters at ${voidptr(intf.midl_stub_desc.pFormatTypes)}.')
 
 		for ctr := 0; ctr < arg_num; ctr++ {
@@ -334,7 +334,7 @@ pub fn (intf RpcInterfaceInfo) decode_method(process_handle win.HANDLE, index in
 
 		mut midl_function := MidlFunction{
 			name:              method.name
-			offset:            usize(method.addr)
+			offset:            method.addr
 			opcode:            index
 			arg_num:           arg_num
 			arg_offset:        usize(ptr)
