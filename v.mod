@@ -8,4 +8,5 @@ Module
     tags: ['rpc', 'rpv', 'rpv-web', 'rpcview']
     description: 'rpv is a v library for analyzing RPC servers and interfaces on the Windows operating system'
     license: 'GPL3'
+    base_url: 'src'
 }
